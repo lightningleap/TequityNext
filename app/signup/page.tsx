@@ -11,18 +11,58 @@ import SignupLogo from "../../public/SignupLogo.svg";
 export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
+
+  const validateEmail = (email: string): boolean => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setEmailError(null);
+
+    // Basic validation
+    if (!email.trim()) {
+      setEmailError('Email is required');
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      // Simulate API call
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          // Simulate random API failure (20% chance)
+          if (Math.random() < 0.2) {
+            reject(new Error('Network error. Please try again.'));
+          } else {
+            resolve(true);
+          }
+        }, 1500);
+      });
 
-    setIsLoading(false);
-    // Navigate to login page after successful signup
-    router.push("/login");
+      // On success
+      setIsSuccess(true);
+      // Show success message for 2 seconds before redirecting
+      setTimeout(() => {
+        router.push("/workspace-setup");
+      }, 2000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleSignIn = () => {
@@ -30,14 +70,20 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex">
-      {/* Left Side - Takes exactly half screen */}
-      <div className="w-1/2 p-2 bg-gray-50 flex items-center justify-center ">
-        <Image src={SignupGraphic} alt="Signup Graphic" className="w-full h-[800px] object-cover rounded-lg" />
+    <div className="h-screen bg-white flex overflow-hidden">
+      {/* Left Side - Image (Hidden on small/medium devices, 50% on large) */}
+      <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
+        <Image
+          src={SignupGraphic}
+          alt="Signup Graphic"
+          fill
+          className="object-cover object-center"
+          priority
+        />
       </div>
 
-      {/* Right Side - Takes exactly half screen with simple form */}
-      <div className="w-1/2 flex items-center justify-center p-12 bg-white">
+      {/* Right Side - Form (Full width on small/medium, 50% on large) */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-white overflow-y-auto">
         <div className="w-full max-w-md space-y-8">
           {/* Simple Header */}
           <Image src={SignupLogo} alt="Signup Logo" />
@@ -78,18 +124,34 @@ export default function SignupPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email address"
-                className="w-full h-12 px-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base transition-colors"
+                className={`w-full h-12 px-4 border ${emailError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base transition-colors`}
                 required
+                disabled={isLoading || isSuccess}
               />
             </div>
 
-            {/* Simple Continue Button */}
+            {/* Error Message */}
+            {(error || emailError) && (
+              <div className="p-3 text-sm text-red-600 bg-red-50 rounded-lg">
+                {error || emailError}
+              </div>
+            )}
+
+            {/* Submit Button */}
             <Button
               onClick={handleSubmit}
-              disabled={!email.trim() || isLoading}
-              className="w-full h-12 bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium text-base transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              disabled={!email.trim() || isLoading || isSuccess}
+              className="w-full h-12 cursor-pointer bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium text-base transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              {isLoading ? "Creating account..." : "Continue"}
+              {isLoading ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating account...
+                </span>
+              ) : isSuccess ? 'Continuing...' : 'Continue'}
             </Button>
 
             {/* Simple Divider */}
@@ -98,7 +160,7 @@ export default function SignupPage() {
             <div className="text-center">
               <Link href="/login">
                 <span className="text-base text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                  Already have an account? Log in
+                  Already have an account? <span className="text-gray-900 font-medium">Log in</span>
                 </span>
               </Link>
             </div>

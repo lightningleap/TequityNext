@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import CompanyLogo from "@/public/CompanyLogo.svg";
+import CompanyLogo from "@/public/SignupLogo.svg";
 import Image from "next/image";
 
 export default function WorkspaceSetupStep3Page() {
@@ -40,18 +40,8 @@ export default function WorkspaceSetupStep3Page() {
       {/* Main Container */}
       <div className="flex flex-col gap-8">
         {/* Company Logo */}
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-pink-500 rounded-xl flex items-center justify-center shadow-lg relative overflow-hidden">
-            {/* Logo background gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-pink-600/20" />
-            <Image
-              src={CompanyLogo}
-              alt="Company Logo"
-              width={20}
-              height={20}
-              className="relative z-10 brightness-0 invert"
-            />
-          </div>
+        <div>
+          <Image src={CompanyLogo} alt="Company Logo" width={60} height={40} />
         </div>
 
         {/* Heading Section */}
@@ -74,7 +64,7 @@ export default function WorkspaceSetupStep3Page() {
                 type="email"
                 value={email1}
                 onChange={(e) => setEmail1(e.target.value)}
-                placeholder="Enter email address"
+                placeholder="email@example.com"
                 className="w-full h-10 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
               />
             </div>
@@ -85,7 +75,7 @@ export default function WorkspaceSetupStep3Page() {
                 type="email"
                 value={email2}
                 onChange={(e) => setEmail2(e.target.value)}
-                placeholder="Enter email address"
+                placeholder="email@example.com"
                 className="w-full h-10 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
               />
             </div>
@@ -96,7 +86,7 @@ export default function WorkspaceSetupStep3Page() {
                 type="email"
                 value={email3}
                 onChange={(e) => setEmail3(e.target.value)}
-                placeholder="Enter email address"
+                placeholder="email@example.com"
                 className="w-full h-10 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
               />
             </div>
@@ -106,9 +96,9 @@ export default function WorkspaceSetupStep3Page() {
           <Button
             onClick={handleSubmit}
             disabled={isLoading}
-            className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-11 cursor-pointer bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? "Sending invitations..." : "Send Invitations"}
+            {isLoading ? "Sending invitations..." : "Send Invites"}
           </Button>
 
           {/* Secondary Buttons */}

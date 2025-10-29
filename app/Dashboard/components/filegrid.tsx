@@ -10,23 +10,67 @@ const formatFileSize = (bytes: number = 0): string => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 };
 
+export type FileType = 
+  | 'PDF' | 'DOCX' | 'DOC' | 'XLSX' | 'XLS' | 'PPTX' | 'PPT' 
+  | 'JPG' | 'JPEG' | 'PNG' | 'GIF' | 'SVG' | 'MP4' | 'MOV' | 'AVI' | 'WMV'
+  | 'MP3' | 'WAV' | 'AAC' | 'OGG' | 'WMA' | 'ZIP' | 'RAR' | '7Z' | 'TAR' | 'GZ'
+  | 'CSV' | 'TXT' | 'FOLDER';
+
 export type FileItem = {
   name: string;
-  type: "PDF" | "DOCX" | "XLSX" | "PPTX" | "PNG" | "MP4" | "CSV" | "TXT";
+  type: FileType;
   size?: number;
   uploadedAt?: Date;
   id?: string;
+  url?: string;
+  files?: FileItem[]; // For folders containing files
 };
 
-const typeTone: Record<FileItem["type"], string> = {
-  PDF: "bg-[oklch(var(--destructive))]/15 text-[oklch(var(--destructive))]",
-  DOCX: "bg-[oklch(var(--chart-2))]/15 text-[oklch(var(--chart-2))]",
-  XLSX: "bg-[oklch(var(--chart-5))]/15 text-[oklch(var(--chart-5))]",
-  PPTX: "bg-[oklch(var(--chart-4))]/15 text-[oklch(var(--chart-4))]",
-  PNG: "bg-[oklch(var(--chart-3))]/15 text-[oklch(var(--chart-3))]",
-  MP4: "bg-accent text-accent-foreground",
-  CSV: "bg-secondary text-secondary-foreground",
-  TXT: "bg-muted text-muted-foreground",
+const typeTone: Record<FileType, string> = {
+  // Document types
+  PDF: "bg-red-100 text-red-600",
+  DOCX: "bg-blue-100 text-blue-600",
+  DOC: "bg-blue-100 text-blue-600",
+  TXT: "bg-gray-100 text-gray-600",
+  
+  // Spreadsheet types
+  XLSX: "bg-green-100 text-green-600",
+  XLS: "bg-green-100 text-green-600",
+  CSV: "bg-green-100 text-green-600",
+  
+  // Presentation types
+  PPTX: "bg-orange-100 text-orange-600",
+  PPT: "bg-orange-100 text-orange-600",
+  
+  // Image types
+  JPG: "bg-purple-100 text-purple-600",
+  JPEG: "bg-purple-100 text-purple-600",
+  PNG: "bg-purple-100 text-purple-600",
+  GIF: "bg-purple-100 text-purple-600",
+  SVG: "bg-purple-100 text-purple-600",
+  
+  // Video types
+  MP4: "bg-pink-100 text-pink-600",
+  MOV: "bg-pink-100 text-pink-600",
+  AVI: "bg-pink-100 text-pink-600",
+  WMV: "bg-pink-100 text-pink-600",
+  
+  // Audio types
+  MP3: "bg-indigo-100 text-indigo-600",
+  WAV: "bg-indigo-100 text-indigo-600",
+  AAC: "bg-indigo-100 text-indigo-600",
+  OGG: "bg-indigo-100 text-indigo-600",
+  WMA: "bg-indigo-100 text-indigo-600",
+  
+  // Archive types
+  ZIP: "bg-amber-100 text-amber-600",
+  RAR: "bg-amber-100 text-amber-600",
+  '7Z': "bg-amber-100 text-amber-600",
+  TAR: "bg-amber-100 text-amber-600",
+  GZ: "bg-amber-100 text-amber-600",
+  
+  // Special types
+  FOLDER: "bg-blue-50 text-blue-600"
 };
 
 interface FileGridProps {
