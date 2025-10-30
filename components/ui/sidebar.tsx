@@ -36,8 +36,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { CiSearch } from "react-icons/ci";
-import sparkles from "../../public/sparkles.svg";
-import Image from "next/image";
+import { Sparkles } from "lucide-react";
 import { MdOutlineFolderCopy } from "react-icons/md";
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -153,7 +152,7 @@ function SidebarProvider({
             } as React.CSSProperties
           }
           className={cn(
-            "group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh w-full",
+            "group/sidebar-wrapper has-data-[variant=inset]:bg-white flex min-h-svh w-full",
             className
           )}
           {...props}
@@ -184,9 +183,15 @@ function Sidebar({
       <div
         data-slot="sidebar"
         className={cn(
-          "bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col",
+          "bg-white text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col",
           className
         )}
+        onClick={(e) => {
+          // Prevent click propagation when sidebar is collapsed
+          if (state === 'collapsed') {
+            e.stopPropagation();
+          }
+        }}
         {...props}
       >
         {children}
@@ -201,7 +206,7 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
+          className="bg-white text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -219,6 +224,13 @@ function Sidebar({
     );
   }
 
+  const handleSidebarClick = (e: React.MouseEvent) => {
+    // Prevent click propagation when sidebar is collapsed
+    if (state === 'collapsed') {
+      e.stopPropagation();
+    }
+  };
+
   return (
     <div
       className="group peer text-sidebar-foreground hidden md:block"
@@ -227,6 +239,7 @@ function Sidebar({
       data-variant={variant}
       data-side={side}
       data-slot="sidebar"
+      onClick={handleSidebarClick}
     >
       {/* This is what handles the sidebar gap on desktop */}
       <div
@@ -258,7 +271,7 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
+          className="bg-white group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
         >
           {children}
         </div>
@@ -269,37 +282,100 @@ function Sidebar({
 
 function SidebarMenuItems() {
   const pathname = usePathname();
+  const { state } = useSidebar();
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
 
   const navItems = [
     {
-      title: "Search",
-      icon: <CiSearch className="h-4 w-4" />,
-      href: "/Dashboard",
-    },
-    {
       title: "Tequity AI",
-      icon: <Image src={sparkles} alt="" className="h-4 w-4" />,
+      icon: <Sparkles className="h-4 w-4 flex-shrink-0" />,
       href: "/Dashboard/chat",
     },
     {
       title: "Library",
-      icon: <MdOutlineFolderCopy className="h-4 w-4" />,
-      href: "/library",
+      icon: <MdOutlineFolderCopy width={15} height={15} className="flex-shrink-0" />,
+      href: "/Dashboard/Library",
     },
   ];
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Search query:", searchQuery);
+    // You can add search logic here
+  };
+
   return (
-    <SidebarMenu>
+    <SidebarMenu className="space-y-0.5 mt-3 mb-3">
+      {/* Search Item - Special interactive input */}
+      <SidebarMenuItem className="py-0.5">
+        {state === "collapsed" ? (
+          <SidebarMenuButton
+            asChild
+            isActive={pathname === "/Dashboard"}
+            className={`w-full justify-start py-2 group-data-[collapsible=icon]:justify-center ${
+              pathname === "/Dashboard" ? 'bg-[#F4F4F5]' : ''
+            }`}
+          >
+            <Link href="/Dashboard" className="flex items-center gap-3 w-full">
+              <span className="flex items-center justify-center w-8 h-8 flex-shrink-0">
+                <CiSearch width={15} height={15} className="flex-shrink-0" />
+              </span>
+            </Link>
+          </SidebarMenuButton>
+        ) : (
+          <div
+            className={`w-full px-2 ${
+              pathname === "/Dashboard" ? 'bg-[#F4F4F5] rounded-md' : ''
+            }`}
+          >
+            <form onSubmit={handleSearchSubmit} className="relative">
+              <div className="flex items-center gap-3 bg-white px-2 py-1.5 focus-within:border-gray-400 transition-colors rounded">
+                <CiSearch width={17} height={17} className="flex-shrink-0 text-black" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search..."
+                  className="flex-1 text-sm outline-none bg-transparent text-black"
+                />
+              </div>
+            </form>
+          </div>
+        )}
+      </SidebarMenuItem>
+
+      {/* Regular Navigation Items */}
       {navItems.map((item) => (
-        <SidebarMenuItem key={item.href}>
+        <SidebarMenuItem key={item.href} className="py-0.5">
           <SidebarMenuButton
             asChild
             isActive={pathname === item.href}
-            className="w-full justify-start py-6"
+            className={`w-full justify-start py-2 group-data-[collapsible=icon]:justify-center ${
+              pathname === item.href ? 'bg-[#F4F4F5]' : ''
+            }`}
+            onClick={(e: React.MouseEvent) => {
+              if (state === 'collapsed') {
+                e.preventDefault();
+                e.stopPropagation();
+                // Navigate programmatically instead of using the Link's default behavior
+                window.location.href = item.href;
+              }
+            }}
           >
-            <Link href={item.href}>
-              <span className="mr-2">{item.icon}</span>
-              <span>{item.title}</span>
+            <Link 
+              href={item.href} 
+              className="flex items-center gap-3 w-full"
+              onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                if (state === 'collapsed') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }
+              }}
+            >
+              <span className="flex items-center justify-center w-8 h-8 flex-shrink-0">{item.icon}</span>
+              <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
@@ -511,7 +587,7 @@ function SidebarMenu({ className, ...props }: React.ComponentProps<"ul">) {
     <ul
       data-slot="sidebar-menu"
       data-sidebar="menu"
-      className={cn("flex w-full min-w-0 flex-col gap-1 ml-4", className)}
+      className={cn("flex w-full min-w-0 flex-col gap-1 px-4 group-data-[collapsible=icon]:px-2", className)}
       {...props}
     />
   );
@@ -529,12 +605,12 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-colors text-foreground/80 hover:text-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:text-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+  "peer/menu-button flex w-full items-center gap-1.5 overflow-hidden rounded-md p-1.5 text-left text-sm outline-none ring-sidebar-ring transition-colors text-foreground/80 disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-6 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:text-foreground group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1.5! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "hover:bg-transparent font-normal",
-        outline: "hover:bg-transparent font-normal",
+        default: "font-normal",
+        outline: "font-normal",
       },
       size: {
         default: "h-8",
@@ -564,6 +640,17 @@ function SidebarMenuButton({
   const Comp = asChild ? Slot : "button";
   const { isMobile, state } = useSidebar();
 
+  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
+    // Prevent click propagation when sidebar is collapsed
+    if (state === 'collapsed') {
+      e.stopPropagation();
+    }
+    // Call the original onClick handler if it exists
+    if (props.onClick) {
+      props.onClick(e as React.MouseEvent<HTMLButtonElement>);
+    }
+  };
+
   const button = (
     <Comp
       data-slot="sidebar-menu-button"
@@ -571,6 +658,7 @@ function SidebarMenuButton({
       data-size={size}
       data-active={isActive}
       className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+      onClick={handleClick}
       {...props}
     />
   );

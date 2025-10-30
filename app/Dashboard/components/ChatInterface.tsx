@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { X, FileText } from "lucide-react";
+import { X, FileText, Plus, AtSign, ArrowUp, File, Folder, Image as ImageIcon, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useChatContext } from "../context/ChatContext";
 
 export interface FileItem {
   id: string;
@@ -16,6 +17,8 @@ export interface FileItem {
 interface ChatInterfaceProps {
   selectedFile: FileItem | null;
   onClose?: () => void;
+  onNewChat?: () => void;
+  key?: string | number; // Add key to the interface
 }
 
 const formatFileSize = (bytes: number): string => {
@@ -27,12 +30,29 @@ const formatFileSize = (bytes: number): string => {
 export function ChatInterface({
   selectedFile,
   onClose,
+  onNewChat,
 }: ChatInterfaceProps) {
-  const [messages, setMessages] = useState<
-    Array<{ text: string; isUser: boolean }>
-  >([]);
+  const { activeChat, activeChatId, createNewChat, addMessageToChat } = useChatContext();
   const [inputValue, setInputValue] = useState("");
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const folderInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [uploadMode, setUploadMode] = useState<"files" | "folder">("files");
+  const [showUploadMenu, setShowUploadMenu] = useState(false);
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const uploadMenuRef = useRef<HTMLDivElement>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
+
+  // Create a new chat if none exists
+  useEffect(() => {
+    if (!activeChatId) {
+      createNewChat();
+    }
+  }, []);
+
+  const messages = activeChat?.messages || [];
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -42,20 +62,110 @@ export function ChatInterface({
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (uploadMenuRef.current && !uploadMenuRef.current.contains(event.target as Node)) {
+        setShowUploadMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputValue.trim()) {
-      // Add user message
-      setMessages(prev => [...prev, { text: inputValue, isUser: true }]);
+    if (!activeChatId) return;
+
+    if (inputValue.trim() || attachedFiles.length > 0) {
+      // Add user message with files
+      const userMessage = {
+        text: inputValue || "Uploaded files",
+        isUser: true,
+        timestamp: new Date(),
+        files: attachedFiles.length > 0 ? [...attachedFiles] : undefined
+      };
+      addMessageToChat(activeChatId, userMessage);
 
       // Simulate AI response
       setTimeout(() => {
         const aiResponse = generateAIResponse();
-        setMessages(prev => [...prev, { text: aiResponse, isUser: false }]);
+        const aiMessage = {
+          text: aiResponse,
+          isUser: false,
+          timestamp: new Date(),
+        };
+        addMessageToChat(activeChatId, aiMessage);
       }, 1000);
 
       setInputValue("");
+      setAttachedFiles([]);
     }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newFiles = Array.from(e.target.files);
+      setAttachedFiles(prev => [...prev, ...newFiles]);
+    }
+  };
+
+  const handleUploadClick = (e: React.MouseEvent) => {
+    console.log('+ button clicked');
+    e.preventDefault();
+    e.stopPropagation();
+
+    // If modifier key is pressed, show the upload menu
+    if (e.shiftKey || e.ctrlKey || e.metaKey) {
+      console.log('Modifier key detected, showing upload menu');
+      setShowUploadMenu(!showUploadMenu);
+    } else {
+      // Otherwise, create a new chat
+      console.log('Creating new chat');
+      setInputValue('');
+      setAttachedFiles([]);
+      setShowUploadMenu(false);
+
+      // Call the parent's onNewChat handler if provided
+      if (onNewChat) {
+        console.log('Calling onNewChat handler');
+        onNewChat();
+      }
+    }
+  };
+  
+  // Handle click outside to close the menus
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (uploadMenuRef.current && !uploadMenuRef.current.contains(event.target as Node)) {
+        setShowUploadMenu(false);
+      }
+      if (contextMenuRef.current && !contextMenuRef.current.contains(event.target as Node)) {
+        setShowContextMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleFileUpload = (type: "files" | "folder" | "image") => {
+    setShowUploadMenu(false);
+    if (type === "files") {
+      fileInputRef.current?.click();
+    } else if (type === "folder") {
+      folderInputRef.current?.click();
+    } else if (type === "image") {
+      imageInputRef.current?.click();
+    }
+  };
+
+  const removeAttachedFile = (index: number) => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const generateAIResponse = (): string => {
@@ -70,21 +180,8 @@ export function ChatInterface({
   };
 
   return (
-    <div className="h-full bg-white flex flex-col">
-      <div className="bg-black text-white p-4 flex justify-between items-center">
-        <h2 className="font-medium">Chat Assistant</h2>
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="text-gray-300 hover:text-white"
-            aria-label="Close chat"
-          >
-            <X size={20} />
-          </button>
-        )}
-      </div>
-
-      <div className="flex-1 p-4 overflow-y-auto bg-white">
+    <div className="h-full bg-white flex flex-col items-center">
+      <div className="flex-1 max-w-[792px] w-full p-4 overflow-y-auto bg-white">
         {selectedFile ? (
           <div className="mb-4 p-4 border rounded-lg">
             <div className="flex items-center gap-3 mb-4">
@@ -114,7 +211,7 @@ export function ChatInterface({
               </div>
             )}
           </div>
-        ) : (
+        ) : messages.length === 0 ? (
           <div className="mb-4 p-4 border rounded-lg bg-gray-50">
             <div className="text-center">
               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -141,11 +238,11 @@ export function ChatInterface({
               </p>
             </div>
           </div>
-        )}
+        ) : null}
 
         {/* Messages Display Area */}
         {messages.length > 0 && (
-          <div className="mb-4 space-y-3 min-h-[200px] overflow-y-auto">
+          <div className="space-y-3">
             {messages.map((message, index) => (
               <div
                 key={index}
@@ -159,28 +256,229 @@ export function ChatInterface({
                   }`}
                 >
                   <p className="text-sm">{message.text}</p>
+                  {message.files && message.files.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {message.files.map((file, fileIndex) => (
+                        <div
+                          key={fileIndex}
+                          className={`flex items-center gap-2 text-xs px-2 py-1 rounded ${
+                            message.isUser
+                              ? 'bg-blue-500'
+                              : 'bg-gray-200 text-gray-700'
+                          }`}
+                        >
+                          <FileText className="h-3 w-3" />
+                          <span className="truncate">{file.name}</span>
+                          <span>({formatFileSize(file.size)})</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
             <div ref={messagesEndRef} />
           </div>
         )}
+      </div>
 
-        <form onSubmit={handleSendMessage} className="border-t border-gray-200 pt-4">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder={
-                selectedFile ? "Ask about this file..." : "Type a message..."
-              }
-              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <Button type="submit" size="sm" disabled={!inputValue.trim()}>
-              Send
-            </Button>
+      {/* Input at bottom */}
+      <div className="border-t border-gray-200 p-4 bg-white w-full flex justify-center">
+        <form onSubmit={handleSendMessage} className="max-w-[792px] w-full">
+          <div className="rounded-lg border border-gray-300 p-3">
+            {/* Attached Files Preview */}
+            {attachedFiles.length > 0 && (
+              <div className="mb-2 flex flex-wrap gap-2">
+                {attachedFiles.map((file, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 bg-gray-100 rounded px-2 py-1 text-xs"
+                  >
+                    <FileText className="h-3 w-3 text-gray-600" />
+                    <span className="truncate max-w-[150px]">{file.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeAttachedFile(index)}
+                      className="text-gray-500 hover:text-gray-700"
+                      aria-label="Remove file"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 mb-2">
+              <input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder="Need quick insights..."
+                className="flex-1 outline-none text-sm"
+              />
+              <button
+                type="submit"
+                disabled={!inputValue.trim() && attachedFiles.length === 0}
+                className="flex items-center justify-center w-8 h-8 rounded-md bg-black text-white hover:bg-black disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                aria-label="Send message"
+              >
+                <ArrowUp className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="flex gap-2 relative">
+              <div ref={uploadMenuRef} className="relative">
+                <button
+                  type="button"
+                  onClick={handleUploadClick}
+                  className="flex items-center bg-[#FFFFFF] border-gray-200 border justify-center w-8 h-8 rounded-md text-gray-600 hover:bg-gray-100 transition-colors"
+                  aria-label="New chat"
+                  title="New chat"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+
+                {/* Upload Dropdown Menu */}
+                {showUploadMenu && (
+                  <div className="absolute bottom-full left-0 mb-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    <div className="py-1">
+                      <button
+                        type="button"
+                        onClick={() => handleFileUpload("files")}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        <File className="h-4 w-4 text-blue-600" />
+                        <span>Upload Files</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleFileUpload("folder")}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        <Folder className="h-4 w-4 text-orange-600" />
+                        <span>Upload Folder</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleFileUpload("image")}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        <ImageIcon className="h-4 w-4 text-purple-600" />
+                        <span>Upload Images</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div ref={contextMenuRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowContextMenu(!showContextMenu)}
+                  className="flex bg-[#FFFFFF] border-gray-200 border items-center gap-1 px-2 h-8 rounded-md text-gray-600 hover:bg-gray-100 transition-colors text-sm"
+                  aria-label="Add context"
+                >
+                  <AtSign className="h-3.5 w-3.5" />
+                  <span>Add context</span>
+                </button>
+
+                {/* Context Dropdown Menu */}
+                {showContextMenu && (
+                  <div className="absolute bottom-full left-0 mb-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    <div className="py-1">
+                      <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-100">
+                        Previous Chats
+                      </div>
+                      {messages.length > 0 ? (
+                        messages
+                          .filter(msg => msg.isUser)
+                          .slice(0, 3)
+                          .map((msg, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => {
+                                setInputValue(prev => prev ? `${prev} ${msg.text}` : msg.text);
+                                setShowContextMenu(false);
+                              }}
+                              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors truncate"
+                              title={msg.text}
+                            >
+                              {msg.text.length > 30 ? `${msg.text.substring(0, 30)}...` : msg.text}
+                            </button>
+                          ))
+                      ) : (
+                        <div className="px-4 py-2 text-sm text-gray-500">No previous chats</div>
+                      )}
+                      <div className="border-t border-gray-100 my-1"></div>
+                      <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-100">
+                        Upload Options
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleFileUpload("files");
+                          setShowContextMenu(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        <File className="h-4 w-4 text-blue-600" />
+                        <span>Upload Files</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleFileUpload("folder");
+                          setShowContextMenu(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        <Folder className="h-4 w-4 text-orange-600" />
+                        <span>Upload Folder</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleFileUpload("image");
+                          setShowContextMenu(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        <ImageIcon className="h-4 w-4 text-purple-600" />
+                        <span>Upload Images</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
+
+          {/* Hidden file inputs */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            onChange={handleFileChange}
+            className="hidden"
+            accept=".pdf,.doc,.docx,.txt,.csv,.xlsx,.pptx"
+          />
+          <input
+            ref={folderInputRef}
+            type="file"
+            multiple
+            onChange={handleFileChange}
+            className="hidden"
+            {...({ webkitdirectory: "", directory: "" } as any)}
+          />
+          <input
+            ref={imageInputRef}
+            type="file"
+            multiple
+            onChange={handleFileChange}
+            className="hidden"
+            accept="image/*"
+          />
         </form>
       </div>
     </div>

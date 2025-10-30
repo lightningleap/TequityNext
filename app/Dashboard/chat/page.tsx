@@ -1,62 +1,59 @@
 "use client";
 
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { Sidebar } from "@/components/ui/sidebar";
-import { SidebarMenuItems } from "@/components/ui/sidebar";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Breadcrumb } from "@/components/ui/breadcrumb";
-import { ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import CompanyLogo from "@/public/CompanyLogo.svg";
-import Image from "next/image";
+import { useState, useEffect } from "react";
+import { Share2 } from "lucide-react";
 import { ChatInterface } from "../components/ChatInterface";
+import { DashboardLayout } from "../components/DashboardLayout";
+import { useChatContext } from "../context/ChatContext";
 
 export default function ChatPage() {
+  const { activeChat, activeChatId, createNewChat, chats } = useChatContext();
+  const [chatTitle, setChatTitle] = useState<string>("Tequity AI");
+
+  // Update title when active chat changes
+  useEffect(() => {
+    if (activeChat && activeChat.title !== "New Chat") {
+      // Only change title if it's not "New Chat"
+      setChatTitle(activeChat.title);
+    } else {
+      // Keep "Tequity AI" as default
+      setChatTitle("Tequity AI");
+    }
+  }, [activeChat]);
+
+  const handleNewChat = () => {
+    console.log('New chat requested');
+    createNewChat();
+  };
+
+  const handleChatSelect = (chatId: string) => {
+    // Title will update automatically via useEffect
+  };
+
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="flex h-screen w-full flex-col">
-        <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 dark:border-gray-800/50 dark:bg-[#111111]">
-          <div className="flex items-center gap-3">
-            <SidebarTrigger />
-            <Breadcrumb />
-            <Button variant="ghost" className="flex items-center gap-2">
-              Tequity AI
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </div>
-        </header>
-
-        <div className="flex-1 flex overflow-hidden relative">
-          <Sidebar
-            side="left"
-            variant="sidebar"
-            collapsible="icon"
-            className="flex-shrink-0"
+    <DashboardLayout
+      title={chatTitle}
+      headerActions={
+        <div className="flex items-center gap-2">
+          <button
+            className="flex items-center gap-2 bg-[#F4F4F5] hover:bg-gray-200 text-gray-700 hover:text-gray-900 transition-colors px-3 py-3 rounded-md"
+            title="Share"
           >
-            <div className="flex items-center gap-3 px-4 py-2">
-              <Image
-                src={CompanyLogo}
-                alt="Company Logo"
-                width={32}
-                height={32}
-                priority
-                className="flex-shrink-0"
-              />
-              <p className="text-balance text-xl font-semibold tracking-tight whitespace-nowrap">
-                LLA&apos;s DATAROOM
-              </p>
-            </div>
-            <SidebarMenuItems />
-            <hr className="my-4" />
-          </Sidebar>
-
-          <main className="flex-1 overflow-hidden">
-            <ChatInterface
-              selectedFile={null}
-            />
-          </main>
+            <Share2 className="h-4 w-4" />
+            <span className="text-sm font-medium">Share</span>
+          </button>
         </div>
-      </div>
-    </SidebarProvider>
+      }
+      activeChatId={activeChatId || undefined}
+      onChatSelect={handleChatSelect}
+    >
+      <main className="flex-1 overflow-hidden">
+        <ChatInterface
+          key={activeChatId || 'new'} // This forces a remount when chat changes
+          selectedFile={null}
+          onNewChat={handleNewChat}
+        />
+      </main>
+    </DashboardLayout>
   );
 }

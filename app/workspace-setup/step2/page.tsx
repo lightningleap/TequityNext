@@ -4,11 +4,19 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import CompanyLogo from "@/public/CompanyLogo.svg";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown, Check } from "lucide-react";
+import CompanyLogo from "@/public/SignupLogo.svg";
 import Image from "next/image";
 
 export default function WorkspaceSetupStep2Page() {
   const [selectedOption, setSelectedOption] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -25,12 +33,12 @@ export default function WorkspaceSetupStep2Page() {
   };
 
   const options = [
-    "M&A Deal",
-    "Fundraising",
-    "Investor Reporting",
-    "Board Pack",
-    "Due Diligence",
-    "Other"
+    { value: "m&a", label: "M&A Deal" },
+    { value: "fundraising", label: "Fundraising" },
+    { value: "investor", label: "Investor Reporting" },
+    { value: "board", label: "Board Pack" },
+    { value: "diligence", label: "Due Diligence" },
+    { value: "other", label: "Other" }
   ];
 
   return (
@@ -38,18 +46,8 @@ export default function WorkspaceSetupStep2Page() {
       {/* Main Container */}
       <div className="flex flex-col gap-8">
         {/* Company Logo */}
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-pink-500 rounded-xl flex items-center justify-center shadow-lg relative overflow-hidden">
-            {/* Logo background gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-pink-600/20" />
-            <Image
-              src={CompanyLogo}
-              alt="Company Logo"
-              width={20}
-              height={20}
-              className="relative z-10 brightness-0 invert"
-            />
-          </div>
+        <div>
+          <Image src={CompanyLogo} alt="Company Logo" width={60} height={40} />
         </div>
 
         {/* Heading Section */}
@@ -64,36 +62,45 @@ export default function WorkspaceSetupStep2Page() {
 
         {/* Form Fields */}
         <div className="space-y-5 flex-1 flex flex-col justify-between">
-          {/* Dropdown Selection */}
+          {/* Custom Dropdown */}
           <div className="space-y-2">
-            <div className="relative">
-              <select
-                value={selectedOption}
-                onChange={(e) => setSelectedOption(e.target.value)}
-                className="w-full h-10 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors appearance-none bg-white"
-                required
-              >
-                <option value="">Select an option</option>
+            <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-between h-10 px-3 border border-gray-300 rounded-lg hover:bg-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
+                >
+                  {selectedOption ? 
+                    options.find(opt => opt.value === selectedOption)?.label : 
+                    'Select an option'}
+                  <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${isOpen ? 'transform rotate-180' : ''}`} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] p-1">
                 {options.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
+                  <DropdownMenuItem
+                    key={option.value}
+                    className="flex items-center justify-between px-3 py-2 text-sm rounded-md cursor-pointer hover:bg-gray-100"
+                    onSelect={() => {
+                      setSelectedOption(option.value);
+                      setIsOpen(false);
+                    }}
+                  >
+                    <span>{option.label}</span>
+                    {selectedOption === option.value && (
+                      <Check className="h-4 w-4 text-pink-500" />
+                    )}
+                  </DropdownMenuItem>
                 ))}
-              </select>
-              {/* Custom dropdown arrow */}
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Continue Button */}
           <Button
             onClick={handleSubmit}
             disabled={!selectedOption || isLoading}
-            className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-11 cursor-pointer bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? "Setting up..." : "Continue"}
           </Button>
