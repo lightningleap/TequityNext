@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { X, FileText, Plus, AtSign, ArrowUp, File, Folder, Image as ImageIcon, ChevronDown } from "lucide-react";
+import { X, FileText, Plus, AtSign, ArrowUp, File, Folder, Image as ImageIcon, ChevronDown, User, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useChatContext } from "../context/ChatContext";
+import Image from "next/image";
 
 export interface FileItem {
   id: string;
@@ -181,7 +182,7 @@ export function ChatInterface({
 
   return (
     <div className="h-full bg-white flex flex-col items-center">
-      <div className="flex-1 max-w-[792px] w-full p-4 overflow-y-auto bg-white">
+      <div className="flex-1 max-w-[792px] w-full p-4 overflow-y-auto scrollbar-hide bg-white">
         {selectedFile ? (
           <div className="mb-4 p-4 border rounded-lg">
             <div className="flex items-center gap-3 mb-4">
@@ -242,38 +243,60 @@ export function ChatInterface({
 
         {/* Messages Display Area */}
         {messages.length > 0 && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
+                className={`flex gap-3 ${message.isUser ? 'flex-row-reverse' : 'flex-row'}`}
               >
-                <div
-                  className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                    message.isUser
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-900 border border-gray-200'
-                  }`}
-                >
-                  <p className="text-sm">{message.text}</p>
-                  {message.files && message.files.length > 0 && (
-                    <div className="mt-2 space-y-1">
-                      {message.files.map((file, fileIndex) => (
-                        <div
-                          key={fileIndex}
-                          className={`flex items-center gap-2 text-xs px-2 py-1 rounded ${
-                            message.isUser
-                              ? 'bg-blue-500'
-                              : 'bg-gray-200 text-gray-700'
-                          }`}
-                        >
-                          <FileText className="h-3 w-3" />
-                          <span className="truncate">{file.name}</span>
-                          <span>({formatFileSize(file.size)})</span>
-                        </div>
-                      ))}
+                {/* Profile Image */}
+                <div className="flex-shrink-0">
+                  {message.isUser ? (
+                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                      <User className="h-5 w-5 text-gray-600" />
+                    </div>
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-[#D91D69] flex items-center justify-center">
+                      <Sparkles className="h-5 w-5 text-white" />
                     </div>
                   )}
+                </div>
+
+                {/* Message Content */}
+                <div className="flex flex-col gap-1 max-w-[80%]">
+                  {/* Name Label */}
+                  {/* <span className={`text-xs font-medium ${message.isUser ? 'text-right' : 'text-left'} text-gray-600`}>
+                    {message.isUser ? 'You' : 'Tequity AI'}
+                  </span> */}
+
+                  {/* Message Bubble */}
+                  <div
+                    className={`rounded-lg px-4 py-2 ${
+                      message.isUser
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-900 border border-gray-200'
+                    }`}
+                  >
+                    <p className="text-sm">{message.text}</p>
+                    {message.files && message.files.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        {message.files.map((file, fileIndex) => (
+                          <div
+                            key={fileIndex}
+                            className={`flex items-center gap-2 text-xs px-2 py-1 rounded ${
+                              message.isUser
+                                ? 'bg-blue-500'
+                                : 'bg-gray-200 text-gray-700'
+                            }`}
+                          >
+                            <FileText className="h-3 w-3" />
+                            <span className="truncate">{file.name}</span>
+                            <span>({formatFileSize(file.size)})</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}

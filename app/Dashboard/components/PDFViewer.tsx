@@ -118,7 +118,7 @@ export function PDFViewer({ isOpen, onClose, file, folderName, onMaximizeChange 
       </div>
 
       {/* Content Area */}
-      <div className="h-[calc(100%-64px)] overflow-auto bg-gray-50">
+      <div className="h-[calc(100%-64px)] overflow-auto scrollbar-hide bg-gray-50">
         {/* PDF Viewer */}
         {file.type === "PDF" ? (
           file.url ? (

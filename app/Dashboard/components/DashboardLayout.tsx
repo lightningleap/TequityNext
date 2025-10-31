@@ -37,21 +37,21 @@ export function DashboardLayout({
           collapsible="icon"
           className="flex-shrink-0"
         >
-          <div className="flex items-center gap-3 px-4 py-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+          <div className="flex items-center gap-2 px-4 py-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 transition-all duration-300 ease-in-out">
             <Image
               src={BlackLogo}
               alt="Company Logo"
               width={32}
               height={32}
               priority
-              className="flex-shrink-0"
+              className="flex-shrink-0 ml-1"
             />
-            <p className="font-sans font-medium text-sm leading-none tracking-[-0.15%] align-middle whitespace-nowrap group-data-[collapsible=icon]:hidden">
+            <p className="font-sans font-medium text-sm leading-none tracking-[-0.15%] align-middle whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0">
               LLA&apos;s DATAROOM
             </p>
           </div>
           <SidebarMenuItems />
-          <hr className="my-4" />
+          {isChatPage && <hr className="my-4 transition-opacity duration-300" />}
 
           {/* Chat History - Only visible on Tequity AI page */}
           {isChatPage && (

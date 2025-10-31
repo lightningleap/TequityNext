@@ -71,7 +71,7 @@ export default function LoginPage() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Navigate directly to dashboard after verification
-      router.push("/Dashboard");
+      router.push("/Dashboard/Library");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Verification failed. Please try again.");
     } finally {
@@ -102,7 +102,7 @@ export default function LoginPage() {
         </div>
 
         {/* Right Side - Verification Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
           <div className="w-full max-w-md flex items-center justify-center">
             {/* Form Card */}
             <div className="w-[412px] h-[430px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-6 flex flex-col gap-8">
@@ -177,7 +177,7 @@ export default function LoginPage() {
                 <div className="text-center">
                   <Link href="/signup">
                     <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                      Don&apos;t have an account? <span className="text-gray-900 font-medium">Create One</span>
+                      Don&apos;t have an account? <span className="text-gray-900 font-medium">Create Account</span>
                     </span>
                   </Link>
                 </div>
@@ -194,7 +194,7 @@ export default function LoginPage() {
       {/* Left Side - Image (Hidden on small/medium, visible on large) */}
       <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
         <Image
-          src={SignupGraphic}
+          src={Container}
           alt="Login Graphic"
           fill
           className="object-cover object-center"
@@ -203,7 +203,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side - Email Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
         <div className="w-full max-w-md flex items-center justify-center">
           {/* Form Card */}
           <div className="w-[412px] h-[484px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-6 flex flex-col gap-8">
@@ -282,7 +282,7 @@ export default function LoginPage() {
               <div className="text-center">
                 <Link href="/signup">
                   <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                    Don&apos;t have an account? <span className="text-gray-900 font-medium">Create One</span>
+                    Don&apos;t have an account? <span className="text-gray-900 font-medium">Create Account</span>
                   </span>
                 </Link>
               </div>
