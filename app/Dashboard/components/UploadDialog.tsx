@@ -12,7 +12,7 @@ import {
 import { Button } from "../../../components/ui/button";
 import { FiUploadCloud } from "react-icons/fi";
 import { FileItem } from "./filegrid";
-
+import UploadGraphic from "../../../public/UploadGraphic.svg";
 import {
   X,
   Upload,
@@ -24,6 +24,7 @@ import {
   XCircle,
   Loader2,
 } from "lucide-react";
+import Image from "next/image";
 type FileType =
   | "PDF"
   | "DOCX"
@@ -53,9 +54,9 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
   const [uploadProgress, setUploadProgress] = useState<Record<number, number>>(
     {}
   );
-  const [uploadStatus, setUploadStatus] = useState<Record<number, UploadStatus>>(
-    {}
-  );
+  const [uploadStatus, setUploadStatus] = useState<
+    Record<number, UploadStatus>
+  >({});
   const [isUploading, setIsUploading] = useState(false);
   const [uploadMode, setUploadMode] = useState<"files" | "folder">("files");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -154,8 +155,12 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Only upload successful files using local statusMap
-    const successfulFiles = files.filter((_, index) => statusMap[index] === "success");
-    const failedFiles = files.filter((_, index) => statusMap[index] === "error");
+    const successfulFiles = files.filter(
+      (_, index) => statusMap[index] === "success"
+    );
+    const failedFiles = files.filter(
+      (_, index) => statusMap[index] === "error"
+    );
 
     // If there are any failed files, don't close the dialog
     if (failedFiles.length > 0) {
@@ -195,9 +200,16 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
       // Create file items for all successful files
       fileItems = successfulFiles.map((file, idx) => {
         const extension = file.name.split(".").pop()?.toUpperCase() || "TXT";
-        const fileType = ["PDF", "DOCX", "XLSX", "PPTX", "PNG", "MP4", "CSV", "TXT"].includes(
-          extension
-        )
+        const fileType = [
+          "PDF",
+          "DOCX",
+          "XLSX",
+          "PPTX",
+          "PNG",
+          "MP4",
+          "CSV",
+          "TXT",
+        ].includes(extension)
           ? (extension as FileType)
           : "TXT";
 
@@ -249,7 +261,6 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        
         <Button
           className="flex items-center bg-[#F4F4F5] gap-2 text-black hover:bg-[#F4F4F5]"
           onClick={() => setIsOpen(true)}
@@ -261,66 +272,41 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
       <DialogContent className="w-[95vw] sm:max-w-[560px] max-w-[95vw] p-4 sm:p-6 max-h-[90vh] overflow-y-auto scrollbar-hide flex items-center justify-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <div className="space-y-4 sm:space-y-6 w-full">
           <DialogHeader className="text-left p-0">
-            <DialogTitle className="text-base sm:text-lg">Upload Files</DialogTitle>
-            <DialogDescription className="sr-only">Upload files to your library</DialogDescription>
+            <DialogTitle className="text-base sm:text-lg">Upload</DialogTitle>
+            <DialogDescription className="sr-only">
+              Upload files to your library
+            </DialogDescription>
           </DialogHeader>
 
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-3 sm:mb-4">
-            <button
-              type="button"
-              onClick={() => handleButtonClick("files")}
-              className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 border-2 border-dashed rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
-            >
-              <div className="flex flex-col items-center gap-1.5 sm:gap-2">
-                <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />
-                <span className="text-xs sm:text-sm font-medium">Upload Files</span>
-              </div>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleButtonClick("folder")}
-              className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 border-2 border-dashed rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
-            >
-              <div className="flex flex-col items-center gap-1.5 sm:gap-2">
-                <FiUploadCloud className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />
-                <span className="text-xs sm:text-sm font-medium">Upload Folder</span>
-              </div>
-            </button>
-          </div>
-
           <div
-            className={`border-2 border-dashed rounded-lg sm:rounded-xl text-center transition-colors w-full ${
-              isDragging
-                ? "border-blue-500 bg-blue-50"
-                : "border-[#E4E4E7] hover:border-gray-400"
-            }`}
-            style={{
-              minHeight: "80px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: "1rem",
-              boxShadow:
-                "0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1)",
-            }}
+            className="space-y-2 cursor-pointer"
             onDragOver={handleDragOver}
-            onDragEnter={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
+            onClick={() => handleButtonClick("files")}
           >
-            <div className="text-center px-2">
-              <p className="text-xs sm:text-sm font-medium text-gray-900">
-                {isDragging
-                  ? "Drop files or folders here"
-                  : "Or drag & drop files/folders here"}
-              </p>
-              <p className="text-[10px] sm:text-xs text-[#71717A] mt-1">
-                Supported: PDF, DOCX, XLSX, PPTX, PNG, MP4, CSV, TXT
-              </p>
+            <div
+              className={`flex justify-center mb-6 ${
+                isDragging ? "opacity-70" : ""
+              }`}
+            >
+              <div className="flex items-center justify-center p-2 rounded-lg transition-colors">
+                <Image
+                  src={UploadGraphic}
+                  alt="Upload"
+                  className="w-[152px] h-[58px]"
+                />
+              </div>
             </div>
+            <p className="font-['Inter'] font-medium text-2xl leading-8 tracking-[-0.6%] text-center text-[#09090B]">
+              {isDragging ? "Drop files here" : "Drop or Select"}
+            </p>
+            <p className="font-['Inter'] font-normal text-sm leading-5 tracking-normal text-center text-[#71717A] mt-1">
+              {isDragging
+                ? "Release to upload"
+                : "Files, Folders, or .zip Archives"}
+            </p>
           </div>
-
           <input
             ref={fileInputRef}
             type="file"
@@ -341,7 +327,9 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
           {files.length > 0 && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <h4 className="text-xs sm:text-sm font-medium">Files to upload</h4>
+                <h4 className="text-xs sm:text-sm font-medium">
+                  Files to upload
+                </h4>
                 <button
                   type="button"
                   className="text-[10px] sm:text-xs text-gray-500 hover:text-gray-700"
@@ -370,7 +358,9 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                           {fileTypeLabel}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs sm:text-sm font-medium truncate">{file.name}</p>
+                          <p className="text-xs sm:text-sm font-medium truncate">
+                            {file.name}
+                          </p>
                           <div className="flex items-center gap-1 sm:gap-2 mt-0.5 sm:mt-1">
                             <p className="text-[10px] sm:text-xs text-gray-500">
                               {(file.size / 1024).toFixed(2)} KB
