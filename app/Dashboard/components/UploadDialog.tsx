@@ -12,19 +12,49 @@ import {
 import { Button } from "../../../components/ui/button";
 import { FiUploadCloud } from "react-icons/fi";
 import { FileItem } from "./filegrid";
-import UploadGraphic from "../../../public/UploadGraphic.svg";
+import PdfIcon from "../../../public/uploadModal/File Type Icon.svg";
+import XlsIcon from "../../../public/uploadModal/File Type Icon-2.svg";
+import FolderIcon from "../../../public/uploadModal/File Type Icon-1.svg";
+import PlusIcon from "../../../public/uploadModal/Icon.svg";
 import {
   X,
-  Upload,
-  Image as ImageIcon,
-  FileText,
-  File,
-  FileSpreadsheet,
   CheckCircle,
-  XCircle,
-  Loader2,
+  RefreshCw,
 } from "lucide-react";
 import Image from "next/image";
+
+function getFileIcon(fileName: string) {
+  const extension = fileName.split(".").pop()?.toLowerCase();
+
+  switch (extension) {
+    case "pdf":
+      return <Image src={PdfIcon} alt="PDF" className="w-8 h-8" />;
+    case "docx":
+    case "doc":
+      return <Image src={FolderIcon} alt="Document" className="w-8 h-8" />;
+    case "xlsx":
+    case "xls":
+    case "csv":
+      return <Image src={XlsIcon} alt="Spreadsheet" className="w-8 h-8" />;
+    case "pptx":
+    case "ppt":
+      return <Image src={FolderIcon} alt="Presentation" className="w-8 h-8" />;
+    case "png":
+    case "jpg":
+    case "jpeg":
+      return <Image src={FolderIcon} alt="Image" className="w-8 h-8" />;
+    case "mp4":
+    case "mov":
+      return <Image src={FolderIcon} alt="Video" className="w-8 h-8" />;
+    case "txt":
+      return <Image src={FolderIcon} alt="Text" className="w-8 h-8" />;
+    case "zip":
+      return <Image src={FolderIcon} alt="Archive" className="w-8 h-8" />;
+    default:
+      return <Image src={FolderIcon} alt="File" className="w-8 h-8" />;
+  }
+}
+
 type FileType =
   | "PDF"
   | "DOCX"
@@ -262,51 +292,75 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
-          className="flex items-center bg-[#F4F4F5] gap-2 text-black hover:bg-[#F4F4F5]"
+          className="flex items-center h-9 bg-[#f1f5f9] gap-2 text-[#0f172a] hover:bg-gray-200 px-3 rounded-md"
           onClick={() => setIsOpen(true)}
         >
           <FiUploadCloud className="h-4 w-4" />
-          Upload
+          <span className="text-xs font-medium">Upload</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[95vw] sm:max-w-[560px] max-w-[95vw] p-4 sm:p-6 max-h-[90vh] overflow-y-auto scrollbar-hide flex items-center justify-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-        <div className="space-y-4 sm:space-y-6 w-full">
-          <DialogHeader className="text-left p-0">
-            <DialogTitle className="text-base sm:text-lg">Upload</DialogTitle>
+      <DialogContent className="w-[calc(100vw-32px)] max-w-[352px] h-[400px] sm:w-[560px] sm:max-w-[560px] p-[16px] overflow-y-auto scrollbar-hide border border-[#E2E8F0] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)]">
+        <div className="flex flex-col items-center w-full h-full">
+          {/* Header */}
+          <div className="flex flex-row items-center gap-3 w-full h-9 mb-0">
+            <h2 className="flex-1 font-['Inter'] font-medium text-[20px] leading-[28px] tracking-[-0.12px] text-[#020617]">
+              Upload
+            </h2>
             <DialogDescription className="sr-only">
               Upload files to your library
             </DialogDescription>
-          </DialogHeader>
+          </div>
 
-          <div
-            className="space-y-2 cursor-pointer"
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={() => handleButtonClick("files")}
-          >
+          {/* Upload Area - Only show when no files */}
+          {files.length === 0 && (
             <div
-              className={`flex justify-center mb-6 ${
-                isDragging ? "opacity-70" : ""
-              }`}
+              className="flex flex-col justify-center items-center flex-1 w-full p-6 gap-5 rounded-xl cursor-pointer"
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => handleButtonClick("files")}
             >
-              <div className="flex items-center justify-center p-2 rounded-lg transition-colors">
-                <Image
-                  src={UploadGraphic}
-                  alt="Upload"
-                  className="w-[152px] h-[58px]"
-                />
+              {/* Graphic - Custom File Icons */}
+              <div
+                className={`relative flex items-center justify-center group ${
+                  isDragging ? "opacity-70" : ""
+                }`}
+              >
+                <div className="relative flex items-center gap-3 transition-all duration-300 group-hover:gap-5">
+                  <Image
+                    src={PdfIcon}
+                    alt="PDF"
+                    className="w-[70px] h-[70px] -rotate-[20deg] transition-all duration-300 group-hover:scale-110 group-hover:-translate-x-2"
+                  />
+                  <Image
+                    src={FolderIcon}
+                    alt="Folder"
+                    className="w-[60px] h-[60px] transition-all duration-300 group-hover:scale-110"
+                  />
+                  <Image
+                    src={XlsIcon}
+                    alt="Excel"
+                    className="w-[70px] h-[70px] rotate-[20deg] transition-all duration-300 group-hover:scale-110 group-hover:translate-x-2"
+                  />
+                </div>
+                <div className="absolute top-[20px] transition-all duration-300 group-hover:scale-110">
+                  <Image src={PlusIcon} alt="Add" className="w-[60px] h-[60px]" />
+                </div>
+              </div>
+
+              {/* Text */}
+              <div className="flex flex-col justify-center items-center gap-1.5 w-full">
+                <p className="font-['Inter'] font-medium text-2xl leading-8 tracking-[-0.006em] text-[#09090B]">
+                  {isDragging ? "Drop files here" : <><span className="sm:hidden">Select or Paste</span><span className="hidden sm:inline">Drop or Select</span></>}
+                </p>
+                <p className="font-['Inter'] font-normal text-sm leading-5 text-center text-[#71717A] w-full">
+                  {isDragging
+                    ? "Release to upload"
+                    : "Files, Folders, or .zip Archives"}
+                </p>
               </div>
             </div>
-            <p className="font-['Inter'] font-medium text-2xl leading-8 tracking-[-0.6%] text-center text-[#09090B]">
-              {isDragging ? "Drop files here" : "Drop or Select"}
-            </p>
-            <p className="font-['Inter'] font-normal text-sm leading-5 tracking-normal text-center text-[#71717A] mt-1">
-              {isDragging
-                ? "Release to upload"
-                : "Files, Folders, or .zip Archives"}
-            </p>
-          </div>
+          )}
           <input
             ref={fileInputRef}
             type="file"
@@ -325,202 +379,112 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
           />
 
           {files.length > 0 && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h4 className="text-xs sm:text-sm font-medium">
-                  Files to upload
-                </h4>
-                <button
-                  type="button"
-                  className="text-[10px] sm:text-xs text-gray-500 hover:text-gray-700"
-                  onClick={() => setFiles([])}
-                >
-                  Clear all
-                </button>
-              </div>
-              <div className="space-y-1.5 sm:space-y-2">
+            <div className="flex flex-col gap-[16px] w-full flex-1">
+              {/* Files Grid */}
+              <div className="grid grid-cols-3 grid-rows-2 gap-[12px] w-full overflow-y-auto flex-1">
                 {files.map((file, index) => {
                   const status = uploadStatus[index] || "pending";
                   const progress = uploadProgress[index] || 0;
-                  const fileTypeLabel = getFileTypeLabel(file.name);
 
                   return (
                     <div
                       key={index}
-                      className={`flex items-center justify-between rounded-lg p-2 sm:p-3 ${
-                        status === "error"
-                          ? "border-2 border-red-500"
-                          : "border border-gray-200"
+                      className={`flex flex-col items-start p-[12px] gap-[8px] bg-white border border-[#E2E8F0] rounded-xl relative h-[126px] ${
+                        status === "uploading" ? "overflow-hidden" : ""
                       }`}
                     >
-                      <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                        <span className="text-[10px] sm:text-xs font-medium text-gray-700 bg-gray-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded flex-shrink-0">
-                          {fileTypeLabel}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs sm:text-sm font-medium truncate">
+                      {/* Progress bar background for uploading state */}
+                      {status === "uploading" && (
+                        <div
+                          className="absolute left-0 top-0 bottom-0 bg-[#F4F4F5] transition-all duration-300"
+                          style={{ width: `${progress}%` }}
+                        />
+                      )}
+
+                      <div className="flex flex-col justify-center items-start gap-[12px] w-full relative z-10">
+                        {/* File icon and action button */}
+                        <div className="flex flex-row justify-between items-center w-full">
+                          <div className="w-8 h-8 flex-shrink-0">
+                            {getFileIcon(file.name)}
+                          </div>
+
+                          {status === "pending" && (
+                            <button
+                              type="button"
+                              className="flex items-center justify-center w-[40px] h-[36px] rounded-md hover:bg-gray-100"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeFile(index);
+                              }}
+                            >
+                              <X className="h-4 w-4 text-[#020617]" />
+                            </button>
+                          )}
+                          {status === "success" && (
+                            <button
+                              type="button"
+                              className="flex items-center justify-center w-[40px] h-[36px] rounded-md hover:bg-gray-100"
+                              onClick={() => removeFile(index)}
+                            >
+                              <CheckCircle className="h-4 w-4 text-[#008A2E]" />
+                            </button>
+                          )}
+                          {status === "error" && (
+                            <button
+                              type="button"
+                              className="flex items-center justify-center w-[40px] h-[36px] rounded-md hover:bg-gray-100"
+                              onClick={() => removeFile(index)}
+                            >
+                              <RefreshCw className="h-4 w-4 text-[#020617]" />
+                            </button>
+                          )}
+                        </div>
+
+                        {/* File info */}
+                        <div className="flex flex-col items-start gap-[4px] w-full">
+                          <p className="font-['Inter'] font-medium text-[12px] leading-[20px] text-[#020617] line-clamp-2 w-full overflow-ellipsis overflow-hidden">
                             {file.name}
                           </p>
-                          <div className="flex items-center gap-1 sm:gap-2 mt-0.5 sm:mt-1">
-                            <p className="text-[10px] sm:text-xs text-gray-500">
-                              {(file.size / 1024).toFixed(2)} KB
-                            </p>
-                            {status === "uploading" && (
-                              <p className="text-[10px] sm:text-xs text-blue-600">
-                                • {progress}%
-                              </p>
-                            )}
-                            {status === "error" && (
-                              <p className="text-[10px] sm:text-xs text-red-600 truncate">
-                                • Failed
-                              </p>
-                            )}
-                          </div>
+                          <p className={`font-['Inter'] font-normal text-[10px] leading-[14px] w-full ${
+                            status === "error" ? "text-[#E60000]" : "text-[#64748B]"
+                          }`}>
+                            {status === "error"
+                              ? "Upload failed try again"
+                              : `${(file.size / (1024 * 1024)).toFixed(1)}MB`}
+                          </p>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                        {status === "uploading" && (
-                          <div className="relative w-6 h-6 sm:w-8 sm:h-8">
-                            <svg className="w-6 h-6 sm:w-8 sm:h-8 transform -rotate-90">
-                              <circle
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="#E5E7EB"
-                                strokeWidth="2"
-                                fill="none"
-                                className="sm:cx-16 sm:cy-16 sm:r-14 sm:stroke-[3]"
-                              />
-                              <circle
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="#3B82F6"
-                                strokeWidth="2"
-                                fill="none"
-                                strokeDasharray={`${2 * Math.PI * 10}`}
-                                strokeDashoffset={`${
-                                  2 * Math.PI * 10 * (1 - progress / 100)
-                                }`}
-                                strokeLinecap="round"
-                                className="transition-all duration-300 sm:cx-16 sm:cy-16 sm:r-14 sm:stroke-[3]"
-                              />
-                            </svg>
-                          </div>
-                        )}
-                        {status === "success" && (
-                          <>
-                            <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
-                            <button
-                              type="button"
-                              className="text-gray-400 hover:text-gray-600"
-                              onClick={() => removeFile(index)}
-                            >
-                              <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                            </button>
-                          </>
-                        )}
-                        {status === "error" && (
-                          <>
-                            <XCircle className="h-5 w-5 sm:h-6 sm:w-6 text-red-600" />
-                            <button
-                              type="button"
-                              className="text-gray-400 hover:text-gray-600"
-                              onClick={() => removeFile(index)}
-                            >
-                              <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                            </button>
-                          </>
-                        )}
-                        {status === "pending" && (
-                          <button
-                            type="button"
-                            className="text-gray-400 hover:text-gray-600"
-                            onClick={() => removeFile(index)}
-                          >
-                            <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                          </button>
-                        )}
                       </div>
                     </div>
                   );
                 })}
+
+                {/* Add files card - only show if less than 6 files */}
+                {files.length < 6 && (
+                  <button
+                    type="button"
+                    onClick={() => handleButtonClick("files")}
+                    className="flex flex-col justify-center items-center p-[12px] gap-[8px] bg-[#FAFAFA] rounded-xl hover:bg-gray-200 transition-colors h-[126px]"
+                  >
+                    <Image src={PlusIcon} alt="Add files" className="w-10 h-10" />
+                    <p className="font-['Inter'] font-normal text-[14px] leading-[20px] text-[#020617]">
+                      Add files
+                    </p>
+                  </button>
+                )}
               </div>
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-3 sm:mt-4">
-                <Button
-                  variant="outline"
-                  className="flex-1 text-xs sm:text-sm h-9 sm:h-10"
-                  onClick={handleCancel}
-                  disabled={isUploading}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  className="flex-1 text-xs sm:text-sm h-9 sm:h-10"
-                  onClick={handleUpload}
-                  disabled={isUploading}
-                >
-                  <Upload className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  Upload {files.length} file{files.length !== 1 ? "s" : ""}
-                </Button>
-              </div>
+
+              {/* Done Button */}
+              <Button
+                className="w-full h-10 bg-[#020617] text-white rounded-lg font-['Inter'] font-medium text-[14px] leading-[20px] tracking-[-0.084px] hover:bg-[#020617]/90"
+                onClick={handleUpload}
+                disabled={isUploading}
+              >
+                Done
+              </Button>
             </div>
           )}
         </div>
       </DialogContent>
     </Dialog>
   );
-}
-
-function getFileTypeLabel(fileName: string): string {
-  const extension = fileName.split(".").pop()?.toLowerCase();
-
-  switch (extension) {
-    case "pdf":
-      return "PDF";
-    case "docx":
-    case "doc":
-      return "Word";
-    case "xlsx":
-    case "xls":
-      return "Excel";
-    case "pptx":
-    case "ppt":
-      return "PowerPoint";
-    case "png":
-    case "jpg":
-    case "jpeg":
-      return "Image";
-    case "mp4":
-    case "mov":
-      return "Video";
-    case "txt":
-      return "Text";
-    case "csv":
-      return "CSV";
-    default:
-      return "File";
-  }
-}
-
-function FileTypeIcon({ fileName }: { fileName: string }) {
-  const extension = fileName.split(".").pop()?.toLowerCase();
-  const iconClass = "h-5 w-5 text-gray-500";
-
-  switch (extension) {
-    case "pdf":
-      return <FileText className={iconClass} />;
-    case "docx":
-    case "doc":
-      return <FileText className={iconClass} />;
-    case "xlsx":
-    case "xls":
-      return <FileSpreadsheet className={iconClass} />;
-    case "png":
-    case "jpg":
-    case "jpeg":
-      return <ImageIcon className={iconClass} />;
-    default:
-      return <File className={iconClass} />;
-  }
 }
