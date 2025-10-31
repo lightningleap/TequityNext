@@ -1,19 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown, Check } from "lucide-react";
 import CompanyLogo from "@/public/SignupLogo.svg";
 import Image from "next/image";
 
 export default function WorkspaceSetupPage() {
+  const [currentStep, setCurrentStep] = useState(1);
   const [workspaceName, setWorkspaceName] = useState("");
+  const [selectedOption, setSelectedOption] = useState("");
+  const [email1, setEmail1] = useState("");
+  const [email2, setEmail2] = useState("");
+  const [email3, setEmail3] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Step 1 handlers
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setWorkspaceName(e.target.value);
+  }, []);
+
+  const handleStep1Submit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
@@ -34,106 +52,283 @@ export default function WorkspaceSetupPage() {
         throw new Error("Dataroom name contains invalid characters");
       }
 
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/workspace/create', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ name: workspaceName }),
-      // });
-      // if (!response.ok) {
-      //   const data = await response.json();
-      //   throw new Error(data.message || 'Failed to create dataroom');
-      // }
-
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Navigate to step 2
-      router.push("/workspace-setup/step2");
+      // Move to step 2
+      setCurrentStep(2);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create dataroom. Please try again.");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [workspaceName]);
+
+  // Step 2 handlers
+  const handleStep2Submit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Move to step 3
+      setCurrentStep(3);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Step 3 handlers
+  const handleStep3Submit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Navigate to Dashboard
+      router.prefetch("/Dashboard/Library");
+      router.push("/Dashboard/Library");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [router]);
+
+  const handleSkip = useCallback(() => {
+    // Navigate to Dashboard when skipping
+    router.prefetch("/Dashboard/Library");
+    router.push("/Dashboard/Library");
+  }, [router]);
+
+  const options = [
+    { value: "m&a", label: "M&A Deal" },
+    { value: "fundraising", label: "Fundraising" },
+    { value: "investor", label: "Investor Reporting" },
+    { value: "board", label: "Board Pack" },
+    { value: "diligence", label: "Due Diligence" },
+    { value: "other", label: "Other" }
+  ];
+
+  const progressWidth = `${(currentStep / 3) * 100}%`;
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6 pt-20">
       {/* Main Container */}
-      <div className="flex flex-col gap-8">
-        {/* Company Logo */}
-        <div>
+      <div className="flex flex-col w-full sm:w-[412px]">
+        {/* Company Logo - Fixed Position */}
+        <div className="mb-8">
           <Image src={CompanyLogo} alt="Company Logo" width={60} height={40} />
         </div>
 
-        {/* Heading Section */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-normal text-gray-900">
-            Welcome to Tequity
-          </h1>
-          <p className="text-sm text-gray-500 leading-relaxed">
-            Create a secure room for your deal, project, or confidential files.
-          </p>
-        </div>
-
-        {/* Form Fields */}
-        <div className="space-y-5 flex-1 flex flex-col justify-between">
-          {/* Error Message */}
-          {error && (
-            <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-600">{error}</p>
+        {/* Steps Container with Fixed Min Height */}
+        <div className="min-h-[500px]">
+          {/* Step 1: Workspace Name */}
+          {currentStep === 1 && (
+          <>
+            <div className="space-y-2">
+              <h1 className="text-3xl font-normal text-gray-900">
+                Welcome to Tequity
+              </h1>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Create a secure room for your deal, project, or confidential files.
+              </p>
             </div>
-          )}
 
-          {/* Workspace Name Input */}
-          <div className="space-y-2">
-            <input
-              type="text"
-              value={workspaceName}
-              onChange={(e) => setWorkspaceName(e.target.value)}
-              placeholder="Dataroom Name"
-              className={`w-full h-10 px-3 border rounded-lg focus:outline-none focus:ring-2 text-sm transition-colors ${
-                error
-                  ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                  : 'border-gray-300 focus:ring-pink-500 focus:border-pink-500'
-              }`}
-              required
-            />
-            {/* Caption */}
-            <p className="text-xs text-gray-500">
-              You can rename this later — no commitments yet.
-            </p>
-          </div>
+            <div className="space-y-5">
+              {error && (
+                <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600">{error}</p>
+                </div>
+              )}
 
-          {/* Continue Button */}
-          <Button
-            onClick={handleSubmit}
-            disabled={!workspaceName.trim() || isLoading}
-            className="w-full h-11 cursor-pointer bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? "Setting up..." : "Set up dataroom"}
-          </Button>
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  value={workspaceName}
+                  onChange={handleInputChange}
+                  placeholder="Dataroom Name"
+                  className={`w-full h-10 px-3 border rounded-lg focus:outline-none focus:ring-2 text-sm transition-colors ${
+                    error
+                      ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:ring-pink-500 focus:border-pink-500'
+                  }`}
+                  required
+                />
+                <p className="text-xs text-gray-500">
+                  You can rename this later — no commitments yet.
+                </p>
+              </div>
 
-          {/* Progress Indicators */}
-          <div className="flex items-center justify-center space-x-2">
-            {/* Step 1 - Active */}
-            <div className="w-10 h-1 bg-gray-900 rounded-full"></div>
-            {/* Step 2 - Inactive */}
-            <div className="w-10 h-1 bg-gray-200 rounded-full"></div>
-            {/* Step 3 - Inactive */}
-            <div className="w-10 h-1 bg-gray-200 rounded-full"></div>
-            {/* Step 4 - Inactive */}
-            <div className="w-10 h-1 bg-gray-200 rounded-full"></div>
-          </div>
+              <Button
+                onClick={handleStep1Submit}
+                disabled={!workspaceName.trim() || isLoading}
+                className="w-full h-11 cursor-pointer bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? "Setting up..." : "Set up dataroom"}
+              </Button>
 
-          {/* Additional Navigation */}
-          <div className="text-center">
-            <Link href="/login">
-              <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                Back to login
-              </span>
-            </Link>
-          </div>
+              <div className="flex items-center justify-center">
+                <div className="w-full max-w-[120px] h-1 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-gray-900 rounded-full transition-all duration-500 ease-out" style={{ width: progressWidth }}></div>
+                </div>
+              </div>
+
+              <div className="text-center">
+                <Link href="/login">
+                  <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
+                    Back to login
+                  </span>
+                </Link>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Step 2: Use Case Selection */}
+        {currentStep === 2 && (
+          <>
+            <div className="space-y-2">
+              <h1 className="text-3xl font-normal text-gray-900">
+                What brings you to Tequity?
+              </h1>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Help us tailor your experience with the right tools.
+              </p>
+            </div>
+
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between h-10 px-3 border border-gray-300 rounded-lg hover:bg-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
+                    >
+                      {selectedOption ?
+                        options.find(opt => opt.value === selectedOption)?.label :
+                        'Select an option'}
+                      <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${isOpen ? 'transform rotate-180' : ''}`} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] p-1">
+                    {options.map((option) => (
+                      <DropdownMenuItem
+                        key={option.value}
+                        className="flex items-center justify-between px-3 py-2 text-sm rounded-md cursor-pointer hover:bg-gray-100"
+                        onSelect={() => {
+                          setSelectedOption(option.value);
+                          setIsOpen(false);
+                        }}
+                      >
+                        <span>{option.label}</span>
+                        {selectedOption === option.value && (
+                          <Check className="h-4 w-4 text-pink-500" />
+                        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              <Button
+                onClick={handleStep2Submit}
+                disabled={!selectedOption || isLoading}
+                className="w-full h-11 cursor-pointer bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? "Setting up..." : "Continue"}
+              </Button>
+
+              <div className="flex items-center justify-center">
+                <div className="w-full max-w-[120px] h-1 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-gray-900 rounded-full transition-all duration-500 ease-out" style={{ width: progressWidth }}></div>
+                </div>
+              </div>
+
+              <div className="text-center">
+                <button
+                  onClick={() => setCurrentStep(1)}
+                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+                >
+                  Back to workspace name
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Step 3: Team Invitations */}
+        {currentStep === 3 && (
+          <>
+            <div className="space-y-2">
+              <h1 className="text-3xl font-normal text-gray-900">
+                Invite Your Team
+              </h1>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Add team members to collaborate in your dataroom.
+              </p>
+            </div>
+
+            <div className="space-y-5">
+              <div className="space-y-4">
+                <input
+                  type="email"
+                  value={email1}
+                  onChange={(e) => setEmail1(e.target.value)}
+                  placeholder="email@example.com"
+                  className="w-full h-10 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
+                />
+                <input
+                  type="email"
+                  value={email2}
+                  onChange={(e) => setEmail2(e.target.value)}
+                  placeholder="email@example.com"
+                  className="w-full h-10 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
+                />
+                <input
+                  type="email"
+                  value={email3}
+                  onChange={(e) => setEmail3(e.target.value)}
+                  placeholder="email@example.com"
+                  className="w-full h-10 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
+                />
+              </div>
+
+              <Button
+                onClick={handleStep3Submit}
+                disabled={isLoading}
+                className="w-full h-11 cursor-pointer bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? "Sending invitations..." : "Send Invites"}
+              </Button>
+
+              <Button
+                onClick={handleSkip}
+                variant="link"
+                className="w-full h-11 border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors duration-200 cursor-pointer"
+              >
+                Skip for now, I'll invite later
+              </Button>
+
+              <div className="flex items-center justify-center">
+                <div className="w-full max-w-[120px] h-1 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-gray-900 rounded-full transition-all duration-500 ease-out" style={{ width: progressWidth }}></div>
+                </div>
+              </div>
+
+              <div className="text-center">
+                <button
+                  onClick={() => setCurrentStep(2)}
+                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+                >
+                  Back to use case selection
+                </button>
+              </div>
+            </div>
+          </>
+        )}
         </div>
       </div>
     </div>

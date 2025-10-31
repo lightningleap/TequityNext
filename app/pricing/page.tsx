@@ -4,16 +4,25 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Plus_Jakarta_Sans, Instrument_Serif } from "next/font/google";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "600"],
+  variable: "--font-plus-jakarta",
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-instrument-serif",
+});
 
 export default function PricingPage() {
   const [billingType, setBillingType] = useState("yearly");
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const router = useRouter();
-
-  const handleBack = () => {
-    router.push("/workspace-setup/step3");
-  };
 
   const handleSelectPlan = async (planName: string) => {
     setSelectedPlan(planName);
@@ -31,7 +40,7 @@ export default function PricingPage() {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Navigate to Dashboard
-      router.push("/Dashboard");
+      router.push("/Dashboard/Library");
     } catch (error) {
       console.error("Error selecting plan:", error);
       setLoadingPlan(null);
@@ -49,20 +58,37 @@ export default function PricingPage() {
           <div className="w-full max-w-[1000px] flex flex-col items-start gap-6">
             {/* Main Heading and Subheading */}
             <div className="text-left">
-              <h1 className="text-3xl font-normal text-gray-900">
-                Try Tequity{" "}
-                <span className="font-bold text-pink-600">FREE</span> for 30-Days
-              </h1>
-              <h2 style={{
-                fontFamily: 'Instrument Serif',
+              <h1 className={plusJakartaSans.className} style={{
                 fontWeight: 400,
-                fontStyle: 'normal',
                 fontSize: '32px',
-                lineHeight: '40px',
+                lineHeight: '50px',
                 letterSpacing: '0px',
                 verticalAlign: 'middle',
                 color: '#111827',
-                marginTop: '8px'
+                margin: 0
+              }}>
+                Try Tequity{" "}
+                <span style={{
+                  fontWeight: 600,
+                  fontSize: '32px',
+                  lineHeight: '40px',
+                  letterSpacing: '0px',
+                  verticalAlign: 'middle',
+                  color: '#EC4899'
+                }}>FREE</span> for 30-Days
+              </h1>
+              <h2 className={instrumentSerif.className} style={{
+                fontWeight: 400,
+                fontSize: '32px',
+                lineHeight: '1',
+                letterSpacing: '1.5px',
+                color: '#111827',
+                display: 'flex',
+                alignItems: 'center',
+                transform: 'scale(1, 1.5)',
+                transformOrigin: 'center',
+                height: '60px',
+                width: '100%',
               }}>
                 No credit card required.
               </h2>
@@ -70,7 +96,7 @@ export default function PricingPage() {
 
             {/* Billing Toggle */}
             <div className="flex items-center gap-4">
-              <div className="relative inline-flex items-center bg-gray-100 p-1 rounded-full border border-gray-200">
+              <div className="relative inline-flex items-center bg-white p-1 rounded-full border border-gray-200">
                 <div className="flex">
                   <button
                     onClick={() => setBillingType("monthly")}
@@ -95,8 +121,8 @@ export default function PricingPage() {
                 </div>
               </div>
               {billingType === "yearly" && (
-                <span className="px-2 py-2 bg-blue-500 text-white text-xs font-semibold rounded-full whitespace-nowrap">
-                  Save 33%
+                <span className="px-2 py-2 text-[#71717A] text-xs font-semibold rounded-full whitespace-nowrap">
+                  <span className="text-blue-500">Save 33%</span> on a yearly subscription
                 </span>
               )}
             </div>
@@ -105,10 +131,10 @@ export default function PricingPage() {
           {/* Pricing Cards Section */}
           <div className="w-full min-h-[566px] flex gap-5 justify-start xl:justify-center overflow-x-auto overflow-y-visible xl:overflow-x-visible scrollbar-hide snap-x snap-mandatory px-4 xl:px-0 xl:flex-row items-center pb-4 pt-5">
             {/* Starter Plan Card */}
-            <div className={`w-[320px] min-w-[300px] flex-shrink-0 h-[600px] bg-white border-2 rounded-2xl snap-center transition-all duration-300 cursor-pointer ${
+            <div className={`w-[320px] min-w-[300px] flex-shrink-0 h-[600px] border-2 rounded-2xl snap-center transition-all duration-300 cursor-pointer ${
               selectedPlan === "Starter"
-                ? "border-blue-500 shadow-xl shadow-blue-300/50 scale-105 ring-4 ring-blue-100"
-                : "border-gray-300 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-100/50 hover:scale-102 hover:-translate-y-1"
+                ? "bg-[#F4F4F5] border-gray-300 hover:shadow-lg hover:shadow-gray-100/50"
+                : "bg-white border-gray-300 hover:border-gray-400 hover:shadow-lg hover:shadow-gray-100/50 hover:scale-102 hover:-translate-y-1"
             }`}
             onClick={() => !loadingPlan && setSelectedPlan(selectedPlan === "Starter" ? null : "Starter")}
             >
@@ -117,10 +143,8 @@ export default function PricingPage() {
                 <div className="w-[211px] h-[116px] flex flex-col items-start gap-8">
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
-                      <h3 style={{
-                        fontFamily: 'Instrument Serif',
+                      <h3 className={instrumentSerif.className} style={{
                         fontWeight: 400,
-                        fontStyle: 'normal',
                         fontSize: '20px',
                         lineHeight: '32px',
                         letterSpacing: '0px',
@@ -128,11 +152,6 @@ export default function PricingPage() {
                       }}>
                         Starter
                       </h3>
-                      {selectedPlan === "Starter" && (
-                        <div className="px-2 py-0.5 bg-blue-500 text-white text-xs font-semibold rounded-full animate-bounce shadow-md">
-                          ✓ Selected
-                        </div>
-                      )}
                     </div>
                     <p className="text-sm text-gray-500">
                       Best for early-stage startups.
@@ -143,9 +162,10 @@ export default function PricingPage() {
                     <span className="text-4xl font-medium text-gray-900">
                       ${billingType === "yearly" ? "12" : "15"}
                     </span>
-                    <span className="text-xs text-gray-500 pb-1">
-                      per month billed yearly
-                    </span>
+                    <div className="flex flex-col pb-1">
+                      <span className="text-xs text-gray-500">per month</span>
+                      <span className="text-xs text-gray-500">billed yearly</span>
+                    </div>
                   </div>
                 </div>
 
@@ -158,10 +178,8 @@ export default function PricingPage() {
                   }}
                   disabled={loadingPlan !== null && loadingPlan !== "Starter"}
                   className={`w-full h-11 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-xl ${
-                    loadingPlan === "Starter"
-                      ? "bg-blue-600 text-white border-blue-600 shadow-blue-400/50"
-                      : selectedPlan === "Starter"
-                      ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-600 hover:scale-105 shadow-blue-300/50"
+                    loadingPlan === "Starter" || selectedPlan === "Starter"
+                      ? "bg-gray-900 text-white border-gray-900"
                       : "bg-gray-100 hover:bg-gray-900 hover:text-white text-gray-800 border-gray-300 hover:border-gray-900 hover:scale-105"
                   }`}
                 >
@@ -219,31 +237,20 @@ export default function PricingPage() {
             </div>
 
             {/* Professional Plan Card - Highlighted */}
-            <div className={`w-[320px] min-w-[300px] flex-shrink-0 h-[620px] bg-white border-2 rounded-2xl snap-center relative transition-all duration-300 cursor-pointer ${
+            <div className={`w-[320px] min-w-[300px] flex-shrink-0 h-[620px] border-2 rounded-2xl snap-center relative transition-all duration-300 cursor-pointer ${
               selectedPlan === "Professional"
-                ? "border-blue-500 shadow-xl shadow-blue-300/50 scale-105 ring-4 ring-blue-100"
-                : "border-gray-300 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-100/50 hover:scale-102 hover:-translate-y-1"
+                ? "bg-[#F4F4F5] border-gray-300 hover:shadow-lg hover:shadow-gray-100/50"
+                : "bg-white border-gray-300 hover:border-gray-400 hover:shadow-lg hover:shadow-gray-100/50 hover:scale-102 hover:-translate-y-1"
             }`}
             onClick={() => !loadingPlan && setSelectedPlan(selectedPlan === "Professional" ? null : "Professional")}
             >
-              {/* Recommended Badge */}
-              {!selectedPlan && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10 animate-pulse">
-                  <div className="px-4 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white text-xs font-semibold rounded-full shadow-lg">
-                    Recommended
-                  </div>
-                </div>
-              )}
-
               <div className="w-[320px] h-[620px] flex flex-col items-start p-6 gap-4">
                 {/* Card Header */}
                 <div className="w-[223px] h-[116px] flex flex-col items-start gap-8">
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
-                      <h3 style={{
-                        fontFamily: 'Instrument Serif',
+                      <h3 className={instrumentSerif.className} style={{
                         fontWeight: 400,
-                        fontStyle: 'normal',
                         fontSize: '20px',
                         lineHeight: '32px',
                         letterSpacing: '0px',
@@ -251,11 +258,9 @@ export default function PricingPage() {
                       }}>
                         Professional
                       </h3>
-                      {selectedPlan === "Professional" && (
-                        <div className="px-2 py-0.5 bg-blue-500 text-white text-xs font-semibold rounded-full animate-bounce shadow-md">
-                          ✓ Selected
-                        </div>
-                      )}
+                      <div className="px-3 py-1.5 bg-blue-500 text-white text-xs font-semibold rounded-sm shadow">
+                        Popular
+                      </div>
                     </div>
                     <p className="text-sm text-gray-500">
                       For large teams & corporations.
@@ -266,9 +271,10 @@ export default function PricingPage() {
                     <span className="text-4xl font-medium text-gray-900">
                       ${billingType === "yearly" ? "25" : "30"}
                     </span>
-                    <span className="text-xs text-gray-500 pb-1">
-                      per month billed yearly
-                    </span>
+                    <div className="flex flex-col pb-1">
+                      <span className="text-xs text-gray-500">per month</span>
+                      <span className="text-xs text-gray-500">billed yearly</span>
+                    </div>
                   </div>
                 </div>
 
@@ -280,10 +286,8 @@ export default function PricingPage() {
                   }}
                   disabled={loadingPlan !== null && loadingPlan !== "Professional"}
                   className={`w-full h-11 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-xl ${
-                    loadingPlan === "Professional"
-                      ? "bg-blue-600 text-white border-blue-600 shadow-blue-400/50"
-                      : selectedPlan === "Professional"
-                      ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-600 hover:scale-105 shadow-blue-300/50"
+                    loadingPlan === "Professional" || selectedPlan === "Professional"
+                      ? "bg-gray-900 text-white border-gray-900"
                       : "bg-gray-100 hover:bg-gray-900 hover:text-white text-gray-800 border-gray-300 hover:border-gray-900 hover:scale-105"
                   }`}
                 >
@@ -342,10 +346,10 @@ export default function PricingPage() {
             </div>
 
             {/* Enterprise Plan Card */}
-            <div className={`w-[320px] min-w-[300px] flex-shrink-0 h-[600px] bg-white border-2 rounded-2xl snap-center transition-all duration-300 cursor-pointer ${
+            <div className={`w-[320px] min-w-[300px] flex-shrink-0 h-[600px] border-2 rounded-2xl snap-center transition-all duration-300 cursor-pointer ${
               selectedPlan === "Enterprise"
-                ? "border-blue-500 shadow-xl shadow-blue-300/50 scale-105 ring-4 ring-blue-100"
-                : "border-gray-300 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-100/50 hover:scale-102 hover:-translate-y-1"
+                ? "bg-[#F4F4F5] border-gray-300 hover:shadow-lg hover:shadow-gray-100/50"
+                : "bg-white border-gray-300 hover:border-gray-400 hover:shadow-lg hover:shadow-gray-100/50 hover:scale-102 hover:-translate-y-1"
             }`}
             onClick={() => !loadingPlan && setSelectedPlan(selectedPlan === "Enterprise" ? null : "Enterprise")}
             >
@@ -354,10 +358,8 @@ export default function PricingPage() {
                 <div className="w-[187px] h-[116px] flex flex-col items-start gap-8">
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
-                      <h3 style={{
-                        fontFamily: 'Instrument Serif',
+                      <h3 className={instrumentSerif.className} style={{
                         fontWeight: 400,
-                        fontStyle: 'normal',
                         fontSize: '20px',
                         lineHeight: '32px',
                         letterSpacing: '0px',
@@ -365,11 +367,6 @@ export default function PricingPage() {
                       }}>
                         Enterprise
                       </h3>
-                      {selectedPlan === "Enterprise" && (
-                        <div className="px-2 py-0.5 bg-blue-500 text-white text-xs font-semibold rounded-full animate-bounce shadow-md">
-                          ✓ Selected
-                        </div>
-                      )}
                     </div>
                     <p className="text-sm text-gray-500">
                       For large organizations.
@@ -380,9 +377,10 @@ export default function PricingPage() {
                     <span className="text-4xl font-medium text-gray-900">
                       ${billingType === "yearly" ? "50" : "60"}
                     </span>
-                    <span className="text-xs text-gray-500 pb-1">
-                      per month billed yearly
-                    </span>
+                    <div className="flex flex-col pb-1">
+                      <span className="text-xs text-gray-500">per month</span>
+                      <span className="text-xs text-gray-500">billed yearly</span>
+                    </div>
                   </div>
                 </div>
 
@@ -395,10 +393,8 @@ export default function PricingPage() {
                   }}
                   disabled={loadingPlan !== null && loadingPlan !== "Enterprise"}
                   className={`w-full h-11 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-xl ${
-                    loadingPlan === "Enterprise"
-                      ? "bg-blue-600 text-white border-blue-600 shadow-blue-400/50"
-                      : selectedPlan === "Enterprise"
-                      ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-600 hover:scale-105 shadow-blue-300/50"
+                    loadingPlan === "Enterprise" || selectedPlan === "Enterprise"
+                      ? "bg-gray-900 text-white border-gray-900"
                       : "bg-gray-100 hover:bg-gray-900 hover:text-white text-gray-800 border-gray-300 hover:border-gray-900 hover:scale-105"
                   }`}
                 >
@@ -457,26 +453,6 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* Progress Indicators - Step 4 of 4 */}
-          <div className="flex items-center justify-center space-x-2 mt-8">
-            {/* Step 1 - Completed */}
-            <div className="w-10 h-1 bg-gray-900 rounded-full"></div>
-            {/* Step 2 - Completed */}
-            <div className="w-10 h-1 bg-gray-900 rounded-full"></div>
-            {/* Step 3 - Completed */}
-            <div className="w-10 h-1 bg-gray-900 rounded-full"></div>
-            {/* Step 4 - Active */}
-            <div className="w-10 h-1 bg-gray-900 rounded-full"></div>
-          </div>
-
-          {/* Back Navigation */}
-          <div className="text-center mt-4">
-            <Link href="/workspace-setup/step3">
-              <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                Back to team invitations
-              </span>
-            </Link>
-          </div>
         </div>
       </div>
     </div>

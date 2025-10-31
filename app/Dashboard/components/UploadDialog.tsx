@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -257,47 +258,49 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
           Upload
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[560px] p-6">
-        <div className="space-y-6">
+      <DialogContent className="w-[95vw] sm:max-w-[560px] max-w-[95vw] p-4 sm:p-6 max-h-[90vh] overflow-y-auto scrollbar-hide flex items-center justify-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div className="space-y-4 sm:space-y-6 w-full">
           <DialogHeader className="text-left p-0">
-            <DialogTitle>Upload Files</DialogTitle>
+            <DialogTitle className="text-base sm:text-lg">Upload Files</DialogTitle>
+            <DialogDescription className="sr-only">Upload files to your library</DialogDescription>
           </DialogHeader>
 
-          <div className="flex gap-3 mb-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-3 sm:mb-4">
             <button
               type="button"
               onClick={() => handleButtonClick("files")}
-              className="flex-1 py-3 px-4 border-2 border-dashed rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+              className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 border-2 border-dashed rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
             >
-              <div className="flex flex-col items-center gap-2">
-                <FileText className="h-6 w-6 text-gray-600" />
-                <span className="text-sm font-medium">Upload Files</span>
+              <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+                <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />
+                <span className="text-xs sm:text-sm font-medium">Upload Files</span>
               </div>
             </button>
             <button
               type="button"
               onClick={() => handleButtonClick("folder")}
-              className="flex-1 py-3 px-4 border-2 border-dashed rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+              className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 border-2 border-dashed rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
             >
-              <div className="flex flex-col items-center gap-2">
-                <FiUploadCloud className="h-6 w-6 text-gray-600" />
-                <span className="text-sm font-medium">Upload Folder</span>
+              <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+                <FiUploadCloud className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />
+                <span className="text-xs sm:text-sm font-medium">Upload Folder</span>
               </div>
             </button>
           </div>
 
           <div
-            className={`border-2 border-dashed rounded-xl text-center transition-colors w-full ${
+            className={`border-2 border-dashed rounded-lg sm:rounded-xl text-center transition-colors w-full ${
               isDragging
                 ? "border-blue-500 bg-blue-50"
                 : "border-[#E4E4E7] hover:border-gray-400"
             }`}
             style={{
-              minHeight: "100px",
+              minHeight: "80px",
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
+              padding: "1rem",
               boxShadow:
                 "0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1)",
             }}
@@ -306,14 +309,14 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
-            <div className="text-center">
-              <p className="text-sm font-medium text-gray-900">
+            <div className="text-center px-2">
+              <p className="text-xs sm:text-sm font-medium text-gray-900">
                 {isDragging
                   ? "Drop files or folders here"
                   : "Or drag & drop files/folders here"}
               </p>
-              <p className="text-xs text-[#71717A] mt-1">
-                Supported formats: PDF, DOCX, XLSX, PPTX, PNG, MP4, CSV, TXT
+              <p className="text-[10px] sm:text-xs text-[#71717A] mt-1">
+                Supported: PDF, DOCX, XLSX, PPTX, PNG, MP4, CSV, TXT
               </p>
             </div>
           </div>
@@ -338,16 +341,16 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
           {files.length > 0 && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-medium">Files to upload</h4>
+                <h4 className="text-xs sm:text-sm font-medium">Files to upload</h4>
                 <button
                   type="button"
-                  className="text-xs text-gray-500 hover:text-gray-700"
+                  className="text-[10px] sm:text-xs text-gray-500 hover:text-gray-700"
                   onClick={() => setFiles([])}
                 >
                   Clear all
                 </button>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 {files.map((file, index) => {
                   const status = uploadStatus[index] || "pending";
                   const progress = uploadProgress[index] || 0;
@@ -356,85 +359,86 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                   return (
                     <div
                       key={index}
-                      className={`flex items-center justify-between rounded-lg p-3 ${
+                      className={`flex items-center justify-between rounded-lg p-2 sm:p-3 ${
                         status === "error"
                           ? "border-2 border-red-500"
                           : "border border-gray-200"
                       }`}
                     >
-                      <div className="flex items-center gap-3 flex-1">
-                        <span className="text-xs font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded">
+                      <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                        <span className="text-[10px] sm:text-xs font-medium text-gray-700 bg-gray-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded flex-shrink-0">
                           {fileTypeLabel}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{file.name}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <p className="text-xs text-gray-500">
+                          <p className="text-xs sm:text-sm font-medium truncate">{file.name}</p>
+                          <div className="flex items-center gap-1 sm:gap-2 mt-0.5 sm:mt-1">
+                            <p className="text-[10px] sm:text-xs text-gray-500">
                               {(file.size / 1024).toFixed(2)} KB
                             </p>
                             {status === "uploading" && (
-                              <p className="text-xs text-blue-600">
-                                • Uploaded {progress}%
+                              <p className="text-[10px] sm:text-xs text-blue-600">
+                                • {progress}%
                               </p>
                             )}
                             {status === "error" && (
-                              <p className="text-xs text-red-600">
-                                • Upload failed. Please try again.
+                              <p className="text-[10px] sm:text-xs text-red-600 truncate">
+                                • Failed
                               </p>
                             )}
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                         {status === "uploading" && (
-                          <div className="relative w-8 h-8">
-                            <svg className="w-8 h-8 transform -rotate-90">
+                          <div className="relative w-6 h-6 sm:w-8 sm:h-8">
+                            <svg className="w-6 h-6 sm:w-8 sm:h-8 transform -rotate-90">
                               <circle
-                                cx="16"
-                                cy="16"
-                                r="14"
+                                cx="12"
+                                cy="12"
+                                r="10"
                                 stroke="#E5E7EB"
-                                strokeWidth="3"
+                                strokeWidth="2"
                                 fill="none"
+                                className="sm:cx-16 sm:cy-16 sm:r-14 sm:stroke-[3]"
                               />
                               <circle
-                                cx="16"
-                                cy="16"
-                                r="14"
+                                cx="12"
+                                cy="12"
+                                r="10"
                                 stroke="#3B82F6"
-                                strokeWidth="3"
+                                strokeWidth="2"
                                 fill="none"
-                                strokeDasharray={`${2 * Math.PI * 14}`}
+                                strokeDasharray={`${2 * Math.PI * 10}`}
                                 strokeDashoffset={`${
-                                  2 * Math.PI * 14 * (1 - progress / 100)
+                                  2 * Math.PI * 10 * (1 - progress / 100)
                                 }`}
                                 strokeLinecap="round"
-                                className="transition-all duration-300"
+                                className="transition-all duration-300 sm:cx-16 sm:cy-16 sm:r-14 sm:stroke-[3]"
                               />
                             </svg>
                           </div>
                         )}
                         {status === "success" && (
                           <>
-                            <CheckCircle className="h-6 w-6 text-green-600" />
+                            <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
                             <button
                               type="button"
                               className="text-gray-400 hover:text-gray-600"
                               onClick={() => removeFile(index)}
                             >
-                              <X className="h-4 w-4" />
+                              <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             </button>
                           </>
                         )}
                         {status === "error" && (
                           <>
-                            <XCircle className="h-6 w-6 text-red-600" />
+                            <XCircle className="h-5 w-5 sm:h-6 sm:w-6 text-red-600" />
                             <button
                               type="button"
                               className="text-gray-400 hover:text-gray-600"
                               onClick={() => removeFile(index)}
                             >
-                              <X className="h-4 w-4" />
+                              <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             </button>
                           </>
                         )}
@@ -444,7 +448,7 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                             className="text-gray-400 hover:text-gray-600"
                             onClick={() => removeFile(index)}
                           >
-                            <X className="h-4 w-4" />
+                            <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           </button>
                         )}
                       </div>
@@ -452,21 +456,21 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                   );
                 })}
               </div>
-              <div className="flex gap-3 mt-4">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-3 sm:mt-4">
                 <Button
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 text-xs sm:text-sm h-9 sm:h-10"
                   onClick={handleCancel}
                   disabled={isUploading}
                 >
                   Cancel
                 </Button>
                 <Button
-                  className="flex-1"
+                  className="flex-1 text-xs sm:text-sm h-9 sm:h-10"
                   onClick={handleUpload}
                   disabled={isUploading}
                 >
-                  <Upload className="mr-2 h-4 w-4" />
+                  <Upload className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   Upload {files.length} file{files.length !== 1 ? "s" : ""}
                 </Button>
               </div>
