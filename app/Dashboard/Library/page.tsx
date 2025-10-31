@@ -665,7 +665,7 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
             </section>
 
             {/* Bottom spacer */}
-            <div className="h-6 sm:h-6" aria-hidden="true"></div>
+            <div className="h-8 sm:h-8" aria-hidden="true"></div>
           </div>
         </main>
 
