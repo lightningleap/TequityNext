@@ -2,24 +2,19 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown, X, Search, ChevronsRight, Maximize2, Edit } from "lucide-react";
-import { FileGrid, FileItem } from "../components/filegrid";
+import { ChevronDown,  ChevronsRight, Maximize2, Edit } from "lucide-react";
+import { FileItem } from "../components/filegrid";
 import { SearchBar } from "../components/searchbar";
-import { FileCard } from "../components/filecard";
 import { UploadDialog, FolderItem as UploadedFolder } from "../components/UploadDialog";
 import { LuClock } from "react-icons/lu";
 import { IoGridOutline } from "react-icons/io5";
 import { FaListUl } from "react-icons/fa";
-import { Folder, FileText, Clock, FilePlus, Download, RefreshCw, ChevronUp, Sparkles, MoreHorizontal, Share2, Trash2, FolderOpen } from "lucide-react";
+import { ChevronUp, Sparkles, MoreHorizontal } from "lucide-react";
 import { ChatInterface } from "../components/ChatInterface";
 import { DashboardLayout } from "../components/DashboardLayout";
 import { PDFViewer } from "../components/PDFViewer";
 import { useChatContext } from "../context/ChatContext";
 import { useSidebar } from "@/components/ui/sidebar";
-import redFolder from "../assets/redFolder.svg";
-import yellowFolder from "../assets/yellowFolder.svg";
-import blackFolder from "../assets/blackFolder.svg";
-// import blueFolder from "";
 
 interface LibraryContentProps {
   files: FileItem[];
@@ -668,6 +663,9 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
               )}
 
             </section>
+
+            {/* Bottom spacer */}
+            <div className="h-6 sm:h-6" aria-hidden="true"></div>
           </div>
         </main>
 
