@@ -8,12 +8,9 @@ import { usePathname } from "next/navigation";
 import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps, cva } from "class-variance-authority";
 import {
-  Home,
   FileText,
-  Settings,
-  Users,
-  BarChart2,
   PanelLeftIcon,
+  MessageCircle,
 } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -36,14 +33,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { CiSearch } from "react-icons/ci";
-import { Sparkles } from "lucide-react";
 import { MdOutlineFolderCopy } from "react-icons/md";
 import { SearchDialog } from "@/app/Dashboard/components/SearchDialog";
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-const SIDEBAR_WIDTH = "16rem";
+const SIDEBAR_WIDTH = "244px";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
-const SIDEBAR_WIDTH_ICON = "3rem";
+const SIDEBAR_WIDTH_ICON = "48px";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
 type SidebarContextProps = {
@@ -177,7 +173,7 @@ function Sidebar({
   variant?: "sidebar" | "floating" | "inset";
   collapsible?: "offcanvas" | "icon" | "none";
 }) {
-  const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+  const { isMobile, state, openMobile, setOpenMobile, toggleSidebar } = useSidebar();
 
   if (collapsible === "none") {
     return (
@@ -258,8 +254,13 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="bg-white group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm transition-all duration-300 ease-in-out will-change-auto"
+          className="bg-white group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm transition-all duration-300 ease-in-out will-change-auto group-data-[collapsible=icon]:cursor-pointer group-data-[collapsible=icon]:hover:bg-gray-50"
           style={{ contain: 'layout style' }}
+          onClick={() => {
+            if (state === "collapsed") {
+              toggleSidebar();
+            }
+          }}
         >
           {children}
         </div>
@@ -270,7 +271,6 @@ function Sidebar({
 
 const SidebarMenuItems = React.memo(function SidebarMenuItems() {
   const pathname = usePathname();
-  const { state } = useSidebar();
   const [searchDialogOpen, setSearchDialogOpen] = React.useState(false);
 
   const handleSearchOpen = React.useCallback(() => {
@@ -279,57 +279,87 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
 
   const navItems = React.useMemo(() => [
     {
-      title: "Tequity AI",
-      icon: <Sparkles className="h-4 w-4 flex-shrink-0" />,
-      href: "/Dashboard/chat",
+      title: "Library",
+      icon: <MdOutlineFolderCopy width={16} height={16} className="flex-shrink-0" />,
+      href: "/Dashboard/Library",
     },
     {
-      title: "Library",
-      icon: <MdOutlineFolderCopy width={15} height={15} className="flex-shrink-0" />,
-      href: "/Dashboard/Library",
+      title: "Chats",
+      icon: <MessageCircle className="h-4 w-4 flex-shrink-0" />,
+      href: "/Dashboard/chat",
     },
   ], []);
 
   return (
     <>
-      <SidebarMenu className="space-y-0.5 mt-3 mb-3">
+      <SidebarMenu className="gap-1 px-2 mt-2 mb-2 group-data-[collapsible=icon]:px-2">
         {/* Search Item - Clickable to open dialog */}
-        <SidebarMenuItem className="py-0.5">
+        <SidebarMenuItem>
           <SidebarMenuButton
-            className="w-full justify-start py-2 group-data-[collapsible=icon]:justify-start group-data-[collapsible=icon]:pl-1 transition-all duration-150 ease-in-out"
+            className="w-full justify-start h-8 px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-150 ease-in-out"
             onClick={handleSearchOpen}
+            tooltip={{
+              children: "Search",
+            }}
           >
-            <span className="flex items-center gap-0 w-full cursor-pointer">
-              <span className="flex items-center justify-center w-8 h-8 flex-shrink-0">
-                <CiSearch width={20} height={20} className="flex-shrink-0 mr-3 text-black" />
-              </span>
-              <span className="overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">Search</span>
+            <span className="flex items-center gap-2 w-full group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:gap-0">
+              <CiSearch className="h-4 w-4 flex-shrink-0 text-black" />
+              <span className="overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:hidden">Search</span>
             </span>
           </SidebarMenuButton>
         </SidebarMenuItem>
 
       {/* Regular Navigation Items */}
       {navItems.map((item) => (
-        <SidebarMenuItem key={item.href} className="py-0.5">
+        <SidebarMenuItem key={item.href}>
           <SidebarMenuButton
             asChild
             isActive={pathname === item.href}
-            className={`w-full justify-start py-2 group-data-[collapsible=icon]:justify-center transition-all duration-150 ease-in-out ${
+            className={`w-full justify-start h-8 px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-150 ease-in-out ${
               pathname === item.href ? 'bg-[#F4F4F5]' : ''
             }`}
+            tooltip={{
+              children: item.title,
+            }}
           >
             <Link
               href={item.href}
-              className="flex items-center gap-0 w-full"
+              className="flex items-center gap-2 w-full group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:justify-center"
               prefetch={true}
             >
-              <span className="flex items-center justify-center w-8 h-8 flex-shrink-0 -ml-1 group-data-[collapsible=icon]:ml-3">{item.icon}</span>
-              <span className="overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">{item.title}</span>
+              {item.icon}
+              <span className="overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:hidden">{item.title}</span>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
       ))}
     </SidebarMenu>
+
+      {/* Starred Section */}
+      <div className="flex flex-col gap-0 items-start px-2 w-full mt-2 group-data-[collapsible=icon]:hidden">
+        <div className="flex h-8 items-center px-2 w-full">
+          <span className="text-xs font-medium text-[#3f3f46] opacity-70 overflow-ellipsis overflow-hidden whitespace-nowrap">
+            Starred
+          </span>
+        </div>
+        <div className="flex flex-col gap-1 items-start w-full">
+          {[
+            { name: "README.md" },
+            { name: "api/hello/route.ts" },
+            { name: "app/layout.tsx" }
+          ].map((file) => (
+            <div
+              key={file.name}
+              className="flex gap-2 h-8 items-center px-2 w-full rounded-md hover:bg-gray-100 transition-colors cursor-pointer"
+            >
+              <FileText className="h-4 w-4 flex-shrink-0 text-[#3f3f46]" />
+              <span className="text-sm font-normal text-[#3f3f46] overflow-ellipsis overflow-hidden whitespace-nowrap leading-5">
+                {file.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Search Dialog */}
       <SearchDialog open={searchDialogOpen} onOpenChange={setSearchDialogOpen} />
