@@ -299,7 +299,7 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
             className="w-full justify-start py-2 group-data-[collapsible=icon]:justify-start group-data-[collapsible=icon]:pl-1 transition-all duration-150 ease-in-out"
             onClick={handleSearchOpen}
           >
-            <span className="flex items-center gap-0 w-full">
+            <span className="flex items-center gap-0 w-full cursor-pointer">
               <span className="flex items-center justify-center w-8 h-8 flex-shrink-0">
                 <CiSearch width={20} height={20} className="flex-shrink-0 mr-3 text-black" />
               </span>
