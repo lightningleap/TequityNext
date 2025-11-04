@@ -250,11 +250,11 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
-          className="flex items-center h-9 bg-[#f1f5f9] gap-2 text-[#0f172a] hover:bg-gray-200 px-3 rounded-md"
+          className="flex items-center justify-center size-9 md:w-auto md:h-9 bg-[#f1f5f9] gap-0 md:gap-2 text-[#0f172a] dark:bg-[#27272A] hover:bg-gray-200 md:px-3 rounded-md"
           onClick={() => setIsOpen(true)}
         >
-          <FiUploadCloud className="h-4 w-4" />
-          <span className="text-xs font-medium">Upload</span>
+          <FiUploadCloud className="h-4 w-4 dark:text-white" />
+          <span className="hidden md:inline text-xs font-medium dark:text-white">Upload</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[95vw] sm:max-w-[560px] max-w-[95vw] p-4 sm:p-6 max-h-[90vh] overflow-y-auto scrollbar-hide flex items-center justify-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">

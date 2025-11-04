@@ -53,9 +53,9 @@ export function SettingsSidebar({
   onSectionChange,
 }: SettingsSidebarProps) {
   return (
-    <div className="w-full md:w-[180px] flex-shrink-0 md:h-full md:border-r border-b md:border-b-0 border-gray-200 sm:bg-blue-50 bg-white p-4 md:rounded-tl-lg md:rounded-bl-lg rounded-tl-lg rounded-tr-lg md:rounded-tr-none">
+    <div className="w-full md:w-[180px] flex-shrink-0 md:h-full md:border-r border-b md:border-b-0 dark:border-[#3F3F46] border-gray-200 sm:bg-blue-50 bg-white dark:bg-[#09090B] p-4 md:rounded-tl-lg md:rounded-bl-lg rounded-tl-lg rounded-tr-lg md:rounded-tr-none border dark:border-[#3F3F46] dark:text-[#F4F4F5]">
       <div className="mb-4 md:mb-6">
-        <h2 className="text-lg font-semibold text-gray-900">Settings</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-[#F4F4F5]">Settings</h2>
       </div>
       <nav className="grid grid-cols-3 gap-2 md:grid-cols-1 md:space-y-1 md:gap-0">
         {menuItems.map((item) => {
@@ -68,8 +68,8 @@ export function SettingsSidebar({
               onClick={() => onSectionChange(item.id)}
               className={`w-full flex flex-row items-center justify-start gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-md text-xs md:text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-gray-100 text-gray-900"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  ? "bg-gray-100 text-gray-900 dark:bg-[#27272A] dark:text-[#F4F4F5] dark:border-[#3F3F46]"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:hover:bg-[#27272A] dark:text-[#F4F4F5] dark:hover:border-[#3F3F46]"
               }`}
             >
               <Icon className="h-4 w-4 md:h-5 md:w-5 flex-shrink-0" />

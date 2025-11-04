@@ -38,7 +38,7 @@ import { SearchDialog } from "@/app/Dashboard/components/SearchDialog";
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = "244px";
-const SIDEBAR_WIDTH_MOBILE = "18rem";
+const SIDEBAR_WIDTH_MOBILE = "15.5rem";
 const SIDEBAR_WIDTH_ICON = "48px";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
@@ -149,7 +149,7 @@ function SidebarProvider({
             } as React.CSSProperties
           }
           className={cn(
-            "group/sidebar-wrapper has-data-[variant=inset]:bg-white flex min-h-svh w-full",
+            "group/sidebar-wrapper has-data-[variant=inset]:bg-white dark:bg-[#09090B] flex min-h-svh w-full",
             className
           )}
           {...props}
@@ -197,7 +197,7 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="bg-white text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
+          className="bg-white dark:bg-[#09090B] text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -254,7 +254,7 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="bg-white group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm transition-all duration-300 ease-in-out will-change-auto group-data-[collapsible=icon]:cursor-pointer group-data-[collapsible=icon]:hover:bg-gray-50"
+          className="bg-white dark:bg-[#09090B] group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm transition-all duration-300 ease-in-out will-change-auto group-data-[collapsible=icon]:cursor-pointer group-data-[collapsible=icon]:hover:bg-gray-50 dark:group-data-[collapsible=icon]:hover:bg-gray-900"
           style={{ contain: 'layout style' }}
           onClick={() => {
             if (state === "collapsed") {
@@ -303,7 +303,7 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
             }}
           >
             <span className="flex items-center gap-2 w-full group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:gap-0">
-              <CiSearch className="h-4 w-4 flex-shrink-0 text-black" />
+              <CiSearch className="h-4 w-4 flex-shrink-0 text-black dark:text-white" />
               <span className="overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:hidden">Search</span>
             </span>
           </SidebarMenuButton>
@@ -316,7 +316,7 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
             asChild
             isActive={pathname === item.href}
             className={`w-full justify-start h-8 px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-150 ease-in-out ${
-              pathname === item.href ? 'bg-[#F4F4F5]' : ''
+              pathname === item.href ? 'bg-[#F4F4F5] dark:bg-[#27272A] dark:text-white' : ''
             }`}
             tooltip={{
               children: item.title,
@@ -335,31 +335,33 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
       ))}
     </SidebarMenu>
 
-      {/* Starred Section */}
-      <div className="flex flex-col gap-0 items-start px-2 w-full mt-2 group-data-[collapsible=icon]:hidden">
-        <div className="flex h-8 items-center px-2 w-full">
-          <span className="text-xs font-medium text-[#3f3f46] opacity-70 overflow-ellipsis overflow-hidden whitespace-nowrap">
-            Starred
-          </span>
+      {/* Starred Section - Only visible on Library page */}
+      {pathname === "/Dashboard/Library" && (
+        <div className="flex flex-col gap-0 items-start px-2 w-full mt-2 group-data-[collapsible=icon]:hidden">
+          <div className="flex h-8 items-center px-2 w-full">
+            <span className="text-xs font-medium text-[#3f3f46] dark:text-[#A1A1AA] opacity-70 overflow-ellipsis overflow-hidden whitespace-nowrap">
+              Starred
+            </span>
+          </div>
+          <div className="flex flex-col gap-1 items-start w-full">
+            {[
+              { name: "README.md" },
+              { name: "api/hello/route.ts" },
+              { name: "app/layout.tsx" }
+            ].map((file) => (
+              <div
+                key={file.name}
+                className="flex gap-2 h-8 items-center px-2 w-full rounded-md hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
+              >
+                <FileText className="h-4 w-4 flex-shrink-0 text-[#3f3f46] dark:text-[#A1A1AA]" />
+                <span className="text-sm font-normal text-[#3f3f46] dark:text-[#A1A1AA] overflow-ellipsis overflow-hidden whitespace-nowrap leading-5">
+                  {file.name}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="flex flex-col gap-1 items-start w-full">
-          {[
-            { name: "README.md" },
-            { name: "api/hello/route.ts" },
-            { name: "app/layout.tsx" }
-          ].map((file) => (
-            <div
-              key={file.name}
-              className="flex gap-2 h-8 items-center px-2 w-full rounded-md hover:bg-gray-100 transition-colors cursor-pointer"
-            >
-              <FileText className="h-4 w-4 flex-shrink-0 text-[#3f3f46]" />
-              <span className="text-sm font-normal text-[#3f3f46] overflow-ellipsis overflow-hidden whitespace-nowrap leading-5">
-                {file.name}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
+      )}
 
       {/* Search Dialog */}
       <SearchDialog open={searchDialogOpen} onOpenChange={setSearchDialogOpen} />
