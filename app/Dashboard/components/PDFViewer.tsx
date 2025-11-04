@@ -77,16 +77,16 @@ export function PDFViewer({ isOpen, onClose, file, folderName, onMaximizeChange 
 
   return (
     <div
-      className={`fixed top-0 right-0 h-full bg-white border-l border-gray-200 shadow-lg transform transition-all duration-300 ease-in-out z-50 ${
+      className={`fixed top-0 right-0 h-full bg-white dark:bg-[#09090B] border-l border-gray-200 dark:border-gray-800 shadow-lg transform transition-all duration-300 ease-in-out z-50 ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
       } ${isMaximized ? '' : 'w-[400px]'}`}
       style={isMaximized ? { width: maxWidth } : undefined}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#09090B]">
         {/* Left side: File/folder name */}
         <div className="flex items-center gap-3">
-          <h2 className={`text-sm font-medium text-gray-900 truncate ${isMaximized ? 'max-w-[600px]' : 'max-w-[200px]'}`}>
+          <h2 className={`text-sm font-medium text-gray-900 dark:text-white truncate ${isMaximized ? 'max-w-[600px]' : 'max-w-[200px]'}`}>
             {displayName}
           </h2>
         </div>
@@ -95,21 +95,21 @@ export function PDFViewer({ isOpen, onClose, file, folderName, onMaximizeChange 
         <div className="flex items-center gap-3">
           <button
             onClick={handleDownload}
-            className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+            className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors"
             aria-label="Download file"
           >
             <Download className="h-5 w-5" />
           </button>
           <button
             onClick={handleMaximize}
-            className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+            className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors"
             aria-label={isMaximized ? "Minimize viewer" : "Maximize viewer"}
           >
             {isMaximized ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
           </button>
           <button
             onClick={handleClose}
-            className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+            className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors"
             aria-label="Close viewer"
           >
             <ChevronsRight className="h-5 w-5" />
@@ -118,7 +118,7 @@ export function PDFViewer({ isOpen, onClose, file, folderName, onMaximizeChange 
       </div>
 
       {/* Content Area */}
-      <div className="h-[calc(100%-64px)] overflow-auto scrollbar-hide bg-gray-50">
+      <div className="h-[calc(100%-64px)] overflow-auto scrollbar-hide bg-gray-50 dark:bg-[#09090B]">
         {/* PDF Viewer */}
         {file.type === "PDF" ? (
           file.url ? (
@@ -131,13 +131,13 @@ export function PDFViewer({ isOpen, onClose, file, folderName, onMaximizeChange 
                   <div className="flex items-center justify-center h-64">
                     <div className="text-center">
                       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                      <p className="text-sm text-gray-600">Loading PDF...</p>
+                      <p className="text-sm text-gray-600 dark:text-white">Loading PDF...</p>
                     </div>
                   </div>
                 }
                 error={
                   <div className="flex items-center justify-center h-64">
-                    <div className="text-center bg-white rounded-lg border border-red-200 p-6">
+                    <div className="text-center bg-white dark:bg-[#09090B] rounded-lg border border-red-200 p-6">
                       <p className="text-sm text-red-600 mb-2">Failed to load PDF</p>
                       <p className="text-xs text-gray-500">The PDF file could not be loaded</p>
                     </div>

@@ -15,6 +15,14 @@ import { DashboardLayout } from "../components/DashboardLayout";
 import { PDFViewer } from "../components/PDFViewer";
 import { useChatContext } from "../context/ChatContext";
 import { useSidebar } from "@/components/ui/sidebar";
+import Image from "next/image";
+import Logomark from "@/public/Logomark.svg";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface LibraryContentProps {
   files: FileItem[];
@@ -32,7 +40,7 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
   const [foldersExpanded, setFoldersExpanded] = useState(true);
   const [filesExpanded, setFilesExpanded] = useState(true);
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('Search Query');
+  const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [isPDFViewerOpen, setIsPDFViewerOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
@@ -51,13 +59,28 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
     'Excel': ['XLSX', 'XLS', 'CSV']
   };
 
-  // Filter files based on active tab with memoization for better performance
-  const filteredFiles = activeFileType
-    ? files.filter(file => {
-      const fileExt = file.name.split('.').pop()?.toUpperCase();
-      return fileTypeMap[activeFileType]?.includes(fileExt || '');
-    })
-    : files;
+  // Filter files based on active tab and search query
+  const filteredFiles = files.filter(file => {
+    // Filter by file type
+    const fileExt = file.name.split('.').pop()?.toUpperCase();
+    const typeMatch = activeFileType
+      ? fileTypeMap[activeFileType]?.includes(fileExt || '')
+      : true;
+
+    // Filter by search query
+    const searchMatch = searchQuery
+      ? file.name.toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
+
+    return typeMatch && searchMatch;
+  });
+
+  // Filter folders based on search query
+  const filteredFolders = folders.filter(folder =>
+    searchQuery
+      ? folder.name.toLowerCase().includes(searchQuery.toLowerCase())
+      : true
+  );
 
   // Get count of files for each tab
   const getFileCount = (tab: string) => {
@@ -191,7 +214,11 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
         >
           <div className="w-full max-w-[792px] px-2 sm:px-0">
             <header className="mb-6 sm:mb-8 flex flex-col items-start justify-start gap-6 sm:gap-12">
-              <SearchBar />
+              <SearchBar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder="Search files and folders..."
+              />
             </header>
 
             <section aria-labelledby="recently-visited" className="mb-6 sm:mb-10">
@@ -203,42 +230,42 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                 Recently visited
               </h2>
               <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-                <div className="flex flex-col items-center w-full min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 bg-[#F4F4F5] hover:bg-gray-50 cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3">
+                <div className="flex flex-col items-center w-full min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3">
                   <div className="flex items-center justify-center mb-3 sm:mb-4">
                     <img src="/blueFolder.svg" alt="Recent Files" className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]" />
                   </div>
                   <div className="w-full">
-                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1">Opened 3 hours ago</p>
+                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">Opened 3 hours ago</p>
                     <p className="text-xs text-muted-foreground mt-1">5 items</p>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-center w-full min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 bg-[#F4F4F5] hover:bg-gray-50 cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3">
+                <div className="flex flex-col items-center w-full min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3">
                   <div className="flex items-center justify-center mb-3 sm:mb-4">
                     <img src="/blackFolder.svg" alt="Created Files" className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]" />
                   </div>
                   <div className="w-full">
-                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1">Created</p>
+                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">Created</p>
                     <p className="text-xs text-muted-foreground mt-1">12 documents</p>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-center w-full min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 bg-[#F4F4F5] hover:bg-gray-50 cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3">
+                <div className="flex flex-col items-center w-full min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3">
                   <div className="flex items-center justify-center mb-3 sm:mb-4">
                     <img src="/yellowFolder.svg" alt="Received Files" className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]" />
                   </div>
                   <div className="w-full">
-                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1">Received</p>
+                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">Received</p>
                     <p className="text-xs text-muted-foreground mt-1">8 folders</p>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-center w-full min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 bg-[#F4F4F5] hover:bg-gray-50 cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3">
+                <div className="flex flex-col items-center w-full min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3">
                   <div className="flex items-center justify-center mb-3 sm:mb-4">
                     <img src="/redFolder.svg" alt="Updated Files" className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]" />
                   </div>
                   <div className="w-full">
-                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1">Updated</p>
+                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">Updated</p>
                     <p className="text-xs text-muted-foreground mt-1">15 files</p>
                   </div>
                 </div>
@@ -263,12 +290,12 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                     )}
                   </button>
                 </div>
-                <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-md">
+                <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-md dark:bg-[#27272A]">
                   <button
                     onClick={() => setFolderView("grid")}
                     className={`p-1.5 rounded transition-colors ${folderView === "grid"
-                        ? "text-foreground bg-white shadow-sm"
-                        : "text-muted-foreground hover:text-foreground hover:bg-gray-200"
+                        ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
+                        : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
                       }`}
                     aria-label="Grid view"
                   >
@@ -277,8 +304,8 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                   <button
                     onClick={() => setFolderView("list")}
                     className={`p-1.5 rounded transition-colors ${folderView === "list"
-                        ? "text-foreground bg-white shadow-sm"
-                        : "text-muted-foreground hover:text-foreground hover:bg-gray-200"
+                        ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
+                        : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
                       }`}
                     aria-label="List view"
                   >
@@ -291,26 +318,30 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                 <>
                   {folderView === "grid" ? (
                     <div className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                      {folders.map((folder) => (
+                      {filteredFolders.length > 0 ? filteredFolders.map((folder) => (
                         <div
                           key={folder.id}
                           onClick={() => handleFolderSelect(folder)}
-                          className="flex items-center gap-3 rounded-lg bg-muted px-4 py-3 hover:bg-muted/80 cursor-pointer transition-colors"
+                          className="flex items-center gap-3 rounded-lg bg-muted px-4 py-3 hover:bg-muted/80 cursor-pointer transition-colors dark:bg-[#27272A]"
                           role="button"
                           tabIndex={0}
                           onKeyDown={(e) => e.key === "Enter" && handleFolderSelect(folder)}
                         >
                           <img src="/Folder.svg" alt="Folder" className="h-[20px] w-[20px]" />
-                          <div className="flex-1 min-w-0">
+                          <div className="flex-1 min-w-0 ">
                             <p className="truncate text-sm font-medium">{folder.name}</p>
                           </div>
                         </div>
-                      ))}
+                      )) : (
+                        <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
+                          No folders found
+                        </div>
+                      )}
                     </div>
                   ) : (
-                    <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+                    <div className="overflow-hidden bg-white dark:bg-[#09090B]">
                       {/* Table Header */}
-                      <div className="grid grid-cols-[32px_1fr_40px] sm:grid-cols-[40px_1fr_50px] md:grid-cols-[40px_1fr_120px_120px_50px] gap-2 sm:gap-3 md:gap-4 px-2 sm:px-3 md:px-4 py-3 bg-gray-50 border-b border-gray-200 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <div className="grid grid-cols-[32px_1fr_40px] sm:grid-cols-[40px_1fr_50px] md:grid-cols-[40px_1fr_120px_120px_50px] gap-2 sm:gap-3 md:gap-4 px-2 sm:px-3 md:px-4 py-3 bg-gray-50 border-b dark:border-[#3F3F46] border-gray-200 text-xs font-medium text-gray-500 dark:text-[#A1A1AA] tracking-wider dark:bg-[#09090B]">
                         <div></div>
                         <div>Name</div>
                         <div className="hidden md:block">Size</div>
@@ -319,12 +350,12 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                       </div>
 
                       {/* Table Rows */}
-                      <div className="divide-y divide-gray-100">
-                        {folders.map((folder) => (
+                      <div className="divide-y divide-gray-100 dark:divide-[#3F3F46]">
+                        {filteredFolders.length > 0 ? filteredFolders.map((folder) => (
                           <div
                             key={folder.id}
                             onClick={() => handleFolderSelect(folder)}
-                            className="grid grid-cols-[32px_1fr_40px] sm:grid-cols-[40px_1fr_50px] md:grid-cols-[40px_1fr_120px_120px_50px] gap-2 sm:gap-3 md:gap-4 px-2 sm:px-3 md:px-4 py-2 sm:py-3 hover:bg-gray-50 cursor-pointer transition-colors items-center"
+                            className="grid grid-cols-[32px_1fr_40px] sm:grid-cols-[40px_1fr_50px] md:grid-cols-[40px_1fr_120px_120px_50px] gap-2 sm:gap-3 md:gap-4 px-2 sm:px-3 md:px-4 py-2 sm:py-3 hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors items-center"
                             role="button"
                             tabIndex={0}
                             onKeyDown={(e) => e.key === "Enter" && handleFolderSelect(folder)}
@@ -344,18 +375,18 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                               <img src="/Folder.svg" alt="Folder" className="h-[16px] w-[16px] sm:h-[18px] sm:w-[18px] md:h-[20px] md:w-[20px] flex-shrink-0" />
                               <div className="min-w-0 flex-1">
-                                <p className="truncate text-xs sm:text-sm font-medium text-gray-900">{folder.name}</p>
+                                <p className="truncate text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{folder.name}</p>
                                 <p className="text-[10px] sm:text-xs text-gray-500 md:hidden">{folder.fileCount} items</p>
                               </div>
                             </div>
 
                             {/* Size - Hidden on mobile */}
-                            <div className="hidden md:block text-sm text-gray-500">
+                            <div className="hidden md:block text-sm text-gray-500 dark:text-white">
                               {folder.fileCount} items
                             </div>
 
                             {/* Date Created - Hidden on mobile */}
-                            <div className="hidden md:block text-sm text-gray-500">
+                            <div className="hidden md:block text-sm text-gray-500 dark:text-white">
                               {formatDate(new Date())}
                             </div>
 
@@ -366,14 +397,18 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                                   e.stopPropagation();
                                   console.log("Open menu for folder:", folder.name);
                                 }}
-                                className="p-1 sm:p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+                                className="p-1 sm:p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-[#27272B] dark:text-white rounded transition-colors"
                                 title="More actions"
                               >
                                 <MoreHorizontal className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                               </button>
                             </div>
                           </div>
-                        ))}
+                        )) : (
+                          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                            No folders found
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -400,12 +435,12 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                   </button>
                 </div>
 
-                <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-md">
+                <div className="flex items-center gap-1 bg-gray-100 dark:bg-[#27272A] p-1 rounded-md">
                   <button
                     onClick={() => setFileView("grid")}
                     className={`p-1.5 rounded transition-colors ${fileView === "grid"
-                        ? "text-foreground bg-white shadow-sm"
-                        : "text-muted-foreground hover:text-foreground hover:bg-gray-200"
+                        ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
+                        : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
                       }`}
                     aria-label="Grid view"
                   >
@@ -414,8 +449,8 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                   <button
                     onClick={() => setFileView("list")}
                     className={`p-1.5 rounded transition-colors ${fileView === "list"
-                        ? "text-foreground bg-white shadow-sm"
-                        : "text-muted-foreground hover:text-foreground hover:bg-gray-200"
+                        ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
+                        : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
                       }`}
                     aria-label="List view"
                   >
@@ -427,13 +462,13 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
               {filesExpanded && (
                 <>
                   {/* File Type Tabs */}
-                  <div className="flex items-center gap-2 bg-white py-3 sm:py-4 overflow-x-auto pb-3 sm:pb-4 scrollbar-hide -mx-2 px-2 sm:mx-0 sm:px-0">
+                  <div className="flex items-center gap-2 bg-white dark:bg-[#09090B] py-3 sm:py-4 overflow-x-auto pb-3 sm:pb-4 scrollbar-hide -mx-2 px-2 sm:mx-0 sm:px-0">
                     <button
                       onClick={() => setActiveFileType(null)}
                       className={`shrink-0 cursor-pointer rounded-md px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
                         activeFileType === null
                           ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm'
-                          : 'text-gray-600 hover:bg-gray-50 border border-gray-200 bg-white hover:border-gray-300'
+                          : 'text-gray-600 hover:bg-gray-50 border border-gray-200 bg-white hover:border-gray-300 dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]'
                       }`}
                     >
                       <span>All Files</span>
@@ -450,10 +485,10 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                         <button
                           key={tab}
                           onClick={() => setActiveFileType(isActive ? null : tab)}
-                          className={`shrink-0 cursor-pointer rounded-md px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                          className={`shrink-0 cursor-pointer rounded-md px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 dark:bg-[#09090B] ${
                             isActive
-                              ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm'
-                              : 'text-gray-600 hover:bg-gray-50 border border-gray-200 bg-white hover:border-gray-300'
+                              ? 'bg-primary/10 text-primary dark:border-[#3F3F46] border border-primary/20 shadow-sm dark:bg-[#27272A]'
+                              : 'text-gray-600 hover:bg-gray-50 border border-gray-200 bg-white hover:border-gray-300 dark:border-[#3F3F46] dark:text-[#A1A1AA] dark:bg-[#09090B]'
                           }`}
                         >
                           <span>{tab}</span>
@@ -488,7 +523,7 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                           <div
                             key={file.id}
                             onClick={() => handleFileSelect(file)}
-                            className="flex items-center rounded-lg bg-[#F4F4F5] border border-gray-200 px-3 py-2 hover:bg-gray-50 cursor-pointer transition-colors"
+                            className="flex items-center rounded-lg bg-[#F4F4F5] dark:bg-[#27272A] dark:border-[#27272A] border border-gray-200 px-3 py-2 hover:bg-gray-50 cursor-pointer transition-colors"
                             role="button"
                             tabIndex={0}
                             onKeyDown={(e) => e.key === "Enter" && handleFileSelect(file)}
@@ -558,7 +593,7 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                       )}
                     </div>
                   ) : (
-                    <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+                    <div className="overflow-hidden bg-white dark:bg-[#09090B]">
                       {filteredFiles.length === 0 ? (
                         <div className="text-center py-8 text-gray-500">
                           <p className="text-sm">
@@ -570,7 +605,7 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                       ) : (
                         <>
                           {/* Table Header */}
-                          <div className="grid grid-cols-[32px_1fr_40px] sm:grid-cols-[40px_1fr_50px] md:grid-cols-[40px_1fr_120px_120px_50px] gap-2 sm:gap-3 md:gap-4 px-2 sm:px-3 md:px-4 py-3 bg-gray-50 border-b border-gray-200 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <div className="grid grid-cols-[32px_1fr_40px] sm:grid-cols-[40px_1fr_50px] md:grid-cols-[40px_1fr_120px_120px_50px] gap-2 sm:gap-3 md:gap-4 px-2 sm:px-3 md:px-4 py-3 bg-gray-50 border-b dark:border-[#3F3F46] border-gray-200 text-xs font-medium text-gray-500 tracking-wider dark:text-[#A1A1AA] dark:bg-[#09090B] ">
                             <div></div>
                             <div>Name</div>
                             <div className="hidden md:block">Size</div>
@@ -579,8 +614,17 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                           </div>
 
                           {/* Table Rows */}
-                          <div className="divide-y divide-gray-100">
-                            {filteredFiles.map((file) => {
+                          <div className="divide-y divide-gray-100 dark:divide-[#3F3F46]">
+                            {filteredFiles.length === 0 ? (
+                              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                                <p className="text-sm">
+                                  {activeFileType
+                                    ? `No ${activeFileType.toLowerCase()} files found`
+                                    : 'No files found'}
+                                </p>
+                              </div>
+                            ) : (
+                              filteredFiles.map((file) => {
                               const getFileIcon = () => {
                                 if (file.type === "PDF") return "/Files/PDF-icon.svg";
                                 if (file.type === "DOCX" || file.type === "DOC") return "/Files/Docs-icon.svg";
@@ -599,7 +643,7 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                                 <div
                                   key={fileId}
                                   onClick={() => handleFileSelect(file)}
-                                  className="grid grid-cols-[32px_1fr_40px] sm:grid-cols-[40px_1fr_50px] md:grid-cols-[40px_1fr_120px_120px_50px] gap-2 sm:gap-3 md:gap-4 px-2 sm:px-3 md:px-4 py-2 sm:py-3 hover:bg-gray-50 cursor-pointer transition-colors items-center"
+                                  className="grid grid-cols-[32px_1fr_40px] sm:grid-cols-[40px_1fr_50px] md:grid-cols-[40px_1fr_120px_120px_50px] gap-2 sm:gap-3 md:gap-4 px-2 sm:px-3 md:px-4 py-2 sm:py-3 hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors items-center"
                                   role="button"
                                   tabIndex={0}
                                   onKeyDown={(e) => e.key === "Enter" && handleFileSelect(file)}
@@ -623,18 +667,18 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                                       className="h-[16px] w-[16px] sm:h-[18px] sm:w-[18px] md:h-[20px] md:w-[20px] flex-shrink-0 object-contain"
                                     />
                                     <div className="min-w-0 flex-1">
-                                      <p className="truncate text-xs sm:text-sm font-medium text-gray-900">{file.name}</p>
-                                      <p className="text-[10px] sm:text-xs text-gray-500 md:hidden">{formatFileSize(file.size || 0)}</p>
+                                      <p className="truncate text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{file.name}</p>
+                                      <p className="text-[10px] sm:text-xs text-gray-500 md:hidden dark:text-white">{formatFileSize(file.size || 0)}</p>
                                     </div>
                                   </div>
 
                                   {/* Size - Hidden on mobile */}
-                                  <div className="hidden md:block text-sm text-gray-500">
+                                  <div className="hidden md:block text-sm text-gray-500 dark:text-white">
                                     {formatFileSize(file.size || 0)}
                                   </div>
 
                                   {/* Date Created - Hidden on mobile */}
-                                  <div className="hidden md:block text-sm text-gray-500">
+                                  <div className="hidden md:block text-sm text-gray-500 dark:text-white">
                                     {formatDate(file.uploadedAt || new Date())}
                                   </div>
 
@@ -645,7 +689,7 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                                         e.stopPropagation();
                                         console.log("Open menu for file:", file.name);
                                       }}
-                                      className="p-1 sm:p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+                                      className="p-1 sm:p-1.5 text-gray-500 hover:text-gray-900 dark:text-white dark:hover:bg-[#27272A] hover:bg-gray-100 rounded transition-colors"
                                       title="More actions"
                                     >
                                       <MoreHorizontal className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -653,7 +697,8 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                                   </div>
                                 </div>
                               );
-                            })}
+                            })
+                            )}
                           </div>
                         </>
                       )}
@@ -671,16 +716,16 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
 
         {/* AI Chat Sidebar */}
         <div
-          className={`fixed top-0 right-0 h-full w-[400px] bg-white border-l border-gray-200 shadow-lg transform transition-transform duration-300 ease-in-out z-40 ${isAIChatOpen ? 'translate-x-0' : 'translate-x-full'
+          className={`fixed top-0 right-0 h-full w-[400px] bg-white dark:bg-[#09090B] border-l border-gray-200 dark:border-[#3F3F46] shadow-lg transform transition-transform duration-300 ease-in-out z-40 ${isAIChatOpen ? 'translate-x-0' : 'translate-x-full'
             }`}
         >
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-[#3F3F46]">
             <input
               ref={searchInputRef}
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="text-sm font-medium text-gray-700 bg-transparent border-none focus:outline-none focus:ring-0 p-0 m-0 w-full"
+              className="text-sm font-medium dark:text-white text-gray-700 bg-transparent border-none focus:outline-none focus:ring-0 p-0 m-0 w-full"
             />
             <div className="flex items-center space-x-3">
               <button
@@ -688,7 +733,7 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                   e.preventDefault();
                   searchInputRef.current?.focus();
                 }}
-                className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+                className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors"
                 aria-label="Edit search query"
                 type="button"
               >
@@ -698,14 +743,14 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                 onClick={() => {
                   router.push('/Dashboard/chat');
                 }}
-                className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+                className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors"
                 aria-label="Maximize chat"
               >
                 <Maximize2 className="h-4 w-4" />
               </button>
               <button
                 onClick={() => setIsAIChatOpen(false)}
-                className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+                className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors"
                 aria-label="Close AI chat"
               >
                 <ChevronsRight className="h-4 w-4" />
@@ -725,13 +770,28 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
 
         {/* Floating AI Button */}
         {!isAIChatOpen && (
-          <button
-            onClick={() => setIsAIChatOpen(true)}
-            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 bg-[#D91D69] text-white rounded-full shadow-lg hover:bg-[#C01858] transition-all duration-200 flex items-center justify-center z-30 hover:scale-110"
-            aria-label="Open AI chat"
-          >
-            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
-          </button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setIsAIChatOpen(true)}
+                  className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 transition-all duration-200 flex items-center justify-center z-30 hover:scale-110"
+                  aria-label="Open AI chat"
+                >
+                  <Image
+                    src={Logomark}
+                    alt="Tequity AI"
+                    width={56}
+                    height={56}
+                    className="flex-shrink-0"
+                  />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="left">
+                <p>Ask Tequity</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
 
         {/* PDF Viewer */}

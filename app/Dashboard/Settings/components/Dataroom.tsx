@@ -13,10 +13,10 @@ export function Dataroom() {
   const [leaveDataroomOpen, setLeaveDataroomOpen] = useState(false);
   const [deleteDataroomOpen, setDeleteDataroomOpen] = useState(false);
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 dark:bg-[#09090B] max-h-[500px] overflow-y-auto">
       <div className="flex items-center gap-3">
         {/* <MdOutlineFolderCopy className="h-6 w-6 text-gray-700" /> */}
-        <h2 className="text-xl font-semibold text-gray-900">Dataroom</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Dataroom</h2>
       </div>
 
       {/* Logo and Name */}
@@ -41,10 +41,10 @@ export function Dataroom() {
       {/* Export data */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-900 mb-1">Export data</p>
-          <p className="text-xs text-gray-500">Download all data and documents from this dataroom to your device.</p>
+          <p className="text-sm font-medium text-gray-900 mb-1 dark:text-white">Export data</p>
+          <p className="text-xs text-gray-500 dark:text-[#A1A1AA]">Download all data and documents from this dataroom to your device.</p>
         </div>
-        <button className="px-4 py-2 rounded-md text-sm hover:bg-gray-50 shadow border transition-colors">
+        <button className="px-4 py-2 border rounded-md dark:border-[#27272A] dark:text-white text-sm hover:bg-gray-50 dark:hover:bg-[#27272A] dark:hover:text-white dark:border-[#27272A] transition-colors">
           Export
         </button>
       </div>
@@ -52,10 +52,10 @@ export function Dataroom() {
       {/* Archive all chats */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-900 mb-1">Archive all chats</p>
-          <p className="text-xs text-gray-500">Save and archive all messages for secure backup and future reference.</p>
+          <p className="text-sm font-medium text-gray-900 mb-1 dark:text-white">Archive all chats</p>
+          <p className="text-xs text-gray-500 dark:text-[#A1A1AA]">Save and archive all messages for secure backup and future reference.</p>
         </div>
-        <button className="whitespace-nowrap px-4 py-2 border shadow rounded-md text-sm hover:bg-gray-50 transition-colors">
+        <button className="whitespace-nowrap px-4 py-2 border shadow rounded-md dark:border-[#27272A] dark:text-white text-sm hover:bg-gray-50 dark:hover:bg-[#27272A] dark:hover:text-white dark:border-[#27272A] transition-colors">
           Archive all chats
         </button>
       </div>
@@ -63,12 +63,12 @@ export function Dataroom() {
       {/* Delete all chats */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-900 mb-1">Delete all chats</p>
-          <p className="text-xs text-gray-500">Remove all chat history associated with this dataroom. This action cannot be undone.</p>
+          <p className="text-sm font-medium text-gray-900 mb-1 dark:text-white">Delete all chats</p>
+          <p className="text-xs text-gray-500 dark:text-[#A1A1AA]">Remove all chat history associated with this dataroom. This action cannot be undone.</p>
         </div>
         <button
           onClick={() => setDeleteAllChatsOpen(true)}
-          className="whitespace-nowrap px-4 py-2 border border-red-600 text-red-600 rounded-md text-sm hover:bg-red-50 transition-colors"
+          className="whitespace-nowrap px-4 py-2 border border-red-600 text-red-600 rounded-md text-sm hover:bg-red-50 dark:hover:bg-[#27272A] dark:hover:text-white dark:border-[#27272A] transition-colors"
         >
           Delete all chats
         </button>
@@ -77,12 +77,12 @@ export function Dataroom() {
       {/* Leave dataroom */}
       <div className="flex gap-2 items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-900 mb-1">Leave dataroom</p>
-          <p className="text-xs text-gray-500">Log out and leave this dataroom. Your access will be removed from all active devices.</p>
+          <p className="text-sm font-medium text-gray-900 mb-1 dark:text-white">Leave dataroom</p>
+          <p className="text-xs text-gray-500 dark:text-[#A1A1AA]">Log out and leave this dataroom. Your access will be removed from all active devices.</p>
         </div>
         <button
           onClick={() => setLeaveDataroomOpen(true)}
-          className="whitespace-nowrap px-4 py-2 border border-red-600 text-red-600 rounded-md text-sm hover:bg-red-50 transition-colors"
+          className="whitespace-nowrap px-4 py-2 border border-red-600 text-red-600 rounded-md text-sm hover:bg-red-50 dark:hover:bg-[#27272A] dark:hover:text-white dark:border-[#27272A] transition-colors"
         >
           Leave dataroom
         </button>
@@ -91,8 +91,8 @@ export function Dataroom() {
       {/* Delete entire dataroom */}
       <div className="flex gap-2 items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-900 mb-1">Delete entire dataroom</p>
-          <p className="text-xs text-gray-500">Permanently delete this dataroom and all its contents. This action cannot be undone. Please confirm before proceeding.</p>
+          <p className="text-sm font-medium text-gray-900 mb-1 dark:text-white">Delete entire dataroom</p>
+          <p className="text-xs text-gray-500 dark:text-[#A1A1AA]">Permanently delete this dataroom and all its contents. This action cannot be undone. Please confirm before proceeding.</p>
         </div>
         <button
           onClick={() => setDeleteDataroomOpen(true)}

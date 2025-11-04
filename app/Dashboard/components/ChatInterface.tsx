@@ -1,11 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { X, FileText, Plus, AtSign, ArrowUp, File, Folder, Image as ImageIcon, ChevronDown, User, Sparkles } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { X, FileText, Plus, AtSign, ArrowUp, File, Folder, Image as ImageIcon, ChevronDown, User, Sparkles, Copy, ThumbsUp, ThumbsDown, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useChatContext } from "../context/ChatContext";
 import Image from "next/image";
+import Logomark from "@/public/Logomark.svg";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export interface FileItem {
   id: string;
@@ -34,7 +41,7 @@ export function ChatInterface({
   onClose,
   onNewChat,
 }: ChatInterfaceProps) {
-  const { activeChat, activeChatId, createNewChat, addMessageToChat } = useChatContext();
+  const { activeChat, activeChatId, createNewChat, addMessageToChat, chats } = useChatContext();
   const [inputValue, setInputValue] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -46,13 +53,29 @@ export function ChatInterface({
   const [showContextMenu, setShowContextMenu] = useState(false);
   const uploadMenuRef = useRef<HTMLDivElement>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
+  const [messageReactions, setMessageReactions] = useState<Record<number, 'like' | 'dislike' | null>>({});
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [contextSearchValue, setContextSearchValue] = useState("");
+  const [selectedContextItems, setSelectedContextItems] = useState<Array<{id: string, name: string, type: 'file' | 'chat', fileType?: string, size?: number}>>([]);
+  const hasInitialized = useRef(false);
 
-  // Create a new chat if none exists
+  // TODO: Replace with actual file data from your backend/context
+  // You can fetch this from an API or file management context
+  const [userFiles] = useState<FileItem[]>([
+    { id: "1", name: "Project Proposal.pdf", type: "application/pdf", size: 2457600 },
+    { id: "2", name: "Financial Report Q1.xlsx", type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", size: 1048576 },
+    { id: "3", name: "Meeting Notes.docx", type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", size: 524288 },
+    { id: "4", name: "Design Mockups.png", type: "image/png", size: 3145728 },
+    { id: "5", name: "Contract Agreement.pdf", type: "application/pdf", size: 1572864 },
+  ]);
+
+  // Create a new chat only if there are no chats at all (initial app load)
   useEffect(() => {
-    if (!activeChatId) {
+    if (!hasInitialized.current && !activeChatId && chats.length === 0) {
+      hasInitialized.current = true;
       createNewChat();
     }
-  }, []);
+  }, [activeChatId, chats.length, createNewChat]);
 
   const messages = activeChat?.messages || [];
 
@@ -81,10 +104,19 @@ export function ChatInterface({
     e.preventDefault();
     if (!activeChatId) return;
 
-    if (inputValue.trim() || attachedFiles.length > 0) {
+    if (inputValue.trim() || attachedFiles.length > 0 || selectedContextItems.length > 0) {
+      // Build message text with context items
+      let messageText = inputValue || "";
+      if (selectedContextItems.length > 0) {
+        const contextText = selectedContextItems.map(item =>
+          `@${item.name}`
+        ).join(' ');
+        messageText = messageText ? `${contextText} ${messageText}` : contextText;
+      }
+
       // Add user message with files
       const userMessage = {
-        text: inputValue || "Uploaded files",
+        text: messageText || "Uploaded files",
         isUser: true,
         timestamp: new Date(),
         files: attachedFiles.length > 0 ? [...attachedFiles] : undefined
@@ -104,6 +136,7 @@ export function ChatInterface({
 
       setInputValue("");
       setAttachedFiles([]);
+      setSelectedContextItems([]);
     }
   };
 
@@ -115,27 +148,10 @@ export function ChatInterface({
   };
 
   const handleUploadClick = (e: React.MouseEvent) => {
-    console.log('+ button clicked');
     e.preventDefault();
     e.stopPropagation();
-
-    // If modifier key is pressed, show the upload menu
-    if (e.shiftKey || e.ctrlKey || e.metaKey) {
-      console.log('Modifier key detected, showing upload menu');
-      setShowUploadMenu(!showUploadMenu);
-    } else {
-      // Otherwise, create a new chat
-      console.log('Creating new chat');
-      setInputValue('');
-      setAttachedFiles([]);
-      setShowUploadMenu(false);
-
-      // Call the parent's onNewChat handler if provided
-      if (onNewChat) {
-        console.log('Calling onNewChat handler');
-        onNewChat();
-      }
-    }
+    // Toggle the upload menu
+    setShowUploadMenu(!showUploadMenu);
   };
   
   // Handle click outside to close the menus
@@ -146,6 +162,7 @@ export function ChatInterface({
       }
       if (contextMenuRef.current && !contextMenuRef.current.contains(event.target as Node)) {
         setShowContextMenu(false);
+        setContextSearchValue("");
       }
     };
 
@@ -181,9 +198,88 @@ export function ChatInterface({
     return responses[Math.floor(Math.random() * responses.length)];
   };
 
+  const handleCopy = (text: string, index: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedIndex(index);
+    setTimeout(() => setCopiedIndex(null), 2000);
+  };
+
+  const handleLike = (index: number) => {
+    setMessageReactions(prev => ({
+      ...prev,
+      [index]: prev[index] === 'like' ? null : 'like'
+    }));
+  };
+
+  const handleDislike = (index: number) => {
+    setMessageReactions(prev => ({
+      ...prev,
+      [index]: prev[index] === 'dislike' ? null : 'dislike'
+    }));
+  };
+
+  const handleFileSelect = (file: FileItem) => {
+    // Check if file is already selected
+    if (!selectedContextItems.some(item => item.id === file.id && item.type === 'file')) {
+      setSelectedContextItems(prev => [...prev, {
+        id: file.id,
+        name: file.name,
+        type: 'file',
+        fileType: file.type,
+        size: file.size
+      }]);
+    }
+    setShowContextMenu(false);
+    setContextSearchValue("");
+  };
+
+  const handleChatSelect = (chatText: string, chatId: string) => {
+    // Check if chat is already selected
+    if (!selectedContextItems.some(item => item.id === chatId && item.type === 'chat')) {
+      setSelectedContextItems(prev => [...prev, { id: chatId, name: chatText, type: 'chat' }]);
+    }
+    setShowContextMenu(false);
+    setContextSearchValue("");
+  };
+
+  const removeContextItem = (id: string, type: 'file' | 'chat') => {
+    setSelectedContextItems(prev => prev.filter(item => !(item.id === id && item.type === type)));
+  };
+
+  const getFileIcon = (type: string) => {
+    let iconPath = '/Files/TXT-icon.svg'; // default icon
+
+    if (type.includes('image') || type.includes('jpeg') || type.includes('jpg') || type.includes('png') || type.includes('gif')) {
+      iconPath = '/Files/JPG-icon.svg';
+
+    } else if (type.includes('svg')) {
+      iconPath = '/Files/SVG-icon.svg';
+    } else if (type.includes('pdf')) {
+      iconPath = '/Files/PDF-icon.svg';
+    } else if (type.includes('spreadsheet') || type.includes('excel') || type.includes('sheet')) {
+      iconPath = '/Files/XLS-icon.svg';
+    } else if (type.includes('word') || type.includes('document') || type.includes('msword')) {
+      iconPath = '/Files/Docs-icon.svg';
+    } else if (type.includes('zip') || type.includes('compressed') || type.includes('archive')) {
+      iconPath = '/Files/ZIP-icon.svg';
+    } else if (type.includes('audio') || type.includes('mp3') || type.includes('wav')) {
+      iconPath = '/Files/MP3-icon.svg';
+    } else if (type.includes('text') || type.includes('txt')) {
+      iconPath = '/Files/TXT-icon.svg';
+    }
+
+
+    return <Image src={iconPath} alt="file icon" width={32} height={32} className="flex-shrink-0" />;
+  };
+
+  const filteredFiles = userFiles.filter(file =>
+    contextSearchValue === "" ||
+    file.name.toLowerCase().includes(contextSearchValue.toLowerCase())
+  );
+
   return (
-    <div className="h-full bg-white flex flex-col items-center">
-      <div className="flex-1 max-w-[792px] w-full p-4 overflow-y-auto scrollbar-hide bg-white">
+    <div className="h-full bg-white dark:bg-[#09090B] flex flex-col items-center">
+      <div className="flex-1 max-w-[792px] w-full p-4 overflow-y-auto scrollbar-hide bg-white dark:bg-[#09090B]">
         {selectedFile ? (
           <div className="mb-4 p-4 border rounded-lg">
             <div className="flex items-center gap-3 mb-4">
@@ -214,29 +310,22 @@ export function ChatInterface({
             )}
           </div>
         ) : messages.length === 0 ? (
-          <div className="mb-4 p-4 border rounded-lg bg-gray-50">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-blue-600"
-                >
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
+          <div className="flex flex-col items-center justify-center h-full">
+            <div className="text-center max-w-md mx-auto">
+              <div className="flex items-center justify-center mx-auto mb-3">
+                <Image
+                  src={Logomark}
+                  alt="Tequity AI"
+                  width={48}
+                  height={48}
+                  className="flex-shrink-0"
+                />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                How can I help you today?
+              <h3 className="text-[28px] font-normal text-gray-900 dark:text-white leading-10" style={{ fontFamily: 'Instrument Serif' }}>
+                Hello Marcus
               </h3>
-              <p className="text-gray-500 text-sm">
-                Ask me anything about your files or documents.
+              <p className="text-gray-500 text-sm leading-5 text-center dark:text-[#F4F4F5]" style={{ fontFamily: 'Inter', fontSize: '14px' }}>
+                How can I help you today?
               </p>
             </div>
           </div>
@@ -251,17 +340,32 @@ export function ChatInterface({
                 className={`flex gap-3 ${message.isUser ? 'flex-row-reverse' : 'flex-row'}`}
               >
                 {/* Profile Image */}
-                <div className="flex-shrink-0">
+                {/* <div className="flex-shrink-0">
                   {message.isUser ? (
                     <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
                       <User className="h-5 w-5 text-gray-600" />
                     </div>
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-[#D91D69] flex items-center justify-center">
-                      <Sparkles className="h-5 w-5 text-white" />
-                    </div>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="transition-transform duration-200 hover:scale-110 cursor-pointer">
+                            <Image
+                              src={Logomark}
+                              alt="Tequity AI"
+                              width={32}
+                              height={32}
+                              className="flex-shrink-0"
+                            />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Tequity</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   )}
-                </div>
+                </div> */}
 
                 {/* Message Content */}
                 <div className="flex flex-col gap-1 max-w-[80%]">
@@ -272,10 +376,10 @@ export function ChatInterface({
 
                   {/* Message Bubble */}
                   <div
-                    className={`rounded-lg px-4 py-2 ${
+                    className={`rounded-lg px-2 py-2 ${
                       message.isUser
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-900 border border-gray-200'
+                        ? 'bg-blue-600 text-white dark:bg-[#27272A] dark:text-white'
+                        : 'bg-gray-100 text-gray-900 border border-gray-200 dark:bg-transparent dark:border-none dark:text-white'
                     }`}
                   >
                     <p className="text-sm">{message.text}</p>
@@ -298,6 +402,45 @@ export function ChatInterface({
                       </div>
                     )}
                   </div>
+
+                  {/* Action Buttons - Only for AI messages */}
+                  {!message.isUser && (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleCopy(message.text, index)}
+                        className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors ${
+                          copiedIndex === index
+                            ? 'text-black dark:text-white'
+                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                        }`}
+                        title="Copy"
+                      >
+                        <Copy className={`h-3 w-3 ${copiedIndex === index ? 'fill-current' : ''}`} />
+                      </button>
+                      <button
+                        onClick={() => handleLike(index)}
+                        className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors ${
+                          messageReactions[index] === 'like'
+                            ? 'text-blue-600 dark:text-blue-400'
+                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                        }`}
+                        title="Like"
+                      >
+                        <ThumbsUp className={`h-3 w-3 ${messageReactions[index] === 'like' ? 'fill-current' : ''}`} />
+                      </button>
+                      <button
+                        onClick={() => handleDislike(index)}
+                        className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors ${
+                          messageReactions[index] === 'dislike'
+                            ? 'text-red-600 dark:text-red-400'
+                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                        }`}
+                        title="Dislike"
+                      >
+                        <ThumbsDown className={`h-3 w-3 ${messageReactions[index] === 'dislike' ? 'fill-current' : ''}`} />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -307,33 +450,93 @@ export function ChatInterface({
       </div>
 
       {/* Input at bottom */}
-      <div className="border-t border-gray-200 p-4 bg-white w-full flex justify-center">
+      <div className="p-4 bg-white dark:bg-[#09090B] w-full flex justify-center">
         <form onSubmit={handleSendMessage} className="max-w-[792px] w-full">
-          <div className="rounded-lg border border-gray-300 p-3">
-            {/* Attached Files Preview */}
-            {attachedFiles.length > 0 && (
-              <div className="mb-2 flex flex-wrap gap-2">
-                {attachedFiles.map((file, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-2 bg-gray-100 rounded px-2 py-1 text-xs"
-                  >
-                    <FileText className="h-3 w-3 text-gray-600" />
-                    <span className="truncate max-w-[150px]">{file.name}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeAttachedFile(index)}
-                      className="text-gray-500 hover:text-gray-700"
-                      aria-label="Remove file"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
+          <div className="rounded-lg border border-gray-200 dark:border-[#27272A] bg-white dark:bg-[#18181B] p-3">
+            <div className="flex flex-col">
+              {/* Selected Context Items (Files & Chats) - At Top Inside Input */}
+              {selectedContextItems.length > 0 && (
+                <div className="pb-2 mb-2">
+                  <div className="flex flex-wrap gap-2">
+                    {selectedContextItems.map((item) => (
+                      <div
+                        key={`${item.type}-${item.id}`}
+                        className={`flex items-center gap-2 bg-gray-100 dark:bg-[#27272A] px-2 py-1.5 text-xs ${
+                          item.type === 'file' ? 'rounded-md' : 'rounded-full'
+                        }`}
+                      >
+                        {item.type === 'file' ? (
+                          // File display with icon, name and size
+                          <>
+                            <div className="flex-shrink-0">
+                              {getFileIcon(item.fileType || '')}
+                            </div>
+                            <div className="flex flex-col min-w-0">
+                              <span className="truncate max-w-[150px] text-gray-700 dark:text-white font-medium">
+                                {item.name}
+                              </span>
+                              {item.size && (
+                                <span className="text-[10px] text-gray-500 dark:text-gray-400">
+                                  {formatFileSize(item.size)}
+                                </span>
+                              )}
+                            </div>
+                          </>
+                        ) : (
+                          // Chat display - just name, no icon
+                          <span className="truncate max-w-[200px] text-gray-700 dark:text-white">
+                            {item.name}
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeContextItem(item.id, item.type)}
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors flex-shrink-0"
+                          aria-label="Remove"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              )}
 
-            <div className="flex items-center gap-2 mb-2">
+              {/* Attached Files Preview - Inside Input */}
+              {attachedFiles.length > 0 && (
+                <div className="pb-2 mb-2 border-b border-gray-200 dark:border-[#27272A]">
+                  <div className="flex flex-wrap gap-2">
+                    {attachedFiles.map((file, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-2 bg-gray-100 dark:bg-[#27272A] rounded-md px-2 py-1.5 text-xs"
+                      >
+                        <div className="flex-shrink-0">
+                          {getFileIcon(file.type)}
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <span className="truncate max-w-[150px] text-gray-700 dark:text-white font-medium">
+                            {file.name}
+                          </span>
+                          <span className="text-[10px] text-gray-500 dark:text-gray-400">
+                            {formatFileSize(file.size)}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeAttachedFile(index)}
+                          className="text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-200 transition-colors flex-shrink-0"
+                          aria-label="Remove file"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center gap-2 mb-2">
               <input
                 type="text"
                 value={inputValue}
@@ -343,8 +546,8 @@ export function ChatInterface({
               />
               <button
                 type="submit"
-                disabled={!inputValue.trim() && attachedFiles.length === 0}
-                className="flex items-center justify-center w-8 h-8 rounded-md bg-black text-white hover:bg-black disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                disabled={!inputValue.trim() && attachedFiles.length === 0 && selectedContextItems.length === 0}
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-black text-white hover:bg-black dark:bg-[#FAFAFA] dark:text-black dark:border-[#3F3F46] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 aria-label="Send message"
               >
                 <ArrowUp className="h-4 w-4" />
@@ -355,21 +558,21 @@ export function ChatInterface({
                 <button
                   type="button"
                   onClick={handleUploadClick}
-                  className="flex items-center bg-[#FFFFFF] border-gray-200 border justify-center w-8 h-8 rounded-md text-gray-600 hover:bg-gray-100 transition-colors"
-                  aria-label="New chat"
-                  title="New chat"
+                  className="flex items-center bg-[#FFFFFF] dark:bg-[#09090B] border-gray-200 dark:border-[#3F3F46] border justify-center w-8 h-8 rounded-md text-gray-600 hover:bg-gray-100 transition-colors"
+                  aria-label="Upload files"
+                  title="Upload files"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className={`h-4 w-4 dark:text-white transition-transform duration-200 ${showUploadMenu ? 'rotate-45' : ''}`} />
                 </button>
 
                 {/* Upload Dropdown Menu */}
                 {showUploadMenu && (
-                  <div className="absolute bottom-full left-0 mb-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <div className="absolute bottom-full left-0 mb-2 w-48 bg-white dark:bg-[#09090B] dark:border-[#27272A] border border-gray-200 rounded-lg shadow-lg z-50">
                     <div className="py-1">
                       <button
                         type="button"
                         onClick={() => handleFileUpload("files")}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white transition-colors"
                       >
                         <File className="h-4 w-4 text-blue-600" />
                         <span>Upload Files</span>
@@ -377,7 +580,7 @@ export function ChatInterface({
                       <button
                         type="button"
                         onClick={() => handleFileUpload("folder")}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white transition-colors"
                       >
                         <Folder className="h-4 w-4 text-orange-600" />
                         <span>Upload Folder</span>
@@ -385,7 +588,7 @@ export function ChatInterface({
                       <button
                         type="button"
                         onClick={() => handleFileUpload("image")}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white transition-colors"
                       >
                         <ImageIcon className="h-4 w-4 text-purple-600" />
                         <span>Upload Images</span>
@@ -398,8 +601,13 @@ export function ChatInterface({
               <div ref={contextMenuRef} className="relative">
                 <button
                   type="button"
-                  onClick={() => setShowContextMenu(!showContextMenu)}
-                  className="flex bg-[#FFFFFF] border-gray-200 border items-center gap-1 px-2 h-8 rounded-md text-gray-600 hover:bg-gray-100 transition-colors text-sm"
+                  onClick={() => {
+                    if (showContextMenu) {
+                      setContextSearchValue("");
+                    }
+                    setShowContextMenu(!showContextMenu);
+                  }}
+                  className="flex bg-[#FFFFFF] dark:text-white dark:bg-[#09090B] border-gray-200 dark:border-[#3F3F46] border items-center gap-1 px-2 h-8 rounded-md text-gray-600 hover:bg-gray-100 transition-colors text-sm"
                   aria-label="Add context"
                 >
                   <AtSign className="h-3.5 w-3.5" />
@@ -408,73 +616,91 @@ export function ChatInterface({
 
                 {/* Context Dropdown Menu */}
                 {showContextMenu && (
-                  <div className="absolute bottom-full left-0 mb-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                    <div className="py-1">
-                      <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-100">
-                        Previous Chats
+                  <div className="absolute bottom-full left-0 mb-2 w-80 bg-white dark:bg-[#09090B] border border-gray-200 dark:border-[#27272A] rounded-lg shadow-lg z-50">
+                    <div className="">
+                      {/* Search Bar */}
+                      <div className="">
+                        <div className="flex items-center gap-2 px-2 py-2 dark:bg-[#18181B] rounded-t-md">
+                          <Search className="h-4 w-4 text-gray-400" />
+                          <input
+                            type="text"
+                            value={contextSearchValue}
+                            onChange={(e) => setContextSearchValue(e.target.value)}
+                            placeholder="Search..."
+                            className="flex-1 bg-transparent outline-none text-sm text-gray-700 dark:text-white placeholder:text-gray-400"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </div>
                       </div>
-                      {messages.length > 0 ? (
-                        messages
-                          .filter(msg => msg.isUser)
-                          .slice(0, 3)
-                          .map((msg, idx) => (
-                            <button
-                              key={idx}
-                              type="button"
-                              onClick={() => {
-                                setInputValue(prev => prev ? `${prev} ${msg.text}` : msg.text);
-                                setShowContextMenu(false);
-                              }}
-                              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors truncate"
-                              title={msg.text}
-                            >
-                              {msg.text.length > 30 ? `${msg.text.substring(0, 30)}...` : msg.text}
-                            </button>
-                          ))
-                      ) : (
-                        <div className="px-4 py-2 text-sm text-gray-500">No previous chats</div>
-                      )}
-                      <div className="border-t border-gray-100 my-1"></div>
-                      <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-100">
-                        Upload Options
+
+                      {/* Show Files Section */}
+                      <div className="border-t border-gray-200 dark:border-[#27272A] pt-2">
+                        <div className="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+                          Files
+                        </div>
+                        <div className="max-h-25 overflow-y-auto scrollbar-hide">
+                          {filteredFiles.length > 0 ? (
+                            filteredFiles.map((file) => (
+                              <button
+                                key={file.id}
+                                type="button"
+                                onClick={() => handleFileSelect(file)}
+                                className="w-full flex items-center gap-2 px-4 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors"
+                              >
+                                {getFileIcon(file.type)}
+                                <div className="flex-1 text-left min-w-0">
+                                  <div className="truncate font-medium">{file.name}</div>
+                                  {/* <div className="text-xs text-gray-500 dark:text-gray-400">
+                                    {formatFileSize(file.size)}
+                                  </div> */}
+                                </div>
+                              </button>
+                            ))
+                          ) : (
+                            <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+                              {contextSearchValue ? "No files found" : "No files available"}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          handleFileUpload("files");
-                          setShowContextMenu(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                      >
-                        <File className="h-4 w-4 text-blue-600" />
-                        <span>Upload Files</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          handleFileUpload("folder");
-                          setShowContextMenu(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                      >
-                        <Folder className="h-4 w-4 text-orange-600" />
-                        <span>Upload Folder</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          handleFileUpload("image");
-                          setShowContextMenu(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                      >
-                        <ImageIcon className="h-4 w-4 text-purple-600" />
-                        <span>Upload Images</span>
-                      </button>
+
+                      {/* Previous Chats Section */}
+                      <div className="border-t border-gray-200 dark:border-[#27272A] pt-2 mt-2">
+                        <div className="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+                          Chats
+                        </div>
+                        <div className="max-h-40 overflow-y-auto scrollbar-hide">
+                        {messages.length > 0 ? (
+                          messages
+                            .filter(msg => msg.isUser)
+                            .filter(msg =>
+                              contextSearchValue === "" ||
+                              msg.text.toLowerCase().includes(contextSearchValue.toLowerCase())
+                            )
+                            .slice(0, 3)
+                            .map((msg, idx) => (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => handleChatSelect(msg.text, `chat-${idx}-${msg.timestamp.getTime()}`)}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors"
+                                title={msg.text}
+                              >
+                                <div className="truncate">
+                                  {msg.text.length > 35 ? `${msg.text.substring(0, 35)}...` : msg.text}
+                                </div>
+                              </button>
+                            ))
+                        ) : (
+                          <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">No previous chats</div>
+                        )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
               </div>
+            </div>
             </div>
           </div>
 

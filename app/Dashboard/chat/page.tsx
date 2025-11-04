@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Share2 } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { ChatInterface } from "../components/ChatInterface";
 import { DashboardLayout } from "../components/DashboardLayout";
 import { useChatContext } from "../context/ChatContext";
@@ -36,11 +36,12 @@ export default function ChatPage() {
       headerActions={
         <div className="flex items-center gap-2">
           <button
-            className="flex items-center gap-2 bg-[#F4F4F5] hover:bg-gray-200 text-gray-700 hover:text-gray-900 transition-colors px-3 py-3 rounded-md"
-            title="Share"
+            onClick={handleNewChat}
+            className="flex items-center gap-2 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-200 dark:hover:bg-[#27272A] dark:hover:text-white text-gray-700 hover:text-gray-900 transition-colors px-3 py-3 rounded-md dark:border-gray-700"
+            title="New Chat"
           >
-            <Share2 className="h-4 w-4" />
-            <span className="text-sm font-medium">Share</span>
+            <MessageCircle className="h-4 w-4 dark:text-white" />
+            <span className="text-sm font-medium dark:text-white md:block hidden">New Chat</span>
           </button>
         </div>
       }

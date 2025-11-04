@@ -40,9 +40,10 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
-      <DialogContent className="w-[368px] sm:max-w-[425px] z-[100] !fixed !left-[50%] !top-[50%] !translate-x-[-50%] !translate-y-[-50%]">
+      <DialogContent className="w-[368px] sm:max-w-[425px] z-[100] !fixed !left-[50%] !top-[50%] !translate-x-[-50%] !translate-y-[-50%] dark:bg-[#09090B] dark:border">
         <DialogHeader>
           <DialogTitle>Add User</DialogTitle>
+          <hr className="border-gray-300 dark:border-[#27272A]" />
         </DialogHeader>
         <div className="space-y-4 py-4">
           {/* <div className="space-y-2">
@@ -59,7 +60,7 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
             />
           </div> */}
           <div className="space-y-2">
-            <label htmlFor="user-email" className="text-sm font-medium text-gray-900">
+            <label htmlFor="user-email" className="text-sm font-medium text-gray-900 dark:text-white">
               Email
             </label>
             <input
@@ -67,23 +68,23 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className="text-xs w-full px-3 py-2 border border-gray-300 dark:border-[#27272A] rounded-md"
               placeholder="Enter email address"
             />
           </div>
           <div className="space-y-2 relative">
-            <label htmlFor="user-role" className="text-sm font-medium text-gray-900">
+            <label htmlFor="user-role" className="text-sm font-medium text-gray-900 dark:text-white">
               Role
             </label>
             <button
               onClick={() => setShowRoleDropdown(!showRoleDropdown)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md  flex items-center justify-between"
+              className="text-xs w-full px-3 py-2 border border-gray-300 dark:border-[#27272A] rounded-md  flex items-center justify-between"
             >
               <span>{role}</span>
               <ChevronDown className="h-4 w-4" />
             </button>
             {showRoleDropdown && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 dark:border-[#27272A] rounded-md shadow-lg dark:bg-[#09090B]">
                 {roles.map((r) => (
                   <button
                     key={r}
@@ -91,7 +92,7 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
                       setRole(r);
                       setShowRoleDropdown(false);
                     }}
-                    className="w-full px-3 py-2 text-left hover:bg-gray-100 transition-colors"
+                    className="text-xs w-full px-3 py-2 text-left hover:bg-gray-100 transition-colors"
                   >
                     {r}
                   </button>
@@ -109,7 +110,7 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
           </button> */}
           <button
             onClick={handleSubmit}
-            className="px-4 w-full py-2 bg-black text-white rounded-md text-sm hover:bg-gray-800 transition-colors"
+            className="px-4 font-semibold w-full border dark:border-[#27272A] dark:hover:bg-[#27272A] py-2 bg-black dark:bg-white text-white dark:text-black rounded-md text-sm hover:bg-gray-800 transition-colors"
           >
             Send Invite
           </button>

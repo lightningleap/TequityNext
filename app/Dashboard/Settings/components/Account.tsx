@@ -11,17 +11,17 @@ export function Account() {
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [disableAccountOpen, setDisableAccountOpen] = useState(false);
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
+    <div className="space-y-6 dark:bg-[#09090B]">
+      <div className="flex items-center gap-3 dark:text-white">
         {/* <FiUser className="h-6 w-6 text-gray-700" /> */}
-        <h2 className="text-xl font-semibold text-gray-900">Account</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Account</h2>
       </div>
 
       {/* Profile Picture and Name */}
-      <div className="space-y-3">
+      <div className="space-y-3 dark:text-white">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-            <FiUser className="h-8 w-8 text-gray-500" />
+            <FiUser className="h-8 w-8 text-gray-500 dark:text-white" />
           </div>
           <div className="flex-1 space-y-1">
             <p className="text-xs font-medium" style={{ color: '#64748B' }}>Preferred Name</p>
@@ -40,10 +40,10 @@ export function Account() {
       {/* Email Section */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-900 mb-1">Email</p>
-          <p className="text-sm text-gray-600">john.doe@example.com</p>
+          <p className="text-sm font-medium text-gray-900 mb-1 dark:text-white">Email</p>
+          <p className="text-sm text-gray-600 dark:text-[#A1A1AA]">john.doe@example.com</p>
         </div>
-        <button className="px-4 py-2 shadow rounded-md text-sm hover:bg-gray-50 transition-colors">
+        <button className="px-4 py-2 border shadow rounded-md dark:border-[#27272A] dark:text-white text-sm hover:bg-gray-50 dark:hover:bg-[#27272A] transition-colors">
           Change email
         </button>
       </div>
@@ -51,12 +51,12 @@ export function Account() {
       {/* Password Section */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-900 mb-1">Password</p>
-          <p className="text-xs text-gray-500">Change your password to login to your account.</p>
+          <p className="text-sm font-medium text-gray-900 mb-1 dark:text-white">Password</p>
+          <p className="text-xs text-gray-500 dark:text-[#A1A1AA]">Change your password to login to your account.</p>
         </div>
         <button
           onClick={() => setChangePasswordOpen(true)}
-          className="whitespace-nowrap px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 transition-colors"
+          className="whitespace-nowrap px-4 py-2 border border-gray-300  rounded-md text-sm hover:bg-gray-50 dark:hover:bg-[#27272A] dark:hover:text-white dark:border-[#27272A] transition-colors dark:border dark:text-white"
         >
           Change password
         </button>
@@ -65,22 +65,22 @@ export function Account() {
       {/* Logout of all devices */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-900 mb-1">Logout of all device</p>
-          <p className="text-xs text-gray-500">Log out of all other active sessions besides this device.</p>
+          <p className="text-sm font-medium text-gray-900 mb-1 dark:text-white">Logout of all device</p>
+          <p className="text-xs text-gray-500 dark:text-[#A1A1AA]">Log out of all other active sessions besides this device.</p>
         </div>
         <button
           onClick={() => setLogoutOpen(true)}
-          className="whitespace-nowrap px-4 py-2 shadow rounded-md text-sm hover:bg-gray-50 transition-colors"
+          className="whitespace-nowrap px-4 py-2 shadow rounded-md dark:border-[#27272A] text-sm hover:bg-gray-50 dark:hover:bg-[#27272A] dark:hover:text-white dark:border-[#27272A] transition-colors dark:border dark:text-white"
         >
           Log out
         </button>
       </div>
 
       {/* Disable Account */}
-      <div className="flex items-center gap-2 justify-between pt-4 border-t border-gray-200">
+      <div className="flex items-center gap-2 justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-900 mb-1">Disable my account</p>
-          <p className="text-xs text-gray-500">This will temporarily disable your account and log you out from all sessions. You can reactivate it by logging in again.</p>
+          <p className="text-sm font-medium text-gray-900 mb-1 dark:text-white">Disable my account</p>
+          <p className="text-xs text-gray-500 dark:text-[#A1A1AA]">This will temporarily disable your account and log you out from all sessions. You can reactivate it by logging in again.</p>
         </div>
         <button
           onClick={() => setDisableAccountOpen(true)}

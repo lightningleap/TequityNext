@@ -44,21 +44,21 @@ export function DeleteDataroomDialog({ open, onOpenChange }: DeleteDataroomDialo
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="w-[368px] sm:max-w-[425px] z-[100] !fixed !left-[50%] !top-[50%] !translate-x-[-50%] !translate-y-[-50%]">
+      <DialogContent className="w-[368px] sm:max-w-[425px] z-[100] !fixed !left-[50%] !top-[50%] !translate-x-[-50%] !translate-y-[-50%] dark:bg-[#09090B] dark:border">
         <DialogHeader className="items-center font-bold">
           <DialogTitle>Delete Entire Dataroom</DialogTitle>
         </DialogHeader>
-        <div className="py-4 space-y-4 text-center">
-          <div className="bg-red-50 border border-red-200 rounded-md p-3">
-            <p className="text-sm text-red-800 font-medium mb-1">
+        <div className="py-4 space-y-4 text-center dark:text-white dark:bg-[#09090B]">
+          <div className="bg-red-50 border border-red-200 rounded-md p-3 dark:bg-[#09090B]">
+            <p className="text-xs text-red-800 font-medium mb-1 dark:text-white">
               Warning: This action cannot be undone!
             </p>
-            <p className="text-xs text-red-700">
+            <p className="text-xs text-red-700 dark:text-[#A1A1AA]">
               This will permanently delete this dataroom and all its contents including chats, files, and user access.
             </p>
           </div>
           <div className="space-y-2">
-            <label htmlFor="confirm-text" className="text-sm font-medium text-gray-900">
+            <label htmlFor="confirm-text" className="text-xs font-medium text-gray-900 dark:text-white">
               Type <strong>DELETE</strong> to confirm
             </label>
             <input
@@ -69,16 +69,16 @@ export function DeleteDataroomDialog({ open, onOpenChange }: DeleteDataroomDialo
                 setConfirmText(e.target.value);
                 setError("");
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="text-xs w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:border-[#27272A] dark:text-white"
               placeholder="Type DELETE"
             />
-            {error && <p className="text-xs text-red-600">{error}</p>}
+            {error && <p className="text-xs text-red-600 dark:text-[#A1A1AA]">{error}</p>}
           </div>
         </div>
         <div className="flex justify-end gap-3">
           <button
             onClick={handleClose}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 dark:hover:bg-[#27272A] dark:hover:text-white transition-colors dark:border-[#27272A] dark:text-white"
           >
             Cancel
           </button>
