@@ -13,6 +13,7 @@ import { FaListUl } from "react-icons/fa";
 import { ChevronUp, Sparkles, MoreHorizontal } from "lucide-react";
 import { FiTrash } from "react-icons/fi";
 import { ChatInterface } from "../components/ChatInterface";
+import { useFiles } from "../context/FilesContext";
 import { DashboardLayout } from "../components/DashboardLayout";
 import { PDFViewer } from "../components/PDFViewer";
 import { DeleteModal } from "../components/DeleteModal";
@@ -1018,6 +1019,8 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
 }
 
 export default function LibraryPage() {
+  const { setFiles: setGlobalFiles, setFolders: setGlobalFolders } = useFiles();
+
   const [folders, setFolders] = useState([
     { id: "1", name: "Financial Reports", fileCount: 24 },
     { id: "2", name: "Marketing Materials", fileCount: 156 },
@@ -1093,6 +1096,12 @@ export default function LibraryPage() {
       url: "https://via.placeholder.com/800x600/4CAF50/ffffff?text=Team+Photo",
     },
   ]);
+
+  // Update global context whenever files or folders change
+  useEffect(() => {
+    setGlobalFiles(files);
+    setGlobalFolders(folders);
+  }, [files, folders, setGlobalFiles, setGlobalFolders]);
 
   const handleFileUpload = (newFiles: FileItem[], newFolders: UploadedFolder[]) => {
     console.log("Library received - Files:", newFiles);
