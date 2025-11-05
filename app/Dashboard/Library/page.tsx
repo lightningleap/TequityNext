@@ -959,7 +959,10 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={() => setIsAIChatOpen(true)}
+                  onClick={() => {
+                    createNewChat();
+                    setIsAIChatOpen(true);
+                  }}
                   className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 transition-all duration-200 flex items-center justify-center z-30 hover:scale-110"
                   aria-label="Open AI chat"
                 >

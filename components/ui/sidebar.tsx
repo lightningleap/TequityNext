@@ -35,7 +35,6 @@ import {
 import { CiSearch } from "react-icons/ci";
 import { MdOutlineFolderCopy } from "react-icons/md";
 import { SearchDialog } from "@/app/Dashboard/components/SearchDialog";
-import { useChatContextOptional } from "@/app/Dashboard/context/ChatContext";
 import { useFilesOptional } from "@/app/Dashboard/context/FilesContext";
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -276,7 +275,6 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
   const [searchDialogOpen, setSearchDialogOpen] = React.useState(false);
   const [starredFiles, setStarredFiles] = React.useState<Array<{ id: string; name: string; type: string }>>([]);
   const filesContext = useFilesOptional();
-  const chatContext = useChatContextOptional();
 
   const handleSearchOpen = React.useCallback(() => {
     setSearchDialogOpen(true);
