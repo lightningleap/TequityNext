@@ -321,7 +321,7 @@ export function ChatInterface({
                   className="flex-shrink-0"
                 />
               </div>
-              <h3 className="text-[28px] font-normal text-gray-900 dark:text-white leading-10" style={{ fontFamily: 'Instrument Serif' }}>
+               <h3 className="text-[28px] font-normal text-gray-900 dark:text-white leading-10 font-[family-name:var(--font-instrument-serif)]">
                 Hello Marcus
               </h3>
               <p className="text-gray-500 text-sm leading-5 text-center dark:text-[#F4F4F5]" style={{ fontFamily: 'Inter', fontSize: '14px' }}>

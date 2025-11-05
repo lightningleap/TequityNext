@@ -35,6 +35,7 @@ import {
 import { CiSearch } from "react-icons/ci";
 import { MdOutlineFolderCopy } from "react-icons/md";
 import { SearchDialog } from "@/app/Dashboard/components/SearchDialog";
+import { useChatContextOptional } from "@/app/Dashboard/context/ChatContext";
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = "244px";
@@ -272,9 +273,50 @@ function Sidebar({
 const SidebarMenuItems = React.memo(function SidebarMenuItems() {
   const pathname = usePathname();
   const [searchDialogOpen, setSearchDialogOpen] = React.useState(false);
+  const [starredFiles, setStarredFiles] = React.useState<Array<{ id: string; name: string; type: string }>>([]);
+  const chatContext = useChatContextOptional();
 
   const handleSearchOpen = React.useCallback(() => {
     setSearchDialogOpen(true);
+  }, []);
+
+  // Load starred files from localStorage
+  React.useEffect(() => {
+    const loadStarredFiles = () => {
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem("starredFiles");
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            setStarredFiles(parsed);
+          } catch (e) {
+            console.error("Error parsing starred files:", e);
+          }
+        }
+      }
+    };
+
+    loadStarredFiles();
+
+    // Listen for storage changes (when starred files are updated in other tabs/components)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "starredFiles") {
+        loadStarredFiles();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    // Also listen for custom event for same-tab updates
+    const handleCustomEvent = () => {
+      loadStarredFiles();
+    };
+    window.addEventListener("starredFilesUpdated", handleCustomEvent);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("starredFilesUpdated", handleCustomEvent);
+    };
   }, []);
 
   const navItems = React.useMemo(() => [
@@ -336,7 +378,7 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
     </SidebarMenu>
 
       {/* Starred Section - Only visible on Library page */}
-      {pathname === "/Dashboard/Library" && (
+      {pathname === "/Dashboard/Library" && starredFiles.length > 0 && (
         <div className="flex flex-col gap-0 items-start px-2 w-full mt-2 group-data-[collapsible=icon]:hidden">
           <div className="flex h-8 items-center px-2 w-full">
             <span className="text-xs font-medium text-[#3f3f46] dark:text-[#A1A1AA] opacity-70 overflow-ellipsis overflow-hidden whitespace-nowrap">
@@ -344,13 +386,9 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
             </span>
           </div>
           <div className="flex flex-col gap-1 items-start w-full">
-            {[
-              { name: "README.md" },
-              { name: "api/hello/route.ts" },
-              { name: "app/layout.tsx" }
-            ].map((file) => (
+            {starredFiles.map((file) => (
               <div
-                key={file.name}
+                key={file.id}
                 className="flex gap-2 h-8 items-center px-2 w-full rounded-md hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
               >
                 <FileText className="h-4 w-4 flex-shrink-0 text-[#3f3f46] dark:text-[#A1A1AA]" />
@@ -364,7 +402,7 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
       )}
 
       {/* Search Dialog */}
-      <SearchDialog open={searchDialogOpen} onOpenChange={setSearchDialogOpen} />
+      {/* <SearchDialog open={searchDialogOpen} onOpenChange={setSearchDialogOpen} /> */}
     </>
   );
 });

@@ -8,16 +8,14 @@ import { useChatContext } from "../context/ChatContext";
 
 export default function ChatPage() {
   const { activeChat, activeChatId, createNewChat, chats } = useChatContext();
-  const [chatTitle, setChatTitle] = useState<string>("Tequity AI");
+  const [chatTitle, setChatTitle] = useState<string>("New Chat");
 
   // Update title when active chat changes
   useEffect(() => {
-    if (activeChat && activeChat.title !== "New Chat") {
-      // Only change title if it's not "New Chat"
+    if (activeChat) {
       setChatTitle(activeChat.title);
     } else {
-      // Keep "Tequity AI" as default
-      setChatTitle("Tequity AI");
+      setChatTitle("New Chat");
     }
   }, [activeChat]);
 

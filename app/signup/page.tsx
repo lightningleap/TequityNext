@@ -191,11 +191,11 @@ export default function SignupPage() {
 
   // Email Step UI
   return (
-    <div className="h-screen bg-white flex overflow-hidden">
-      {/* Left Side - Image (Hidden on small/medium devices, 50% on large) */}
+    <div className="flex h-screen overflow-hidden">
+      {/* Left Side - Image (Hidden on small/medium, visible on large) */}
       <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
         <Image
-          src={SignupGraphic}
+          src={Container}
           alt="Signup Graphic"
           fill
           className="object-cover object-center"
@@ -203,8 +203,8 @@ export default function SignupPage() {
         />
       </div>
 
-      {/* Right Side - Form (Full width on small/medium, 50% on large) */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-white overflow-y-auto scrollbar-hide">
+      {/* Right Side - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
         <div className="w-full max-w-md flex items-center justify-center">
           {/* Form Card */}
           <div className="w-full max-w-[412px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-6 flex flex-col gap-8">

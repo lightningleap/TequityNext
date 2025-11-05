@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown,  ChevronsRight, Maximize2, Edit } from "lucide-react";
+import { ChevronDown,  ChevronsRight, Maximize2, Star, Download } from "lucide-react";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { FileItem } from "../components/filegrid";
 import { SearchBar } from "../components/searchbar";
 import { UploadDialog, FolderItem as UploadedFolder } from "../components/UploadDialog";
@@ -10,9 +11,11 @@ import { LuClock } from "react-icons/lu";
 import { IoGridOutline } from "react-icons/io5";
 import { FaListUl } from "react-icons/fa";
 import { ChevronUp, Sparkles, MoreHorizontal } from "lucide-react";
+import { FiTrash } from "react-icons/fi";
 import { ChatInterface } from "../components/ChatInterface";
 import { DashboardLayout } from "../components/DashboardLayout";
 import { PDFViewer } from "../components/PDFViewer";
+import { DeleteModal } from "../components/DeleteModal";
 import { useChatContext } from "../context/ChatContext";
 import { useSidebar } from "@/components/ui/sidebar";
 import Image from "next/image";
@@ -33,7 +36,7 @@ interface LibraryContentProps {
 
 function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContentProps) {
   const router = useRouter();
-  const { createNewChat } = useChatContext();
+  const { createNewChat, activeChat, activeChatId, chats, selectChat } = useChatContext();
   const { state: sidebarState } = useSidebar();
   const [folderView, setFolderView] = useState<"grid" | "list">("grid");
   const [fileView, setFileView] = useState<"grid" | "list">("grid");
@@ -41,13 +44,31 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
   const [filesExpanded, setFilesExpanded] = useState(true);
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const searchInputRef = useRef<HTMLInputElement>(null);
   const [isPDFViewerOpen, setIsPDFViewerOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
   const [isPDFMaximized, setIsPDFMaximized] = useState(false);
   const [activeFileType, setActiveFileType] = useState<string | null>(null);
   const [selectedFolders, setSelectedFolders] = useState<Set<string>>(new Set());
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
+  const [starredFileIds, setStarredFileIds] = useState<Set<string>>(new Set());
+  const [fileToDelete, setFileToDelete] = useState<FileItem | null>(null);
+
+  // Load starred files from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("starredFiles");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          // Extract IDs from the stored data
+          const ids = parsed.map((item: { id: string }) => item.id);
+          setStarredFileIds(new Set(ids));
+        } catch (e) {
+          console.error("Error parsing starred files:", e);
+        }
+      }
+    }
+  }, []);
 
   // File type mapping for filtering
   const fileTypeMap: Record<string, string[]> = {
@@ -114,6 +135,36 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
       } else {
         newSet.add(fileId);
       }
+      return newSet;
+    });
+  };
+
+  // Toggle star status for a file
+  const toggleFileStar = (fileId: string, fileName: string) => {
+    setStarredFileIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(fileId)) {
+        newSet.delete(fileId);
+      } else {
+        newSet.add(fileId);
+      }
+
+      // Save to localStorage with file details
+      const starredFilesData = Array.from(newSet).map((id) => {
+        const file = files.find((f) => f.id === id);
+        return {
+          id,
+          name: file?.name || fileName,
+          type: file?.type || "FILE",
+        };
+      });
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem("starredFiles", JSON.stringify(starredFilesData));
+        // Dispatch custom event to notify sidebar
+        window.dispatchEvent(new Event("starredFilesUpdated"));
+      }
+
       return newSet;
     });
   };
@@ -523,7 +574,7 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                           <div
                             key={file.id}
                             onClick={() => handleFileSelect(file)}
-                            className="flex items-center rounded-lg bg-[#F4F4F5] dark:bg-[#27272A] dark:border-[#27272A] border border-gray-200 px-3 py-2 hover:bg-gray-50 cursor-pointer transition-colors"
+                            className="group relative flex items-center rounded-lg bg-[#F4F4F5] dark:bg-[#27272A] dark:border-[#27272A] border border-gray-200 px-3 py-2 hover:bg-gray-50 cursor-pointer transition-colors"
                             role="button"
                             tabIndex={0}
                             onKeyDown={(e) => e.key === "Enter" && handleFileSelect(file)}
@@ -587,6 +638,70 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                             </div>
                             <div className="flex-1 min-w-0 ml-2">
                               <p className="truncate text-sm font-medium">{file.name}</p>
+                            </div>
+
+                            {/* 3-dot dropdown menu */}
+                            <div
+                              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <DropdownMenu.Root>
+                                <DropdownMenu.Trigger asChild>
+                                  <button
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="p-1 text-gray-500 hover:text-gray-900 dark:text-white dark:hover:bg-[#27272A] hover:bg-gray-100 rounded transition-colors"
+                                    title="More actions"
+                                  >
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </button>
+                                </DropdownMenu.Trigger>
+                                <DropdownMenu.Portal>
+                                  <DropdownMenu.Content
+                                    align="end"
+                                    className="min-w-[180px] bg-white dark:bg-[#09090B] rounded-md shadow-lg border border-gray-100 dark:border-[#3F3F46] p-1 z-50"
+                                    side="bottom"
+                                    sideOffset={5}
+                                    onCloseAutoFocus={(e) => e.preventDefault()}
+                                  >
+                                    <DropdownMenu.Item
+                                      className="flex items-center gap-2 text-sm p-2 rounded hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer outline-none"
+                                      onSelect={() => {
+                                        toggleFileStar(file.id || "", file.name);
+                                      }}
+                                    >
+                                      <Star
+                                        className={`h-4 w-4 ${
+                                          starredFileIds.has(file.id || "")
+                                            ? "fill-yellow-400 text-yellow-400"
+                                            : ""
+                                        }`}
+                                      />
+                                      <span>
+                                        {starredFileIds.has(file.id || "") ? "Unstar" : "Star"}
+                                      </span>
+                                    </DropdownMenu.Item>
+                                    <DropdownMenu.Item
+                                      className="flex items-center gap-2 text-sm p-2 rounded hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer outline-none"
+                                      onSelect={() => {
+                                        console.log("Download file:", file.name);
+                                      }}
+                                    >
+                                      <Download className="h-4 w-4" />
+                                      <span>Download</span>
+                                    </DropdownMenu.Item>
+
+                                    <DropdownMenu.Item
+                                      className="flex items-center gap-2 text-sm p-2 rounded text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer outline-none"
+                                      onSelect={() => {
+                                        setFileToDelete(file);
+                                      }}
+                                    >
+                                      <FiTrash className="h-4 w-4" />
+                                      <span>Delete</span>
+                                    </DropdownMenu.Item>
+                                  </DropdownMenu.Content>
+                                </DropdownMenu.Portal>
+                              </DropdownMenu.Root>
                             </div>
                           </div>
                         ))
@@ -683,17 +798,67 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                                   </div>
 
                                   {/* Actions */}
-                                  <div className="flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        console.log("Open menu for file:", file.name);
-                                      }}
-                                      className="p-1 sm:p-1.5 text-gray-500 hover:text-gray-900 dark:text-white dark:hover:bg-[#27272A] hover:bg-gray-100 rounded transition-colors"
-                                      title="More actions"
-                                    >
-                                      <MoreHorizontal className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                                    </button>
+                                  <div
+                                    className="flex items-center justify-center"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <DropdownMenu.Root>
+                                      <DropdownMenu.Trigger asChild>
+                                        <button
+                                          onClick={(e) => e.stopPropagation()}
+                                          className="p-1 sm:p-1.5 text-gray-500 hover:text-gray-900 dark:text-white dark:hover:bg-[#27272A] hover:bg-gray-100 rounded transition-colors"
+                                          title="More actions"
+                                        >
+                                          <MoreHorizontal className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                        </button>
+                                      </DropdownMenu.Trigger>
+                                      <DropdownMenu.Portal>
+                                        <DropdownMenu.Content
+                                          align="end"
+                                          className="min-w-[180px] bg-white dark:bg-[#09090B] rounded-md shadow-lg border border-gray-100 dark:border-[#3F3F46] p-1 z-50"
+                                          side="bottom"
+                                          sideOffset={5}
+                                          onCloseAutoFocus={(e) => e.preventDefault()}
+                                        >
+                                          <DropdownMenu.Item
+                                            className="flex items-center gap-2 text-sm p-2 rounded hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer outline-none"
+                                            onSelect={() => {
+                                              toggleFileStar(file.id || "", file.name);
+                                            }}
+                                          >
+                                            <Star
+                                              className={`h-4 w-4 ${
+                                                starredFileIds.has(file.id || "")
+                                                  ? "fill-yellow-400 text-yellow-400"
+                                                  : ""
+                                              }`}
+                                            />
+                                            <span>
+                                              {starredFileIds.has(file.id || "") ? "Unstar" : "Star"}
+                                            </span>
+                                          </DropdownMenu.Item>
+                                          <DropdownMenu.Item
+                                            className="flex items-center gap-2 text-sm p-2 rounded hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer outline-none"
+                                            onSelect={() => {
+                                              console.log("Download file:", file.name);
+                                            }}
+                                          >
+                                            <Download className="h-4 w-4" />
+                                            <span>Download</span>
+                                          </DropdownMenu.Item>
+
+                                          <DropdownMenu.Item
+                                            className="flex items-center gap-2 text-sm p-2 rounded text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer outline-none"
+                                            onSelect={() => {
+                                              setFileToDelete(file);
+                                            }}
+                                          >
+                                            <FiTrash className="h-4 w-4" />
+                                            <span>Delete</span>
+                                          </DropdownMenu.Item>
+                                        </DropdownMenu.Content>
+                                      </DropdownMenu.Portal>
+                                    </DropdownMenu.Root>
                                   </div>
                                 </div>
                               );
@@ -720,42 +885,61 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
             }`}
         >
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-[#3F3F46]">
-            <input
-              ref={searchInputRef}
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="text-sm font-medium dark:text-white text-gray-700 bg-transparent border-none focus:outline-none focus:ring-0 p-0 m-0 w-full"
-            />
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  searchInputRef.current?.focus();
-                }}
-                className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors"
-                aria-label="Edit search query"
-                type="button"
-              >
-                <Edit className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => {
-                  router.push('/Dashboard/chat');
-                }}
-                className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors"
-                aria-label="Maximize chat"
-              >
-                <Maximize2 className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setIsAIChatOpen(false)}
-                className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors"
-                aria-label="Close AI chat"
-              >
-                <ChevronsRight className="h-4 w-4" />
-              </button>
-            </div>
+            <button
+              onClick={() => setIsAIChatOpen(false)}
+              className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors"
+              aria-label="Close AI chat"
+            >
+              <ChevronsRight className="h-4 w-4" />
+            </button>
+
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors">
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    {activeChat?.title || "New Chat"}
+                  </span>
+                  <ChevronDown className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content
+                  align="center"
+                  className="min-w-[200px] bg-white dark:bg-[#09090B] rounded-md shadow-lg border border-gray-100 dark:border-[#3F3F46] p-1 z-50"
+                  side="bottom"
+                  sideOffset={5}
+                >
+                  <div className="px-2 py-1.5 text-xs text-gray-500 dark:text-gray-400 font-medium">
+                    Recent Chats
+                  </div>
+                  {chats.slice(0, 5).map((chat) => (
+                    <DropdownMenu.Item
+                      key={chat.id}
+                      className={`flex items-center gap-2 text-sm px-3 py-2 rounded cursor-pointer outline-none ${
+                        activeChatId === chat.id
+                          ? 'bg-gray-100 dark:bg-[#27272A]'
+                          : 'hover:bg-gray-50 dark:hover:bg-[#27272A]'
+                      }`}
+                      onSelect={() => {
+                        selectChat(chat.id);
+                      }}
+                    >
+                      <span className="truncate text-gray-900 dark:text-white">{chat.title}</span>
+                    </DropdownMenu.Item>
+                  ))}
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+
+            <button
+              onClick={() => {
+                router.push('/Dashboard/chat');
+              }}
+              className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors"
+              aria-label="Maximize chat"
+            >
+              <Maximize2 className="h-4 w-4" />
+            </button>
           </div>
           <div className="h-[calc(100%-64px)]">
             <ChatInterface
@@ -800,6 +984,33 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
           onClose={() => setIsPDFViewerOpen(false)}
           file={selectedFile}
           onMaximizeChange={(isMaximized) => setIsPDFMaximized(isMaximized)}
+        />
+
+        {/* Delete Confirmation Modal */}
+        <DeleteModal
+          isOpen={!!fileToDelete}
+          itemName={fileToDelete?.name || ""}
+          onCancel={() => setFileToDelete(null)}
+          onConfirm={() => {
+            if (!fileToDelete) return;
+
+            // Close PDF viewer if the deleted file is currently open
+            if (selectedFile?.id === fileToDelete.id) {
+              setIsPDFViewerOpen(false);
+              setSelectedFile(null);
+            }
+            // Remove the file from the files array
+            setFiles((prevFiles) =>
+              prevFiles.filter((f) => f.id !== fileToDelete.id)
+            );
+            // Also remove from selected files if it's selected
+            setSelectedFiles((prev) => {
+              const newSet = new Set(prev);
+              newSet.delete(fileToDelete.id || "");
+              return newSet;
+            });
+            setFileToDelete(null);
+          }}
         />
       </div>
     </>

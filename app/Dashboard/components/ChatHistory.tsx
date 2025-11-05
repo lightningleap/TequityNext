@@ -101,7 +101,7 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
   return (
     <div className="flex flex-col gap-1 px-4 py-2">
       <div className="px-2 mb-1">
-        <h3 className="text-xs font-medium text-gray-500 tracking-wide">
+        <h3 className="text-xs font-medium text-gray-700 dark:text-gray-400 tracking-wide">
           Chat History
         </h3>
       </div>
@@ -110,7 +110,7 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
           <div
             key={chat.id}
             onClick={() => handleChatClick(chat.id)}
-            className={`group relative flex items-center justify-between dark:text-white rounded-md px-3 py-2 cursor-pointer transition-colors ${
+            className={`group relative flex items-center justify-between dark:text-white text-black rounded-md px-3 py-2 cursor-pointer transition-colors ${
               activeChatId === chat.id ? "bg-[#F4F4F5] dark:bg-[#27272A] dark:text-white" : "hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white"
             }`}
           >
@@ -122,7 +122,7 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
                   onKeyDown={(e) => handleKeyDown(chat.id, e)}
-                  className="flex-1 min-w-0 text-sm text-gray-900 bg-white dark:bg-[#27272A] dark:text-white px-2 py-1 border border-gray-10 focus:outline-none"
+                  className="flex-1 min-w-0 text-sm  bg-white text-black dark:bg-[#27272A] dark:text-white px-2 py-1 border border-gray-10 focus:outline-none"
                   onClick={(e) => e.stopPropagation()}
                   onFocus={(e) => e.target.select()}
                 />
@@ -148,7 +148,7 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
               </div>
             ) : (
               <>
-                <span className="text-xs font-medium text-[#F4F4F5] truncate flex-1">
+                <span className="text-xs font-medium text-gray-900 dark:text-[#F4F4F5] truncate flex-1">
                   {chat.title}
                 </span>
                 <div className="relative">

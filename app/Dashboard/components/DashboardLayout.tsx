@@ -21,6 +21,7 @@ import { SettingsDialog } from "../Settings/SettingsDialog";
 import { ChevronsLeft, ChevronDown, UploadCloud } from "lucide-react";
 import { MdOutlineFolderCopy } from "react-icons/md";
 import { useTheme } from "next-themes";
+import { useChatContextOptional } from "../context/ChatContext";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -42,6 +43,7 @@ export function DashboardLayout({
   const isChatPage = pathname === "/Dashboard/chat";
   const { theme, setTheme } = useTheme();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const chatContext = useChatContextOptional();
 
   const handleLogout = () => {
     // Add your logout logic here
@@ -181,17 +183,49 @@ export function DashboardLayout({
           <header className="flex md:hidden h-16 items-center justify-between border-b dark:border-[#A1A1AA] border-gray-200 bg-white dark:bg-[#09090B] px-3">
             <SidebarTrigger className="size-9 p-2" />
 
-            <div className="flex items-center gap-2">
-              <Image
-                src={BlackLogo}
-                alt="Company Logo"
-                width={20}
-                height={20}
-                priority
-                className="flex-shrink-0"
-              />
-              <span className="text-sm font-semibold text-[#3f3f46] dark:text-white">LLA&apos;s Dataroom</span>
-            </div>
+            {isChatPage && chatContext && chatContext.chats.length > 0 ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors">
+                    <span className="text-sm font-semibold text-[#3f3f46] dark:text-white truncate max-w-[150px]">
+                      {chatContext.activeChat?.title || "New Chat"}
+                    </span>
+                    <ChevronDown className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 dark:bg-[#09090B] dark:text-white" align="center">
+                  <DropdownMenuLabel className="text-xs text-gray-500 dark:text-gray-400 font-normal">
+                    Recent Chats
+                  </DropdownMenuLabel>
+                  {chatContext.chats.slice(0, 5).map((chat) => (
+                    <DropdownMenuItem
+                      key={chat.id}
+                      onClick={() => {
+                        chatContext.selectChat(chat.id);
+                        onChatSelect?.(chat.id);
+                      }}
+                      className={`cursor-pointer ${
+                        chatContext.activeChatId === chat.id ? 'bg-gray-100 dark:bg-[#27272A]' : ''
+                      }`}
+                    >
+                      <span className="truncate">{chat.title}</span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Image
+                  src={BlackLogo}
+                  alt="Company Logo"
+                  width={20}
+                  height={20}
+                  priority
+                  className="flex-shrink-0"
+                />
+                <span className="text-sm font-semibold text-[#3f3f46] dark:text-white">LLA&apos;s Dataroom</span>
+              </div>
+            )}
 
             {headerActions ? (
               <div className="flex items-center">{headerActions}</div>
