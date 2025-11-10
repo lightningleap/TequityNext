@@ -65,6 +65,7 @@ function LibraryContent({
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -128,20 +129,12 @@ function LibraryContent({
       ? fileTypeMap[activeFileType]?.includes(fileExt || "")
       : true;
 
-    // Filter by search query
-    const searchMatch = searchQuery
-      ? file.name.toLowerCase().includes(searchQuery.toLowerCase())
-      : true;
-
-    return typeMatch && searchMatch;
+    // Don't filter by search query here since we're handling it in the SearchDropdown
+    return typeMatch;
   });
 
-  // Filter folders based on search query
-  const filteredFolders = folders.filter((folder) =>
-    searchQuery
-      ? folder.name.toLowerCase().includes(searchQuery.toLowerCase())
-      : true
-  );
+  // Don't filter folders based on search query since we're handling it in the SearchDropdown
+  const filteredFolders = [...folders];
 
   // Get count of files for each tab
   const getFileCount = (tab: string) => {
@@ -310,22 +303,24 @@ function LibraryContent({
           <div className="w-full max-w-[792px] px-2 sm:px-0">
             <header className="mb-6 sm:mb-8 flex flex-col items-start justify-start gap-6 sm:gap-12">
               <div className="relative w-full" ref={searchRef}>
-                <SearchBar
-                  value={searchQuery}
-                  onChange={setSearchQuery}
-                  onFocus={() => setIsSearchFocused(true)}
-                  placeholder="Search files and folders..."
-                />
-                <SearchDropdown
-                  isOpen={isSearchFocused && searchQuery.length > 0}
-                  searchQuery={searchQuery}
-                  onClose={() => setIsSearchFocused(false)}
-                  onSelect={(file) => {
-                    console.log("Selected file:", file);
-                    // Handle file selection (e.g., open file, navigate, etc.)
-                    setIsSearchFocused(false);
-                  }}
-                />
+                <div className="relative w-full max-w-[792px]" ref={searchRef}>
+                  <SearchBar
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    placeholder="Search files and folders..."
+                    onFocus={() => setIsSearchFocused(true)}
+                  />
+                  <SearchDropdown
+                    isOpen={isSearchFocused}
+                    searchQuery={searchQuery}
+                    onSelect={(item) => {
+                      setSearchQuery(item.name);
+                      setIsSearchFocused(false);
+                      // Focus the input after selection
+                      searchInputRef.current?.focus();
+                    }}
+                  />
+                </div>
               </div>
             </header>
 
