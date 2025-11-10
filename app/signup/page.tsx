@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import SignupGraphic from "../../public/SignupGraphic.svg";
 import GoogleIcon from "../../public/GoogleIcon.svg";
 import SignupLogo from "../../public/SignupLogo.svg";
 import Container from "../../public/Container.svg";
@@ -96,11 +95,6 @@ export default function SignupPage() {
     console.log("Google sign-in clicked");
   };
 
-  const handleBackToEmail = () => {
-    setStep('email');
-    setVerificationCode('');
-    setError(null);
-  };
 
   // Verification Step UI
   if (step === 'verification') {

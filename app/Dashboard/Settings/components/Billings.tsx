@@ -1,7 +1,6 @@
 "use client";
 
 import { FiCreditCard } from "react-icons/fi";
-import { ChevronDown } from "lucide-react";
 
 export function Billings() {
   return (

@@ -1,6 +1,5 @@
 "use client";
 
-import { IoSettingsOutline } from "react-icons/io5";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 

@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import SignupLogo from "../../public/SignupLogo.svg";
-import SignupGraphic from "../../public/SignupGraphic.svg";
 import GoogleIcon from "../../public/GoogleIcon.svg";
 import Container from "../../public/Container.svg";
 import Image from "next/image";

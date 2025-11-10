@@ -1,7 +1,6 @@
 "use client";
 
-import { FiUsers } from "react-icons/fi";
-import { MoreHorizontal, ChevronDown } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import { AddUserDialog } from "../dialogbox/AddUserDialog";
 import { RemoveUserDialog } from "../dialogbox/RemoveUserDialog";

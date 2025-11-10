@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState, useRef, useCallback } from "react";
@@ -5,8 +6,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "../../../components/ui/dialog";
 import { Button } from "../../../components/ui/button";
@@ -92,12 +91,7 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
 
-  const handleUploadProgress = (fileIndex: number, progress: number) => {
-    setUploadProgress((prev) => ({
-      ...prev,
-      [fileIndex]: progress,
-    }));
-  };
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -205,8 +199,9 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
       // Group files by folder
       const folderMap = new Map<string, File[]>();
 
-      successfulFiles.forEach((file) => {
-        const path = (file as any).webkitRelativePath || file.name;
+      successfulFiles.forEach((file : File) => {
+        // webkitRelativePath is available on File objects from directory inputs
+        const path = (file as File & { webkitRelativePath?: string }).webkitRelativePath || file.name;
         const pathParts = path.split("/");
 
         if (pathParts.length > 1) {
@@ -271,13 +266,6 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
     setIsOpen(false);
   };
 
-  const handleCancel = () => {
-    setFiles([]);
-    setUploadProgress({});
-    setUploadStatus({});
-    setIsUploading(false);
-    setIsOpen(false);
-  };
 
   const handleButtonClick = (mode: "files" | "folder") => {
     setUploadMode(mode);
@@ -375,7 +363,7 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
             multiple
             onChange={handleFileChange}
             className="hidden"
-            {...({ webkitdirectory: "", directory: "" } as any)}
+            {...({ webkitdirectory: "", directory: "" } as React.InputHTMLAttributes<HTMLInputElement>)}
           />
 
           {files.length > 0 && (

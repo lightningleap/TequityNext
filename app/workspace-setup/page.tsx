@@ -309,7 +309,7 @@ export default function WorkspaceSetupPage() {
                 variant="link"
                 className="w-full h-11 border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors duration-200 cursor-pointer"
               >
-                Skip for now, I'll invite later
+                Skip for now, I &apos;ll invite later
               </Button>
 
               <div className="flex items-center justify-center">

@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { ChevronDown,  ChevronsRight, Maximize2, Star, Download } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { FileItem } from "../components/filegrid";
@@ -10,17 +13,21 @@ import { UploadDialog, FolderItem as UploadedFolder } from "../components/Upload
 import { LuClock } from "react-icons/lu";
 import { IoGridOutline } from "react-icons/io5";
 import { FaListUl } from "react-icons/fa";
-import { ChevronUp, Sparkles, MoreHorizontal } from "lucide-react";
+import { ChevronUp,  MoreHorizontal } from "lucide-react";
 import { FiTrash } from "react-icons/fi";
 import { ChatInterface } from "../components/ChatInterface";
 import { useFiles } from "../context/FilesContext";
 import { DashboardLayout } from "../components/DashboardLayout";
-import { PDFViewer } from "../components/PDFViewer";
 import { DeleteModal } from "../components/DeleteModal";
 import { useChatContext } from "../context/ChatContext";
 import { useSidebar } from "@/components/ui/sidebar";
 import Image from "next/image";
 import Logomark from "@/public/Logomark.svg";
+
+// Dynamically import PDFViewer to prevent SSR issues with react-pdf
+const PDFViewer = dynamic(() => import("../components/PDFViewer").then(mod => ({ default: mod.PDFViewer })), {
+  ssr: false,
+});
 import {
   Tooltip,
   TooltipContent,
@@ -35,7 +42,7 @@ interface LibraryContentProps {
   setFolders: React.Dispatch<React.SetStateAction<Array<{ id: string; name: string; fileCount: number }>>>;
 }
 
-function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContentProps) {
+function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
   const router = useRouter();
   const { createNewChat, activeChat, activeChatId, chats, selectChat } = useChatContext();
   const { state: sidebarState } = useSidebar();
@@ -103,15 +110,6 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
       ? folder.name.toLowerCase().includes(searchQuery.toLowerCase())
       : true
   );
-
-  // Get count of files for each tab
-  const getFileCount = (tab: string) => {
-    if (tab === 'All Files') return;
-    return files.filter(file => {
-      const fileExt = file.name.split('.').pop()?.toUpperCase();
-      return fileTypeMap[tab]?.includes(fileExt || '');
-    }).length;
-  };
 
   // Checkbox handlers
   const toggleFolderSelection = (folderId: string, e: React.MouseEvent) => {
@@ -243,25 +241,32 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
     setIsPDFViewerOpen(true);
   };
 
-  // Calculate margin based on sidebar and viewer state
+  // Calculate sidebar width for PDF maximized state
   const sidebarWidth = sidebarState === "collapsed" ? "3rem" : "16rem";
-  const getMainMargin = () => {
-    if (isAIChatOpen) return '400px';
-    if (isPDFViewerOpen) {
-      if (isPDFMaximized) return `calc(100% - ${sidebarWidth})`;
-      return '400px';
+
+  // Prevent body scroll when chat is open on mobile
+  useEffect(() => {
+    if (isAIChatOpen && typeof window !== 'undefined' && window.innerWidth < 640) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
     }
-    return '0px';
-  };
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isAIChatOpen]);
 
   return (
     <>
       <div className="flex-1 flex overflow-hidden">
         <main
-          className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide p-3 sm:p-4 md:p-6 flex justify-center transition-all duration-300 scroll-smooth"
+          className={`flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide p-3 sm:p-4 md:p-6 flex justify-center transition-all duration-300 scroll-smooth
+            ${isAIChatOpen ? 'sm:mr-[400px]' : ''}
+            ${isPDFViewerOpen && !isPDFMaximized ? 'sm:mr-[400px]' : ''}
+          `}
           style={{
             scrollbarGutter: 'stable',
-            marginRight: getMainMargin()
+            marginRight: isPDFViewerOpen && isPDFMaximized ? `calc(100% - ${sidebarWidth})` : undefined
           }}
         >
           <div className="w-full max-w-[792px] px-2 sm:px-0">
@@ -530,7 +535,6 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
                     </button>
                     
                     {['Documents', 'Photos', 'Videos', 'Compressed ZIPs', 'Audio', 'Excel'].map((tab) => {
-                      const count = getFileCount(tab);
                       const isActive = activeFileType === tab;
 
                       return (
@@ -880,10 +884,26 @@ function LibraryContent({ files, setFiles, folders, setFolders }: LibraryContent
           </div>
         </main>
 
-        {/* AI Chat Sidebar */}
+        {/* Backdrop for mobile when AI chat is open */}
+        {isAIChatOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-30 sm:hidden"
+            onClick={() => setIsAIChatOpen(false)}
+          />
+        )}
+
+        {/* AI Chat Sidebar - Slides from bottom on mobile, from right on desktop */}
         <div
-          className={`fixed top-0 right-0 h-full w-[400px] bg-white dark:bg-[#09090B] border-l border-gray-200 dark:border-[#3F3F46] shadow-lg transform transition-transform duration-300 ease-in-out z-40 ${isAIChatOpen ? 'translate-x-0' : 'translate-x-full'
-            }`}
+          className={`fixed bg-white dark:bg-[#09090B] border-gray-200 dark:border-[#3F3F46] shadow-lg transition-all duration-300 ease-in-out z-40
+            ${/* Mobile - from bottom, no X translation */ ''}
+            bottom-0 left-0 right-0 w-full h-[85vh] rounded-t-2xl border-t translate-x-0
+            ${/* Desktop - from right */ ''}
+            sm:top-0 sm:bottom-auto sm:left-auto sm:right-0 sm:h-full sm:w-[400px] sm:rounded-none sm:border-t-0 sm:border-l
+            ${/* Mobile Animation - ONLY Y axis */ ''}
+            ${isAIChatOpen ? 'translate-y-0' : 'translate-y-full'}
+            ${/* Desktop Animation - ONLY X axis, reset Y */ ''}
+            sm:translate-y-0 ${isAIChatOpen ? 'sm:translate-x-0' : 'sm:translate-x-full'}
+          `}
         >
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-[#3F3F46]">
             <button

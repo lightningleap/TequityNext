@@ -1,6 +1,5 @@
 "use client";
 
-import { FiShield } from "react-icons/fi";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 

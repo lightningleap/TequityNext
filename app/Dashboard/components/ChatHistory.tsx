@@ -154,7 +154,7 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
                 <div className="relative">
                   <button
                     onClick={(e) => toggleMenu(chat.id, e)}
-                    className="hover:bg-gray-200 dark:hover:bg-[#27272A] dark:hover:text-white cursor-pointer rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="hover:bg-gray-200 dark:hover:bg-[#27272A] dark:hover:text-white cursor-pointer rounded-full opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                     aria-label="Chat actions"
                   >
                     <HiOutlineDotsHorizontal className="h-5 w-5 text-gray-500 dark:text-white" />

@@ -1,18 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import { X, FileText, Plus, AtSign, ArrowUp, File, Folder, Image as ImageIcon, ChevronDown, User, Sparkles, Copy, ThumbsUp, ThumbsDown, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { X, FileText, Plus, AtSign, ArrowUp, File, Folder, Image as ImageIcon,  Copy, ThumbsUp, ThumbsDown, Search } from "lucide-react";
 import { useChatContext } from "../context/ChatContext";
 import Image from "next/image";
 import Logomark from "@/public/Logomark.svg";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 export interface FileItem {
   id: string;
@@ -38,8 +31,6 @@ const formatFileSize = (bytes: number): string => {
 
 export function ChatInterface({
   selectedFile,
-  onClose,
-  onNewChat,
 }: ChatInterfaceProps) {
   const { activeChat, activeChatId, createNewChat, addMessageToChat, chats } = useChatContext();
   const [inputValue, setInputValue] = useState("");
@@ -48,7 +39,6 @@ export function ChatInterface({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
-  const [uploadMode, setUploadMode] = useState<"files" | "folder">("files");
   const [showUploadMenu, setShowUploadMenu] = useState(false);
   const [showContextMenu, setShowContextMenu] = useState(false);
   const uploadMenuRef = useRef<HTMLDivElement>(null);
@@ -77,7 +67,7 @@ export function ChatInterface({
     }
   }, [activeChatId, chats.length, createNewChat]);
 
-  const messages = activeChat?.messages || [];
+  const messages = useMemo(() => activeChat?.messages || [], [activeChat?.messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

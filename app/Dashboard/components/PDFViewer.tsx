@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { X, Download, Maximize2, Minimize2, ChevronsRight, FileText, Folder } from "lucide-react";
+import { Download, Maximize2, Minimize2, ChevronsRight, FileText, Folder } from "lucide-react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { FileItem } from "./filegrid";
 import { useSidebar } from "@/components/ui/sidebar";
+import Image from "next/image";
 
-// Set up the worker for react-pdf
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// Set up the worker for react-pdf - only on client side
+if (typeof window !== 'undefined') {
+  pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+}
 
 interface PDFViewerProps {
   isOpen: boolean;
@@ -19,9 +22,6 @@ interface PDFViewerProps {
 
 export function PDFViewer({ isOpen, onClose, file, folderName, onMaximizeChange }: PDFViewerProps) {
   const [numPages, setNumPages] = useState<number>(0);
-  const [pageNumber, setPageNumber] = useState<number>(1);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [isMaximized, setIsMaximized] = useState<boolean>(false);
   const { state } = useSidebar();
 
@@ -39,15 +39,10 @@ export function PDFViewer({ isOpen, onClose, file, folderName, onMaximizeChange 
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
-    setPageNumber(1);
-    setLoading(false);
-    setError(null);
   }
 
   function onDocumentLoadError(error: Error) {
     console.error("PDF load error:", error);
-    setError("Failed to load PDF");
-    setLoading(false);
   }
 
   const handleDownload = () => {
@@ -202,10 +197,13 @@ export function PDFViewer({ isOpen, onClose, file, folderName, onMaximizeChange 
           /* Image Viewer */
           file.url ? (
             <div className="p-6 flex items-center justify-center">
-              <img
+              <Image
                 src={file.url}
                 alt={file.name}
+                width={1000}
+                height={1000}
                 className="max-w-full h-auto rounded-lg shadow-lg"
+                unoptimized
                 onError={(e) => {
                   console.error("Image load error");
                   e.currentTarget.style.display = 'none';

@@ -7,7 +7,7 @@ import { DashboardLayout } from "../components/DashboardLayout";
 import { useChatContext } from "../context/ChatContext";
 
 export default function ChatPage() {
-  const { activeChat, activeChatId, createNewChat, chats } = useChatContext();
+  const { activeChat, activeChatId, createNewChat } = useChatContext();
   const [chatTitle, setChatTitle] = useState<string>("New Chat");
 
   // Update title when active chat changes
@@ -24,7 +24,7 @@ export default function ChatPage() {
     createNewChat();
   };
 
-  const handleChatSelect = (chatId: string) => {
+  const handleChatSelect = () => {
     // Title will update automatically via useEffect
   };
 

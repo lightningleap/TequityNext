@@ -1,6 +1,5 @@
 "use client";
 
-import { FiBell } from "react-icons/fi";
 import { useState } from "react";
 
 export function Notifications() {

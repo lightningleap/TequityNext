@@ -1,6 +1,5 @@
 "use client";
 
-import { MdOutlineFolderCopy } from "react-icons/md";
 import Image from "next/image";
 import BlackLogo from "@/public/BlackLogo.svg";
 import { useState } from "react";
