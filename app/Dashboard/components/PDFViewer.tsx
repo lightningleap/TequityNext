@@ -71,14 +71,32 @@ export function PDFViewer({ isOpen, onClose, file, folderName, onMaximizeChange 
   };
 
   return (
-    <div
-      className={`fixed top-0 right-0 h-full bg-white dark:bg-[#09090B] border-l border-gray-200 dark:border-gray-800 shadow-lg transform transition-all duration-300 ease-in-out z-50 ${
-        isOpen ? 'translate-x-0' : 'translate-x-full'
-      } ${isMaximized ? '' : 'w-[400px]'}`}
-      style={isMaximized ? { width: maxWidth } : undefined}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#09090B]">
+    <>
+      {/* Backdrop/Overlay for mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={handleClose}
+        />
+      )}
+
+      <div
+        className={`fixed bg-white dark:bg-[#09090B] shadow-lg transform transition-all duration-300 ease-in-out z-50
+          ${isOpen ? 'translate-y-0 md:translate-x-0' : 'translate-y-full md:translate-y-0 md:translate-x-full'}
+          ${isMaximized ? '' : 'w-full md:w-[400px]'}
+          bottom-0 md:bottom-auto md:top-0 md:right-0
+          h-[90vh] md:h-full
+          rounded-t-2xl md:rounded-none
+          border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-800`}
+        style={isMaximized ? { width: maxWidth } : undefined}
+      >
+        {/* Mobile drag handle bar */}
+        <div className="flex md:hidden justify-center pt-2 pb-1">
+          <div className="w-12 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
+        </div>
+
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#09090B]">
         {/* Left side: File/folder name */}
         <div className="flex items-center gap-3">
           <h2 className={`text-sm font-medium text-gray-900 dark:text-white truncate ${isMaximized ? 'max-w-[600px]' : 'max-w-[200px]'}`}>
@@ -104,7 +122,7 @@ export function PDFViewer({ isOpen, onClose, file, folderName, onMaximizeChange 
           </button>
           <button
             onClick={handleClose}
-            className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors"
+            className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors hidden md:block"
             aria-label="Close viewer"
           >
             <ChevronsRight className="h-5 w-5" />
@@ -113,7 +131,7 @@ export function PDFViewer({ isOpen, onClose, file, folderName, onMaximizeChange 
       </div>
 
       {/* Content Area */}
-      <div className="h-[calc(100%-64px)] overflow-auto scrollbar-hide bg-gray-50 dark:bg-[#09090B]">
+      <div className="h-[calc(100%-80px)] md:h-[calc(100%-64px)] overflow-auto scrollbar-hide bg-gray-50 dark:bg-[#09090B]">
         {/* PDF Viewer */}
         {file.type === "PDF" ? (
           file.url ? (
@@ -275,5 +293,6 @@ export function PDFViewer({ isOpen, onClose, file, folderName, onMaximizeChange 
         )}
       </div>
     </div>
+    </>
   );
 }
