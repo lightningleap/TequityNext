@@ -8,6 +8,7 @@ interface SearchBarProps {
   onChange: (value: string) => void;
   placeholder?: string;
   onFocus?: () => void;
+  onClick?: () => void;
 }
 
 export function SearchBar({
@@ -15,6 +16,7 @@ export function SearchBar({
   onChange,
   placeholder = "Search",
   onFocus,
+  onClick,
 }: SearchBarProps) {
   return (
     <div className="max-auto w-full max-w-6xl">
@@ -29,6 +31,7 @@ export function SearchBar({
           placeholder={placeholder}
           className="border-0 px-2 text-sm placeholder:text-muted-foreground focus-visible:ring-0 dark:bg-[#27272A] dark:text-white"
           aria-label="Search files"
+          onClick={onClick}
           onFocus={onFocus}
         />
       </div>

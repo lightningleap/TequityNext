@@ -533,11 +533,24 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
               <>
                 {/* Main Library View */}
                 <header className="mb-6 sm:mb-8 flex flex-col items-start justify-start gap-6 sm:gap-12">
-                  <SearchBar
-                    value={searchQuery}
-                    onChange={setSearchQuery}
-                    placeholder="Search files and folders..."
-                  />
+                  <div className="relative w-full" ref={searchRef}>
+                    <SearchBar
+                      value={searchQuery}
+                      onChange={setSearchQuery}
+                      onFocus={() => setIsSearchFocused(true)}
+                      onClick={() => setIsSearchFocused(true)}
+                      placeholder="Search files and folders..."
+                    />
+                    <SearchDropdown
+                      isOpen={isSearchFocused}
+                      searchQuery={searchQuery}
+                      onSelect={(file) => {
+                        console.log("Selected file:", file);
+                        // Handle file selection (e.g., open file, navigate, etc.)
+                        setIsSearchFocused(false);
+                      }}
+                    />
+                  </div>
                 </header>
 
             <section
