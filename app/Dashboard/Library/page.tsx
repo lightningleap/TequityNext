@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { ChevronDown, ChevronsRight, Maximize2, Star, Download, Edit, ArrowLeft } from "lucide-react";
@@ -42,29 +42,54 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { SearchDropdown } from "../components/SearchDropdown";
 
 interface LibraryContentProps {
   files: FileItem[];
   setFiles: React.Dispatch<React.SetStateAction<FileItem[]>>;
   folders: Array<{ id: string; name: string; fileCount: number }>;
-  setFolders: React.Dispatch<React.SetStateAction<Array<{ id: string; name: string; fileCount: number }>>>;
+  setFolders: React.Dispatch<
+    React.SetStateAction<Array<{ id: string; name: string; fileCount: number }>>
+  >;
 }
 
 function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
   const router = useRouter();
-  const { createNewChat, activeChat, activeChatId, chats, selectChat } = useChatContext();
+  const { createNewChat, activeChat, activeChatId, chats, selectChat } =
+    useChatContext();
   const { state: sidebarState } = useSidebar();
   const [folderView, setFolderView] = useState<"grid" | "list">("grid");
   const [fileView, setFileView] = useState<"grid" | "list">("grid");
   const [foldersExpanded, setFoldersExpanded] = useState(true);
   const [filesExpanded, setFilesExpanded] = useState(true);
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setIsSearchFocused(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   const [isPDFViewerOpen, setIsPDFViewerOpen] = useState(false);
   const [isPDFMaximized, setIsPDFMaximized] = useState(false);
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
   const [activeFileType, setActiveFileType] = useState<string | null>(null);
-  const [selectedFolders, setSelectedFolders] = useState<Set<string>>(new Set());
+  const [selectedFolders, setSelectedFolders] = useState<Set<string>>(
+    new Set()
+  );
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
   const [starredFileIds, setStarredFileIds] = useState<Set<string>>(new Set());
   const [fileToDelete, setFileToDelete] = useState<FileItem | null>(null);
@@ -95,12 +120,12 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
   }, []);
   // File type mapping for filtering
   const fileTypeMap: Record<string, string[]> = {
-    'Documents': ['PDF', 'DOCX', 'TXT', 'PPTX'],
-    'Photos': ['JPG', 'JPEG', 'PNG', 'GIF', 'SVG'],
-    'Videos': ['MP4', 'MOV', 'AVI', 'WMV'],
-    'Compressed ZIPs': ['ZIP', 'RAR', '7Z', 'TAR', 'GZ'],
-    'Audio': ['MP3', 'WAV', 'AAC', 'OGG', 'WMA'],
-    'Excel': ['XLSX', 'XLS', 'CSV']
+    Documents: ["PDF", "DOCX", "TXT", "PPTX"],
+    Photos: ["JPG", "JPEG", "PNG", "GIF", "SVG"],
+    Videos: ["MP4", "MOV", "AVI", "WMV"],
+    "Compressed ZIPs": ["ZIP", "RAR", "7Z", "TAR", "GZ"],
+    Audio: ["MP3", "WAV", "AAC", "OGG", "WMA"],
+    Excel: ["XLSX", "XLS", "CSV"],
   };
 
   // Get paginated files
@@ -110,11 +135,11 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
   };
   
   // Filter files based on active tab and search query
-  const filteredFiles = files.filter(file => {
+  const filteredFiles = files.filter((file) => {
     // Filter by file type
-    const fileExt = file.name.split('.').pop()?.toUpperCase();
+    const fileExt = file.name.split(".").pop()?.toUpperCase();
     const typeMatch = activeFileType
-      ? fileTypeMap[activeFileType]?.includes(fileExt || '')
+      ? fileTypeMap[activeFileType]?.includes(fileExt || "")
       : true;
 
     // Filter by search query
@@ -130,7 +155,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
 
 
   // Filter folders based on search query
-  const filteredFolders = folders.filter(folder =>
+  const filteredFolders = folders.filter((folder) =>
     searchQuery
       ? folder.name.toLowerCase().includes(searchQuery.toLowerCase())
       : true
@@ -139,7 +164,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
   // Checkbox handlers
   const toggleFolderSelection = (folderId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setSelectedFolders(prev => {
+    setSelectedFolders((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(folderId)) {
         newSet.delete(folderId);
@@ -152,7 +177,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
 
   const toggleFileSelection = (fileId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setSelectedFiles(prev => {
+    setSelectedFiles((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(fileId)) {
         newSet.delete(fileId);
@@ -195,16 +220,16 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
 
   // Format date helper
   const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     }).format(new Date(date));
   };
 
   // Format file size helper
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '-';
+    if (bytes === 0) return "-";
     const kb = bytes / 1024;
     if (kb < 1024) return `${kb.toFixed(0)} KB`;
     const mb = kb / 1024;
@@ -217,7 +242,11 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     setIsPDFViewerOpen(true);
   };
 
-  const handleFolderSelect = (folder: { id: string; name: string; fileCount: number }) => {
+  const handleFolderSelect = (folder: {
+    id: string;
+    name: string;
+    fileCount: number;
+  }) => {
     console.log("Folder selected:", folder);
 
     // Create sample files for the folder
@@ -511,7 +540,10 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                   />
                 </header>
 
-            <section aria-labelledby="recently-visited" className="mb-6 sm:mb-10">
+            <section
+              aria-labelledby="recently-visited"
+              className="mb-6 sm:mb-10"
+            >
               <h2
                 id="recently-visited"
                 className="mb-4 sm:mb-6 flex gap-2 text-sm font-medium text-muted-foreground"
@@ -522,47 +554,82 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
               <div className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 md:grid md:grid-cols-3 lg:grid-cols-4 md:overflow-x-visible">
                 <div className="flex flex-col items-center min-w-[160px] w-[160px] md:w-full md:min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3 flex-shrink-0">
                   <div className="flex items-center justify-center mb-3 sm:mb-4">
-                    <img src="/blueFolder.svg" alt="Recent Files" className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]" />
+                    <img
+                      src="/blueFolder.svg"
+                      alt="Recent Files"
+                      className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]"
+                    />
                   </div>
                   <div className="w-full">
-                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">Opened 3 hours ago</p>
-                    <p className="text-xs text-muted-foreground mt-1">5 items</p>
+                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">
+                      Opened 3 hours ago
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      5 items
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex flex-col items-center min-w-[160px] w-[160px] md:w-full md:min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3 flex-shrink-0">
                   <div className="flex items-center justify-center mb-3 sm:mb-4">
-                    <img src="/blackFolder.svg" alt="Created Files" className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]" />
+                    <img
+                      src="/blackFolder.svg"
+                      alt="Created Files"
+                      className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]"
+                    />
                   </div>
                   <div className="w-full">
-                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">Created</p>
-                    <p className="text-xs text-muted-foreground mt-1">12 documents</p>
+                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">
+                      Created
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      12 documents
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex flex-col items-center min-w-[160px] w-[160px] md:w-full md:min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3 flex-shrink-0">
                   <div className="flex items-center justify-center mb-3 sm:mb-4">
-                    <img src="/yellowFolder.svg" alt="Received Files" className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]" />
+                    <img
+                      src="/yellowFolder.svg"
+                      alt="Received Files"
+                      className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]"
+                    />
                   </div>
                   <div className="w-full">
-                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">Received</p>
-                    <p className="text-xs text-muted-foreground mt-1">8 folders</p>
+                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">
+                      Received
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      8 folders
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex flex-col items-center min-w-[160px] w-[160px] md:w-full md:min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3 flex-shrink-0">
                   <div className="flex items-center justify-center mb-3 sm:mb-4">
-                    <img src="/redFolder.svg" alt="Updated Files" className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]" />
+                    <img
+                      src="/redFolder.svg"
+                      alt="Updated Files"
+                      className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]"
+                    />
                   </div>
                   <div className="w-full">
-                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">Updated</p>
-                    <p className="text-xs text-muted-foreground mt-1">15 files</p>
+                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">
+                      Updated
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      15 files
+                    </p>
                   </div>
                 </div>
               </div>
             </section>
 
-            <section aria-labelledby="all-folders" className="space-y-3 sm:space-y-4 mb-6 sm:mb-10">
+            <section
+              aria-labelledby="all-folders"
+              className="space-y-3 sm:space-y-4 mb-6 sm:mb-10"
+            >
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2">
                   <h2 className="text-sm font-medium text-muted-foreground">
@@ -571,7 +638,9 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                   <button
                     onClick={() => setFoldersExpanded(!foldersExpanded)}
                     className="text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label={foldersExpanded ? "Collapse folders" : "Expand folders"}
+                    aria-label={
+                      foldersExpanded ? "Collapse folders" : "Expand folders"
+                    }
                   >
                     {foldersExpanded ? (
                       <ChevronUp className="size-4" />
@@ -583,20 +652,22 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                 <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-md dark:bg-[#27272A]">
                   <button
                     onClick={() => setFolderView("grid")}
-                    className={`p-1.5 rounded transition-colors ${folderView === "grid"
+                    className={`p-1.5 rounded transition-colors ${
+                      folderView === "grid"
                         ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
                         : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
-                      }`}
+                    }`}
                     aria-label="Grid view"
                   >
                     <IoGridOutline className="size-4" />
                   </button>
                   <button
                     onClick={() => setFolderView("list")}
-                    className={`p-1.5 rounded transition-colors ${folderView === "list"
+                    className={`p-1.5 rounded transition-colors ${
+                      folderView === "list"
                         ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
                         : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
-                      }`}
+                    }`}
                     aria-label="List view"
                   >
                     <FaListUl className="size-4" />
@@ -608,21 +679,31 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                 <>
                   {folderView === "grid" ? (
                     <div className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                      {filteredFolders.length > 0 ? filteredFolders.map((folder) => (
-                        <div
-                          key={folder.id}
-                          onClick={() => handleFolderSelect(folder)}
-                          className="flex items-center gap-3 rounded-lg bg-muted px-4 py-3 hover:bg-muted/80 cursor-pointer transition-colors dark:bg-[#27272A]"
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => e.key === "Enter" && handleFolderSelect(folder)}
-                        >
-                          <img src="/Folder.svg" alt="Folder" className="h-[20px] w-[20px]" />
-                          <div className="flex-1 min-w-0 ">
-                            <p className="truncate text-sm font-medium">{folder.name}</p>
+                      {filteredFolders.length > 0 ? (
+                        filteredFolders.map((folder) => (
+                          <div
+                            key={folder.id}
+                            onClick={() => handleFolderSelect(folder)}
+                            className="flex items-center gap-3 rounded-lg bg-muted px-4 py-3 hover:bg-muted/80 cursor-pointer transition-colors dark:bg-[#27272A]"
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) =>
+                              e.key === "Enter" && handleFolderSelect(folder)
+                            }
+                          >
+                            <img
+                              src="/Folder.svg"
+                              alt="Folder"
+                              className="h-[20px] w-[20px]"
+                            />
+                            <div className="flex-1 min-w-0 ">
+                              <p className="truncate text-sm font-medium">
+                                {folder.name}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      )) : (
+                        ))
+                      ) : (
                         <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
                           No folders found
                         </div>
@@ -698,7 +779,10 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
               )}
             </section>
 
-            <section aria-labelledby="all-files" className="space-y-3 sm:space-y-4">
+            <section
+              aria-labelledby="all-files"
+              className="space-y-3 sm:space-y-4"
+            >
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2">
                   <h2 className="text-sm font-medium text-muted-foreground">
@@ -707,7 +791,9 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                   <button
                     onClick={() => setFilesExpanded(!filesExpanded)}
                     className="text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label={filesExpanded ? "Collapse files" : "Expand files"}
+                    aria-label={
+                      filesExpanded ? "Collapse files" : "Expand files"
+                    }
                   >
                     {filesExpanded ? (
                       <ChevronUp className="size-4" />
@@ -720,20 +806,22 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                 <div className="flex items-center gap-1 bg-gray-100 dark:bg-[#27272A] p-1 rounded-md">
                   <button
                     onClick={() => setFileView("grid")}
-                    className={`p-1.5 rounded transition-colors ${fileView === "grid"
+                    className={`p-1.5 rounded transition-colors ${
+                      fileView === "grid"
                         ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
                         : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
-                      }`}
+                    }`}
                     aria-label="Grid view"
                   >
                     <IoGridOutline className="size-4" />
                   </button>
                   <button
                     onClick={() => setFileView("list")}
-                    className={`p-1.5 rounded transition-colors ${fileView === "list"
+                    className={`p-1.5 rounded transition-colors ${
+                      fileView === "list"
                         ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
                         : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
-                      }`}
+                    }`}
                     aria-label="List view"
                   >
                     <FaListUl className="size-4" />
@@ -749,8 +837,8 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                       onClick={() => setActiveFileType(null)}
                       className={`shrink-0 cursor-pointer rounded-md px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
                         activeFileType === null
-                          ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm'
-                          : 'text-gray-600 hover:bg-gray-50 border border-gray-200 bg-white hover:border-gray-300 dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]'
+                          ? "bg-primary/10 text-primary border border-primary/20 shadow-sm"
+                          : "text-gray-600 hover:bg-gray-50 border border-gray-200 bg-white hover:border-gray-300 dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
                       }`}
                     >
                       <span>All Files</span>
@@ -765,11 +853,13 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                       return (
                         <button
                           key={tab}
-                          onClick={() => setActiveFileType(isActive ? null : tab)}
+                          onClick={() =>
+                            setActiveFileType(isActive ? null : tab)
+                          }
                           className={`shrink-0 cursor-pointer rounded-md px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 dark:bg-[#09090B] ${
                             isActive
-                              ? 'bg-primary/10 text-primary dark:border-[#3F3F46] border border-primary/20 shadow-sm dark:bg-[#27272A]'
-                              : 'text-gray-600 hover:bg-gray-50 border border-gray-200 bg-white hover:border-gray-300 dark:border-[#3F3F46] dark:text-[#A1A1AA] dark:bg-[#09090B]'
+                              ? "bg-primary/10 text-primary dark:border-[#3F3F46] border border-primary/20 shadow-sm dark:bg-[#27272A]"
+                              : "text-gray-600 hover:bg-gray-50 border border-gray-200 bg-white hover:border-gray-300 dark:border-[#3F3F46] dark:text-[#A1A1AA] dark:bg-[#09090B]"
                           }`}
                         >
                           <span>{tab}</span>
@@ -797,7 +887,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                           <p className="text-sm">
                             {activeFileType
                               ? `No ${activeFileType.toLowerCase()} files found`
-                              : 'No files found'}
+                              : "No files found"}
                           </p>
                         </div>
                       ) : (
@@ -808,7 +898,9 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                             className="group relative flex items-center rounded-lg bg-[#F4F4F5] dark:bg-[#27272A] dark:border-[#27272A] border border-gray-200 px-3 py-2 hover:bg-gray-50 cursor-pointer transition-colors"
                             role="button"
                             tabIndex={0}
-                            onKeyDown={(e) => e.key === "Enter" && handleFileSelect(file)}
+                            onKeyDown={(e) =>
+                              e.key === "Enter" && handleFileSelect(file)
+                            }
                           >
                             <div className="w-6 h-6 flex items-center justify-center">
                               {file.type === "PDF" ? (
@@ -817,37 +909,47 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                   alt="PDF"
                                   className="max-w-[34px] max-h-[34px] object-contain"
                                 />
-                              ) : file.type === "DOCX" || file.type === "DOC" ? (
+                              ) : file.type === "DOCX" ||
+                                file.type === "DOC" ? (
                                 <img
                                   src="/Files/Docs-icon.svg"
                                   alt="Document"
                                   className="max-w-[34px] max-h-[34px] object-contain"
                                 />
-                              ) : file.type === "XLSX" || file.type === "XLS" ? (
+                              ) : file.type === "XLSX" ||
+                                file.type === "XLS" ? (
                                 <img
                                   src="/Files/XLS-icon.svg"
                                   alt="Spreadsheet"
                                   className="max-w-[34px] max-h-[34px] object-contain"
                                 />
-                              ) : file.type === "PPTX" || file.type === "PPT" ? (
+                              ) : file.type === "PPTX" ||
+                                file.type === "PPT" ? (
                                 <img
                                   src="/Files/PDF-icon.svg"
                                   alt="Presentation"
                                   className="max-w-[34px] max-h-[34px] object-contain"
                                 />
-                              ) : file.type === "JPG" || file.type === "JPEG" || file.type === "PNG" || file.type === "GIF" ? (
+                              ) : file.type === "JPG" ||
+                                file.type === "JPEG" ||
+                                file.type === "PNG" ||
+                                file.type === "GIF" ? (
                                 <img
                                   src="/Files/JPG-icon.svg"
                                   alt="Image"
                                   className="max-w-[44px] max-h-[44px] object-contain"
                                 />
-                              ) : file.type === "MP3" || file.type === "WAV" || file.type === "AAC" ? (
+                              ) : file.type === "MP3" ||
+                                file.type === "WAV" ||
+                                file.type === "AAC" ? (
                                 <img
                                   src="/Files/MP3-icon.svg"
                                   alt="Audio"
                                   className="max-w-[44px] max-h-[44px] object-contain"
                                 />
-                              ) : file.type === "ZIP" || file.type === "RAR" || file.type === "7Z" ? (
+                              ) : file.type === "ZIP" ||
+                                file.type === "RAR" ||
+                                file.type === "7Z" ? (
                                 <img
                                   src="/Files/ZIP-icon.svg"
                                   alt="Archive"
@@ -868,7 +970,9 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                               )}
                             </div>
                             <div className="flex-1 min-w-0 ml-2">
-                              <p className="truncate text-sm font-medium">{file.name}</p>
+                              <p className="truncate text-sm font-medium">
+                                {file.name}
+                              </p>
                             </div>
 
                             {/* 3-dot dropdown menu */}
@@ -897,7 +1001,10 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                     <DropdownMenu.Item
                                       className="flex items-center gap-2 text-sm p-2 rounded hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer outline-none"
                                       onSelect={() => {
-                                        toggleFileStar(file.id || "", file.name);
+                                        toggleFileStar(
+                                          file.id || "",
+                                          file.name
+                                        );
                                       }}
                                     >
                                       <Star
@@ -908,13 +1015,18 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                         }`}
                                       />
                                       <span>
-                                        {starredFileIds.has(file.id || "") ? "Unstar" : "Star"}
+                                        {starredFileIds.has(file.id || "")
+                                          ? "Unstar"
+                                          : "Star"}
                                       </span>
                                     </DropdownMenu.Item>
                                     <DropdownMenu.Item
                                       className="flex items-center gap-2 text-sm p-2 rounded hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer outline-none"
                                       onSelect={() => {
-                                        console.log("Download file:", file.name);
+                                        console.log(
+                                          "Download file:",
+                                          file.name
+                                        );
                                       }}
                                     >
                                       <Download className="h-4 w-4" />
@@ -1114,7 +1226,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                   )}
                 </>
               )}
-
             </section>
 
             {/* Bottom spacer */}
@@ -1178,14 +1289,16 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                       key={chat.id}
                       className={`flex items-center gap-2 text-sm px-3 py-2 rounded cursor-pointer outline-none ${
                         activeChatId === chat.id
-                          ? 'bg-gray-100 dark:bg-[#27272A]'
-                          : 'hover:bg-gray-50 dark:hover:bg-[#27272A]'
+                          ? "bg-gray-100 dark:bg-[#27272A]"
+                          : "hover:bg-gray-50 dark:hover:bg-[#27272A]"
                       }`}
                       onSelect={() => {
                         selectChat(chat.id);
                       }}
                     >
-                      <span className="truncate text-gray-900 dark:text-white">{chat.title}</span>
+                      <span className="truncate text-gray-900 dark:text-white">
+                        {chat.title}
+                      </span>
                     </DropdownMenu.Item>
                   ))}
                 </DropdownMenu.Content>
@@ -1194,7 +1307,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
 
             <button
               onClick={() => {
-                router.push('/Dashboard/chat');
+                router.push("/Dashboard/chat");
               }}
               className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors"
               aria-label="Maximize chat"
@@ -1365,7 +1478,10 @@ export default function LibraryPage() {
     setGlobalFolders(folders);
   }, [files, folders, setGlobalFiles, setGlobalFolders]);
 
-  const handleFileUpload = (newFiles: FileItem[], newFolders: UploadedFolder[]) => {
+  const handleFileUpload = (
+    newFiles: FileItem[],
+    newFolders: UploadedFolder[]
+  ) => {
     console.log("Library received - Files:", newFiles);
     console.log("Library received - Folders:", newFolders);
 
