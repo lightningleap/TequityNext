@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import BlackLogo from "@/public/BlackLogo.svg";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DeleteAllChatsDialog } from "../dialogbox/DeleteAllChatsDialog";
 import { LeaveDataroomDialog } from "../dialogbox/LeaveDataroomDialog";
 import { DeleteDataroomDialog } from "../dialogbox/DeleteDataroomDialog";
@@ -11,6 +11,25 @@ export function Dataroom() {
   const [deleteAllChatsOpen, setDeleteAllChatsOpen] = useState(false);
   const [leaveDataroomOpen, setLeaveDataroomOpen] = useState(false);
   const [deleteDataroomOpen, setDeleteDataroomOpen] = useState(false);
+  const [dataroomName, setDataroomName] = useState("LLA");
+
+  // Load dataroom name from localStorage
+  useEffect(() => {
+    const savedName = localStorage.getItem('dataroomName');
+    if (savedName) {
+      setDataroomName(savedName);
+    }
+  }, []);
+
+  // Handle dataroom name change
+  const handleDataroomNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = e.target.value;
+    setDataroomName(newName);
+    localStorage.setItem('dataroomName', newName);
+    // Trigger a storage event to update other components
+    window.dispatchEvent(new Event('storage'));
+  };
+
   return (
     <div className="space-y-6 dark:bg-[#09090B] max-h-[500px] overflow-y-auto">
       <div className="flex items-center gap-3">
@@ -30,7 +49,8 @@ export function Dataroom() {
               type="text"
               className="w-50% px-3 py-2 border border-gray-300 rounded-md "
               placeholder="Dataroom name"
-              defaultValue="LLA's DATAROOM"
+              value={dataroomName}
+              onChange={handleDataroomNameChange}
             />
           </div>
         </div>

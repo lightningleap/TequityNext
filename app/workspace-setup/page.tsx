@@ -55,6 +55,9 @@ export default function WorkspaceSetupPage() {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 500));
 
+      // Store dataroom name in localStorage
+      localStorage.setItem('dataroomName', workspaceName.trim());
+
       // Move to step 2
       setCurrentStep(2);
     } catch (err) {
