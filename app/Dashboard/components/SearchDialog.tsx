@@ -30,36 +30,118 @@ interface FileItem {
   size: string;
 }
 
+// File icons mapping to match SearchDropdown
+const fileIcons = {
+  folder: (
+    <div className="w-4 h-4 flex-shrink-0 relative" style={{ width: "16px", height: "16px" }}>
+      <Image
+        src="/Folder.svg"
+        alt="Folder"
+        width={16}
+        height={16}
+        className="object-contain"
+      />
+    </div>
+  ),
+  pdf: (
+    <div className="w-4 h-4 flex-shrink-0 relative" style={{ width: "16px", height: "16px" }}>
+      <Image
+        src="/Files/PDF-icon.svg"
+        alt="PDF"
+        width={16}
+        height={16}
+        className="object-contain"
+      />
+    </div>
+  ),
+  doc: (
+    <div className="w-4 h-4 flex-shrink-0 relative" style={{ width: "16px", height: "16px" }}>
+      <Image
+        src="/Files/Docs-icon.svg"
+        alt="DOC"
+        width={16}
+        height={16}
+        className="object-contain"
+      />
+    </div>
+  ),
+  xls: (
+    <div className="w-4 h-4 flex-shrink-0 relative">
+      <Image
+        src="/Files/XLS-icon.svg"
+        alt="XLS"
+        fill
+        sizes="16px"
+        className="object-contain"
+      />
+    </div>
+  ),
+  ppt: (
+    <div className="w-4 h-4 flex-shrink-0 relative" style={{ width: "16px", height: "16px" }}>
+      <Image
+        src="/Files/PPT-icon.svg"
+        alt="PPT"
+        width={16}
+        height={16}
+        className="object-contain"
+      />
+    </div>
+  ),
+  txt: (
+    <div className="w-4 h-4 flex-shrink-0 relative" style={{ width: "16px", height: "16px" }}>
+      <Image
+        src="/Files/TXT-icon.svg"
+        alt="TXT"
+        width={16}
+        height={16}
+        className="object-contain"
+      />
+    </div>
+  ),
+} as const;
+
 // Helper function to get file icon based on file type
-const getFileIcon = (fileName: string): string => {
+const getFileIcon = (fileName: string) => {
   const extension = fileName.split('.').pop()?.toLowerCase();
 
   switch (extension) {
     case 'pdf':
-      return '/Files/PDF-icon.svg';
+      return fileIcons.pdf;
     case 'doc':
     case 'docx':
-      return '/Files/Docs-icon.svg';
+      return fileIcons.doc;
     case 'xls':
     case 'xlsx':
-      return '/Files/XLS-icon.svg';
+    case 'csv':
+      return fileIcons.xls;
+    case 'ppt':
+    case 'pptx':
+      return fileIcons.ppt;
+    case 'txt':
+      return fileIcons.txt;
     case 'jpg':
     case 'jpeg':
     case 'png':
     case 'gif':
-      return '/Files/JPG-icon.svg';
+    case 'svg':
+    case 'image':
+      return fileIcons.folder; // Using folder icon as fallback for images
     case 'mp3':
     case 'wav':
     case 'aac':
-      return '/Files/MP3-icon.svg';
+    case 'ogg':
+    case 'wma':
+    case 'audio':
+      return fileIcons.folder; // Using folder icon as fallback for audio
     case 'zip':
     case 'rar':
     case '7z':
-      return '/Files/ZIP-icon.svg';
-    case 'txt':
-      return '/Files/TXT-icon.svg';
+    case 'tar':
+    case 'gz':
+    case 'archive':
+      return fileIcons.folder; // Using folder icon as fallback for archives
     default:
-      return '/file.svg';
+      return fileIcons.folder; // Default to folder icon
   }
 };
 
@@ -97,10 +179,10 @@ export function SearchDialog({ open, onOpenChange, folders = [], files = [] }: S
         size: formatSize(file.size),
       }))
     : [
-        { id: 1, name: "Q3_Financial_Report_2025.pdf", type: "pdf", size: "2.4 MB" },
-        { id: 2, name: "Annual_Overview_2024.xlsx", type: "xlsx", size: "3.8 MB" },
-        { id: 3, name: "Budget_Analysis_March.docx", type: "docx", size: "1.2 MB" },
-        { id: 4, name: "2025_Marketing_Strategy.zip", type: "zip", size: "5.1 MB" },
+        { id: 1, name: "Q4_Financial_Report.pdf", type: "pdf", size: "2.4 MB" },
+        { id: 2, name: "Client_Proposal_Template.docx", type: "docx", size: "1.2 MB" },
+        { id: 3, name: "Sales_Data_Analysis.xlsx", type: "xlsx", size: "3.8 MB" },
+        { id: 4, name: "2023_Marketing_Strategy.pptx", type: "pptx", size: "5.1 MB" },
         { id: 5, name: "Project_Management_Guide.txt", type: "txt", size: "890 KB" },
       ];
 
@@ -112,7 +194,7 @@ export function SearchDialog({ open, onOpenChange, folders = [], files = [] }: S
   // Filter files based on search query
   const filteredFiles = allFiles.filter(file =>
     file.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    file.type.toLowerCase().includes(searchQuery.toLowerCase())
+    (file.type && file.type.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   // Check if there are any search results
@@ -151,13 +233,7 @@ export function SearchDialog({ open, onOpenChange, folders = [], files = [] }: S
                       key={category.id}
                       className="w-full flex items-center gap-3 px-2 py-2 rounded-md hover:bg-gray-50 dark:hover:bg-[#27272A] transition-colors text-left"
                     >
-                      <Image
-                        src={category.icon}
-                        alt={category.name}
-                        width={20}
-                        height={20}
-                        className="flex-shrink-0"
-                      />
+                      {fileIcons.folder}
                       <span className="text-sm text-gray-900 dark:text-white">{category.name}</span>
                     </button>
                   ))}
@@ -179,13 +255,9 @@ export function SearchDialog({ open, onOpenChange, folders = [], files = [] }: S
                       key={file.id}
                       className="w-full flex items-center gap-3 px-2 py-2 rounded-md hover:bg-gray-50 dark:hover:bg-[#27272A] transition-colors text-left"
                     >
-                      <Image
-                        src={getFileIcon(file.name)}
-                        alt={file.type}
-                        width={20}
-                        height={20}
-                        className="flex-shrink-0"
-                      />
+                      <div className="flex-shrink-0">
+                        {getFileIcon(file.type || file.name)}
+                      </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-gray-900 dark:text-white truncate">{file.name}</p>
                       </div>
