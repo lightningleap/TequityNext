@@ -1,45 +1,59 @@
 "use client";
 
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import dynamic from "next/dynamic";
+import SignupGraphic from "../../public/SignupGraphic.svg";
 import GoogleIcon from "../../public/GoogleIcon.svg";
 import SignupLogo from "../../public/SignupLogo.svg";
 import Container from "../../public/Container.svg";
+import authAnimationData from "../../public/auth-animation.json";
+
+
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
+
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
-  const [step, setStep] = useState<'email' | 'verification'>('email');
+  const [step, setStep] = useState<"email" | "verification">("email");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const router = useRouter();
+
 
   const validateEmail = (email: string): boolean => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
   };
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setEmailError(null);
 
+
     // Basic validation
     if (!email.trim()) {
-      setEmailError('Email is required');
+      setEmailError("Email is required");
       return;
     }
+
 
     if (!validateEmail(email)) {
-      setEmailError('Please enter a valid email address');
+      setEmailError("Please enter a valid email address");
       return;
     }
 
+
     setIsLoading(true);
+
 
     try {
       // TODO: Replace with actual API call to send verification code
@@ -49,28 +63,37 @@ export default function SignupPage() {
       // });
       // if (!response.ok) throw new Error('Failed to send verification code');
 
+
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
+
       // Switch to verification step
-      setStep('verification');
+      setStep("verification");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send verification code. Please try again.');
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to send verification code. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const handleVerificationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
 
+
     try {
       // Validate verification code format
       if (verificationCode.length < 4) {
         throw new Error("Please enter a valid verification code");
       }
+
 
       // TODO: Replace with actual API call
       // const response = await fetch('/api/auth/verify-signup', {
@@ -79,37 +102,56 @@ export default function SignupPage() {
       // });
       // if (!response.ok) throw new Error('Invalid verification code');
 
+
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
+
 
       // Navigate to workspace setup after verification
       router.push("/workspace-setup");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Verification failed. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Verification failed. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const handleGoogleSignIn = () => {
     console.log("Google sign-in clicked");
   };
 
 
+  const handleBackToEmail = () => {
+    setStep("email");
+    setVerificationCode("");
+    setError(null);
+  };
+
+
   // Verification Step UI
-  if (step === 'verification') {
+  if (step === "verification") {
     return (
       <div className="flex h-screen overflow-hidden">
         {/* Left Side - Background Graphics (Hidden on small/medium, visible on large) */}
-        <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
-          <Image
-            src={Container}
-            alt="Verification Graphic"
-            fill
-            className="object-cover object-center"
-            priority
+        <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden p-0 m-0">
+          <Lottie
+            animationData={authAnimationData}
+            loop={true}
+            autoplay={true}
+            style={{ width: "100%", height: "100%", display: "block" }}
+            rendererSettings={{
+              preserveAspectRatio: "xMidYMid slice"
+            }}
           />
+
+
         </div>
+
 
         {/* Right Side - Verification Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-2 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
@@ -123,24 +165,31 @@ export default function SignupPage() {
                   <Image src={SignupLogo} alt="Signup Logo" />
                 </div>
 
+
                 <h1 className="text-3xl font-normal text-[#09090B]">
-                   Get Started Now
+                  Get Started Now
                 </h1>
 
+
                 <p className="text-sm text-gray-500">
-                 We sent a temporary login code to {email} <br />
-                 Not you?
+                  We sent a temporary login code to {email} <br />
+                  Not you?
                 </p>
               </div>
 
+
               {/* Form Fields */}
-              <form onSubmit={handleVerificationSubmit} className="flex flex-col gap-5 w-[364px]">
+              <form
+                onSubmit={handleVerificationSubmit}
+                className="flex flex-col gap-5 w-[364px]"
+              >
                 {/* Error Message */}
                 {error && (
                   <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg">
                     <p className="text-sm text-red-600">{error}</p>
                   </div>
                 )}
+
 
                 {/* Verification Code Input */}
                 <div className="space-y-1.5 w-[364px]">
@@ -150,11 +199,14 @@ export default function SignupPage() {
                     onChange={(e) => setVerificationCode(e.target.value)}
                     placeholder="Enter verification code"
                     className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                      error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                      error
+                        ? "border-red-300 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-blue-500"
                     }`}
                     disabled={isLoading}
                   />
                 </div>
+
 
                 {/* Continue Button */}
                 <div className="mt-3">
@@ -167,11 +219,13 @@ export default function SignupPage() {
                   </Button>
                 </div>
 
+
                 {/* Link to Login */}
                 <div className="text-center">
                   <Link href="/login">
                     <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                      Already have an account? <span className="text-gray-900 font-medium">Log in</span>
+                      Already have an account?{" "}
+                      <span className="text-gray-900 font-medium">Log in</span>
                     </span>
                   </Link>
                 </div>
@@ -183,19 +237,23 @@ export default function SignupPage() {
     );
   }
 
+
   // Email Step UI
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Side - Image (Hidden on small/medium, visible on large) */}
-      <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
-        <Image
-          src={Container}
-          alt="Signup Graphic"
-          fill
-          className="object-cover object-center"
-          priority
+      <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden p-0 m-0">
+        <Lottie
+          animationData={authAnimationData}
+          loop={true}
+          autoplay={true}
+          style={{ width: "100%", height: "100%", display: "block" }}
+          rendererSettings={{
+            preserveAspectRatio: "xMidYMid slice"
+          }}
         />
       </div>
+
 
       {/* Right Side - Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
@@ -209,15 +267,18 @@ export default function SignupPage() {
                 <Image src={SignupLogo} alt="Signup Logo" />
               </div>
 
+
               <h1 className="text-3xl font-normal text-[#09090B]">
                 Get Started Now
               </h1>
+
 
               <p className="text-sm text-gray-500 leading-relaxed">
                 Secure your workspace, streamline due diligence, and join a
                 trusted network of dealmakers.
               </p>
             </div>
+
 
             {/* Google Sign In Button */}
             <div className="h-12">
@@ -234,6 +295,7 @@ export default function SignupPage() {
               </button>
             </div>
 
+
             {/* Divider */}
             <div className="relative flex items-center justify-center">
               <div className="absolute inset-0 flex items-center">
@@ -244,45 +306,52 @@ export default function SignupPage() {
               </div>
             </div>
 
+
             {/* Form Fields */}
             <div className="w-[364px] space-y-5">
-            {/* Email Input */}
-            <div className="space-y-1.5">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className={`w-full h-10 px-3 py-2 border ${emailError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors`}
-                required
-                disabled={isLoading}
-              />
-            </div>
-
-            {/* Error Message */}
-            {(error || emailError) && (
-              <div className="p-3 text-sm text-red-600 bg-red-50 rounded-lg">
-                {error || emailError}
+              {/* Email Input */}
+              <div className="space-y-1.5">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email address"
+                  className={`w-full h-10 px-3 py-2 border ${
+                    emailError ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors`}
+                  required
+                  disabled={isLoading}
+                />
               </div>
-            )}
 
-            {/* Continue Button */}
-            <Button
-              onClick={handleSubmit}
-              disabled={!email.trim() || isLoading}
-              className="w-full h-11 cursor-pointer bg-[#09090B] hover:bg-gray-800 text-white rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? "Sending code..." : "Continue"}
-            </Button>
 
-            {/* Navigation Options */}
-            <div className="text-center">
-              <Link href="/login">
-                <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                  Already have an account? <span className="text-gray-900 font-medium">Log in</span>
-                </span>
-              </Link>
-            </div>
+              {/* Error Message */}
+              {(error || emailError) && (
+                <div className="p-3 text-sm text-red-600 bg-red-50 rounded-lg">
+                  {error || emailError}
+                </div>
+              )}
+
+
+              {/* Continue Button */}
+              <Button
+                onClick={handleSubmit}
+                disabled={!email.trim() || isLoading}
+                className="w-full h-11 cursor-pointer bg-[#09090B] hover:bg-gray-800 text-white rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? "Sending code..." : "Continue"}
+              </Button>
+
+
+              {/* Navigation Options */}
+              <div className="text-center">
+                <Link href="/login">
+                  <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
+                    Already have an account?{" "}
+                    <span className="text-gray-900 font-medium">Log in</span>
+                  </span>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -290,3 +359,7 @@ export default function SignupPage() {
     </div>
   );
 }
+
+
+
+

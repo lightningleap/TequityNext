@@ -1,26 +1,36 @@
 "use client";
 
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import dynamic from "next/dynamic";
 import SignupLogo from "../../public/SignupLogo.svg";
+import SignupGraphic from "../../public/SignupGraphic.svg";
 import GoogleIcon from "../../public/GoogleIcon.svg";
 import Container from "../../public/Container.svg";
 import Image from "next/image";
+import authAnimationData from "../../public/auth-animation.json";
+
+
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
-  const [step, setStep] = useState<'email' | 'verification'>('email');
+  const [step, setStep] = useState<"email" | "verification">("email");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
+
 
     try {
       // Validate email format
@@ -29,6 +39,7 @@ export default function LoginPage() {
         throw new Error("Please enter a valid email address");
       }
 
+
       // TODO: Replace with actual API call
       // const response = await fetch('/api/auth/send-code', {
       //   method: 'POST',
@@ -36,28 +47,37 @@ export default function LoginPage() {
       // });
       // if (!response.ok) throw new Error('Failed to send verification code');
 
+
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
+
       // Switch to verification step
-      setStep('verification');
+      setStep("verification");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send verification code. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to send verification code. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const handleVerificationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
+
     try {
       // Validate verification code format (assuming 6 digits)
       if (verificationCode.length < 4) {
         throw new Error("Please enter a valid verification code");
       }
+
 
       // TODO: Replace with actual API call
       // const response = await fetch('/api/auth/verify-code', {
@@ -66,39 +86,51 @@ export default function LoginPage() {
       // });
       // if (!response.ok) throw new Error('Invalid verification code');
 
+
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
+
 
       // Navigate directly to dashboard after verification
       router.push("/Dashboard/Library");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Verification failed. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Verification failed. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
+
   const handleBackToSignup = () => {
     window.location.href = "/signup";
   };
+
 
   const handleGoogleSignIn = () => {
     console.log("Google sign-in clicked");
   };
 
-  if (step === 'verification') {
+
+  if (step === "verification") {
     return (
       <div className="flex h-screen overflow-hidden">
         {/* Left Side - Background Graphics (Hidden on small/medium, visible on large) */}
-        <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
-          <Image
-            src={Container}
-            alt="Verification Graphic"
-            fill
-            className="object-cover object-center"
-            priority
+        <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden p-0 m-0">
+          <Lottie
+            animationData={authAnimationData}
+            loop={true}
+            autoplay={true}
+            style={{ width: "100%", height: "100%", display: "block" }}
+            rendererSettings={{
+              preserveAspectRatio: "xMidYMid slice"
+            }}
           />
         </div>
+
 
         {/* Right Side - Verification Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
@@ -112,14 +144,17 @@ export default function LoginPage() {
                   <Image src={SignupLogo} alt="Signup Logo" />
                 </div>
 
+
                 <h1 className="text-3xl font-normal text-[#09090B] w-[364px] h-10">
                   Welcome Back
                 </h1>
+
 
                 <p className="text-sm text-gray-500 w-[364px] h-10">
                   We sent a temporary login code to {email}. Not you?
                 </p>
               </div>
+
 
               {/* Form Fields */}
               <div className="flex flex-col gap-5 w-[364px]">
@@ -130,6 +165,7 @@ export default function LoginPage() {
                   </div>
                 )}
 
+
                 {/* Verification Code Input with Error Handling */}
                 <div className="space-y-1.5 w-[364px]">
                   <div className="relative">
@@ -139,19 +175,26 @@ export default function LoginPage() {
                       onChange={(e) => setVerificationCode(e.target.value)}
                       placeholder="Enter verification code"
                       className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                        error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                        error
+                          ? "border-red-300 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-blue-500"
                       }`}
                     />
                     {/* Error Message - Positioned absolutely to prevent layout shift */}
-                    <div className={`absolute left-0 right-0 transition-all duration-200 ${
-                      error ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
-                    }`}>
+                    <div
+                      className={`absolute left-0 right-0 transition-all duration-200 ${
+                        error
+                          ? "opacity-100 translate-y-0"
+                          : "opacity-0 -translate-y-2 pointer-events-none"
+                      }`}
+                    >
                       {error && (
                         <p className="text-sm text-red-600 py-2">{error}</p>
                       )}
                     </div>
                   </div>
                 </div>
+
 
                 {/* Continue Button */}
                 <div className="mt-3">
@@ -164,6 +207,7 @@ export default function LoginPage() {
                   </Button>
                 </div>
 
+
                 {/* Back to Signup */}
                 <button
                   onClick={handleBackToSignup}
@@ -172,11 +216,15 @@ export default function LoginPage() {
                   Not you? Use a different email
                 </button>
 
+
                 {/* Link to Signup */}
                 <div className="text-center">
                   <Link href="/signup">
                     <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                      Don&apos;t have an account? <span className="text-gray-900 font-medium">Create Account</span>
+                      Don&apos;t have an account?{" "}
+                      <span className="text-gray-900 font-medium">
+                        Create Account
+                      </span>
                     </span>
                   </Link>
                 </div>
@@ -188,18 +236,22 @@ export default function LoginPage() {
     );
   }
 
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Side - Image (Hidden on small/medium, visible on large) */}
-      <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
-        <Image
-          src={Container}
-          alt="Login Graphic"
-          fill
-          className="object-cover object-center"
-          priority
+      <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden p-0 m-0">
+        <Lottie
+          animationData={authAnimationData}
+          loop={true}
+          autoplay={true}
+          style={{ width: "100%", height: "100%", display: "block" }}
+          rendererSettings={{
+            preserveAspectRatio: "xMidYMid slice"
+          }}
         />
       </div>
+
 
       {/* Right Side - Email Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
@@ -213,10 +265,12 @@ export default function LoginPage() {
                 <Image src={SignupLogo} alt="Signup Logo" />
               </div>
 
+
               <h1 className="text-3xl font-normal text-[#09090B] w-[364px] h-10">
                 Welcome Back
               </h1>
             </div>
+
 
             {/* Google Sign In Button - Wrapped in a fixed height container */}
             <div className="h-12">
@@ -233,6 +287,7 @@ export default function LoginPage() {
               </button>
             </div>
 
+
             {/* Divider */}
             <div className="relative flex items-center justify-center">
               <div className="absolute inset-0 flex items-center">
@@ -242,6 +297,7 @@ export default function LoginPage() {
                 <span className="text-base text-gray-500 font-medium">or</span>
               </div>
             </div>
+
 
             {/* Form Fields */}
             <div className="w-[364px] space-y-5">
@@ -254,19 +310,26 @@ export default function LoginPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email address"
                     className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                      error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                      error
+                        ? "border-red-300 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-blue-500"
                     }`}
                   />
                   {/* Error Message - Positioned absolutely to prevent layout shift */}
-                  <div className={`absolute left-0 right-0 transition-all duration-200 ${
-                    error ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
-                  }`}>
+                  <div
+                    className={`absolute left-0 right-0 transition-all duration-200 ${
+                      error
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 -translate-y-2 pointer-events-none"
+                    }`}
+                  >
                     {error && (
                       <p className="text-sm text-red-600 py-2">{error}</p>
                     )}
                   </div>
                 </div>
               </div>
+
 
               {/* Continue Button */}
               <Button
@@ -277,11 +340,15 @@ export default function LoginPage() {
                 {isLoading ? "Sending code..." : "Continue"}
               </Button>
 
+
               {/* Link to Signup */}
               <div className="text-center">
                 <Link href="/signup">
                   <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                    Don&apos;t have an account? <span className="text-gray-900 font-medium">Create Account</span>
+                    Don&apos;t have an account?{" "}
+                    <span className="text-gray-900 font-medium">
+                      Create Account
+                    </span>
                   </span>
                 </Link>
               </div>
@@ -292,3 +359,7 @@ export default function LoginPage() {
     </div>
   );
 }
+
+
+
+
