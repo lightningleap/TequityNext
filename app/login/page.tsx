@@ -1,21 +1,13 @@
 "use client";
 
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import dynamic from "next/dynamic";
 import SignupLogo from "../../public/SignupLogo.svg";
-import SignupGraphic from "../../public/SignupGraphic.svg";
+import Container from "../../public/Auth/Container.svg";
 import GoogleIcon from "../../public/GoogleIcon.svg";
-import Container from "../../public/Container.svg";
 import Image from "next/image";
-import authAnimationData from "../../public/auth-animation.json";
-
-
-const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
-
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -25,12 +17,10 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
-
 
     try {
       // Validate email format
@@ -39,7 +29,6 @@ export default function LoginPage() {
         throw new Error("Please enter a valid email address");
       }
 
-
       // TODO: Replace with actual API call
       // const response = await fetch('/api/auth/send-code', {
       //   method: 'POST',
@@ -47,10 +36,8 @@ export default function LoginPage() {
       // });
       // if (!response.ok) throw new Error('Failed to send verification code');
 
-
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
 
       // Switch to verification step
       setStep("verification");
@@ -65,19 +52,16 @@ export default function LoginPage() {
     }
   };
 
-
   const handleVerificationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
-
 
     try {
       // Validate verification code format (assuming 6 digits)
       if (verificationCode.length < 4) {
         throw new Error("Please enter a valid verification code");
       }
-
 
       // TODO: Replace with actual API call
       // const response = await fetch('/api/auth/verify-code', {
@@ -86,10 +70,8 @@ export default function LoginPage() {
       // });
       // if (!response.ok) throw new Error('Invalid verification code');
 
-
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
 
       // Navigate directly to dashboard after verification
       router.push("/Dashboard/Library");
@@ -104,35 +86,14 @@ export default function LoginPage() {
     }
   };
 
-
-  const handleBackToSignup = () => {
-    window.location.href = "/signup";
-  };
-
-
   const handleGoogleSignIn = () => {
     console.log("Google sign-in clicked");
   };
 
-
   if (step === "verification") {
     return (
       <div className="flex h-screen overflow-hidden">
-        {/* Left Side - Background Graphics (Hidden on small/medium, visible on large) */}
-        <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden p-0 m-0">
-          <Lottie
-            animationData={authAnimationData}
-            loop={true}
-            autoplay={true}
-            style={{ width: "100%", height: "100%", display: "block" }}
-            rendererSettings={{
-              preserveAspectRatio: "xMidYMid slice"
-            }}
-          />
-        </div>
-
-
-        {/* Right Side - Verification Form */}
+        {/* Left Side - Verification Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
           <div className="w-full max-w-md flex items-center justify-center">
             {/* Form Card */}
@@ -144,17 +105,14 @@ export default function LoginPage() {
                   <Image src={SignupLogo} alt="Signup Logo" />
                 </div>
 
-
                 <h1 className="text-3xl font-normal text-[#09090B] w-[364px] h-10">
                   Welcome Back
                 </h1>
-
 
                 <p className="text-sm text-gray-500 w-[364px] h-10">
                   We sent a temporary login code to {email}. Not you?
                 </p>
               </div>
-
 
               {/* Form Fields */}
               <div className="flex flex-col gap-5 w-[364px]">
@@ -164,7 +122,6 @@ export default function LoginPage() {
                     <p className="text-sm text-red-600">{error}</p>
                   </div>
                 )}
-
 
                 {/* Verification Code Input with Error Handling */}
                 <div className="space-y-1.5 w-[364px]">
@@ -195,7 +152,6 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-
                 {/* Continue Button */}
                 <div className="mt-3">
                   <Button
@@ -206,16 +162,6 @@ export default function LoginPage() {
                     {isLoading ? "Verifying..." : "Continue"}
                   </Button>
                 </div>
-
-
-                {/* Back to Signup */}
-                <button
-                  onClick={handleBackToSignup}
-                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors text-left"
-                >
-                  Not you? Use a different email
-                </button>
-
 
                 {/* Link to Signup */}
                 <div className="text-center">
@@ -232,28 +178,26 @@ export default function LoginPage() {
             </div>
           </div>
         </div>
+
+        {/* Right Side - Background Graphics (Hidden on small/medium, visible on large) */}
+        <div className="hidden lg:flex lg:w-1/2 bg-gray-50 items-center justify-center p-12">
+          <div className="w-[616px] h-[776px] rounded-2xl overflow-hidden">
+            <Image
+              src={Container}
+              alt="Login Graphic"
+              width={616}
+              height={776}
+              className="w-full h-full object-contain"
+            />
+          </div>
+        </div>
       </div>
     );
   }
 
-
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Left Side - Image (Hidden on small/medium, visible on large) */}
-      <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden p-0 m-0">
-        <Lottie
-          animationData={authAnimationData}
-          loop={true}
-          autoplay={true}
-          style={{ width: "100%", height: "100%", display: "block" }}
-          rendererSettings={{
-            preserveAspectRatio: "xMidYMid slice"
-          }}
-        />
-      </div>
-
-
-      {/* Right Side - Email Form */}
+      {/* Left Side - Email Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
         <div className="w-full max-w-md flex items-center justify-center">
           {/* Form Card */}
@@ -265,12 +209,10 @@ export default function LoginPage() {
                 <Image src={SignupLogo} alt="Signup Logo" />
               </div>
 
-
               <h1 className="text-3xl font-normal text-[#09090B] w-[364px] h-10">
                 Welcome Back
               </h1>
             </div>
-
 
             {/* Google Sign In Button - Wrapped in a fixed height container */}
             <div className="h-12">
@@ -287,7 +229,6 @@ export default function LoginPage() {
               </button>
             </div>
 
-
             {/* Divider */}
             <div className="relative flex items-center justify-center">
               <div className="absolute inset-0 flex items-center">
@@ -297,7 +238,6 @@ export default function LoginPage() {
                 <span className="text-base text-gray-500 font-medium">or</span>
               </div>
             </div>
-
 
             {/* Form Fields */}
             <div className="w-[364px] space-y-5">
@@ -330,7 +270,6 @@ export default function LoginPage() {
                 </div>
               </div>
 
-
               {/* Continue Button */}
               <Button
                 onClick={handleEmailSubmit}
@@ -339,7 +278,6 @@ export default function LoginPage() {
               >
                 {isLoading ? "Sending code..." : "Continue"}
               </Button>
-
 
               {/* Link to Signup */}
               <div className="text-center">
@@ -356,10 +294,19 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      {/* Right Side - Image (Hidden on small/medium, visible on large) */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gray-50 items-center justify-center p-12">
+        <div className="w-[800px] h-[750px] rounded-2xl overflow-hidden">
+          <Image
+            src={Container}
+            alt="Login Graphic"
+            width={800}
+            height={750}
+            className="w-full h-full object-contain"
+          />
+        </div>
+      </div>
     </div>
   );
 }
-
-
-
-

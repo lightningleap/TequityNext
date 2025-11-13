@@ -376,7 +376,7 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
         </SidebarMenuItem>
       ))}
     </SidebarMenu>
-
+<hr className="my-1" />
       {/* Starred Section - Only visible on Library page */}
       {pathname === "/Dashboard/Library" && starredFiles.length > 0 && (
         <div className="flex flex-col gap-0 items-start px-2 w-full mt-2 group-data-[collapsible=icon]:hidden">

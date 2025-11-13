@@ -88,7 +88,7 @@ export function DashboardLayout({
             <div className="flex items-center gap-2 px-2 py-2 rounded-md h-12 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-300 ease-in-out w-full">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="flex items-center gap-2 flex-1 cursor-pointer hover:bg-gray-50 rounded-md px-2 py-2 -mx-2 -my-2 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:py-0 group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:my-0 dark:hover:bg-[#27272A] dark:hover:text-white">
+                  <div className="flex items-center gap-2 flex-1 cursor-pointer bg-gray-50hover:bg-gray-50 rounded-md px-2 py-2 -mx-2 -my-2 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:py-0 group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:my-0 dark:hover:bg-[#27272A] dark:hover:text-white ">
                     <Image
                       src={BlackLogo}
                       alt="Company Logo"
@@ -104,7 +104,7 @@ export function DashboardLayout({
                     </div>
                   </div>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-59 -ml-1 space-y-1.5 dark:bg-[#09090B] dark:text-white md:mt-2" align="start">
+                <DropdownMenuContent className="w-59 -ml-1 space-y-1.5 bg-gray-100 dark:bg-[#09090B] dark:text-white md:mt-2" align="start">
                 {/* Header */}
                 <DropdownMenuLabel className="text-xs text-gray-500 font-normal dark:text-[#F4F4F5] px-3">
                   Your Dataroom&apos;s

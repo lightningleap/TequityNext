@@ -69,7 +69,7 @@ export function FileCard({
           t.badge
         )}
       >
-        Recently visited
+        Recently visited 
       </div>
     </article>
   );

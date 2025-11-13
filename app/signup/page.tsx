@@ -1,21 +1,13 @@
 "use client";
 
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import dynamic from "next/dynamic";
-import SignupGraphic from "../../public/SignupGraphic.svg";
+import Container from "../../public/Auth/Container.svg";
 import GoogleIcon from "../../public/GoogleIcon.svg";
 import SignupLogo from "../../public/SignupLogo.svg";
-import Container from "../../public/Container.svg";
-import authAnimationData from "../../public/auth-animation.json";
-
-
-const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
-
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -26,18 +18,15 @@ export default function SignupPage() {
   const [emailError, setEmailError] = useState<string | null>(null);
   const router = useRouter();
 
-
   const validateEmail = (email: string): boolean => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
   };
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setEmailError(null);
-
 
     // Basic validation
     if (!email.trim()) {
@@ -45,15 +34,12 @@ export default function SignupPage() {
       return;
     }
 
-
     if (!validateEmail(email)) {
       setEmailError("Please enter a valid email address");
       return;
     }
 
-
     setIsLoading(true);
-
 
     try {
       // TODO: Replace with actual API call to send verification code
@@ -63,10 +49,8 @@ export default function SignupPage() {
       // });
       // if (!response.ok) throw new Error('Failed to send verification code');
 
-
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
 
       // Switch to verification step
       setStep("verification");
@@ -81,19 +65,16 @@ export default function SignupPage() {
     }
   };
 
-
   const handleVerificationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
-
 
     try {
       // Validate verification code format
       if (verificationCode.length < 4) {
         throw new Error("Please enter a valid verification code");
       }
-
 
       // TODO: Replace with actual API call
       // const response = await fetch('/api/auth/verify-signup', {
@@ -102,10 +83,8 @@ export default function SignupPage() {
       // });
       // if (!response.ok) throw new Error('Invalid verification code');
 
-
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
 
       // Navigate to workspace setup after verification
       router.push("/workspace-setup");
@@ -120,11 +99,9 @@ export default function SignupPage() {
     }
   };
 
-
   const handleGoogleSignIn = () => {
     console.log("Google sign-in clicked");
   };
-
 
   const handleBackToEmail = () => {
     setStep("email");
@@ -132,28 +109,11 @@ export default function SignupPage() {
     setError(null);
   };
 
-
   // Verification Step UI
   if (step === "verification") {
     return (
       <div className="flex h-screen overflow-hidden">
-        {/* Left Side - Background Graphics (Hidden on small/medium, visible on large) */}
-        <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden p-0 m-0">
-          <Lottie
-            animationData={authAnimationData}
-            loop={true}
-            autoplay={true}
-            style={{ width: "100%", height: "100%", display: "block" }}
-            rendererSettings={{
-              preserveAspectRatio: "xMidYMid slice"
-            }}
-          />
-
-
-        </div>
-
-
-        {/* Right Side - Verification Form */}
+        {/* Left Side - Verification Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-2 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
           <div className="w-full max-w-md flex items-center justify-center">
             {/* Form Card */}
@@ -165,18 +125,15 @@ export default function SignupPage() {
                   <Image src={SignupLogo} alt="Signup Logo" />
                 </div>
 
-
                 <h1 className="text-3xl font-normal text-[#09090B]">
                   Get Started Now
                 </h1>
-
 
                 <p className="text-sm text-gray-500">
                   We sent a temporary login code to {email} <br />
                   Not you?
                 </p>
               </div>
-
 
               {/* Form Fields */}
               <form
@@ -189,7 +146,6 @@ export default function SignupPage() {
                     <p className="text-sm text-red-600">{error}</p>
                   </div>
                 )}
-
 
                 {/* Verification Code Input */}
                 <div className="space-y-1.5 w-[364px]">
@@ -207,7 +163,6 @@ export default function SignupPage() {
                   />
                 </div>
 
-
                 {/* Continue Button */}
                 <div className="mt-3">
                   <Button
@@ -218,7 +173,6 @@ export default function SignupPage() {
                     {isLoading ? "Verifying..." : "Continue"}
                   </Button>
                 </div>
-
 
                 {/* Link to Login */}
                 <div className="text-center">
@@ -233,29 +187,27 @@ export default function SignupPage() {
             </div>
           </div>
         </div>
+
+        {/* Right Side - Background Graphics (Hidden on small/medium, visible on large) */}
+        <div className="hidden lg:flex lg:w-1/2 bg-gray-50 items-center justify-center p-12">
+          <div className="w-[616px] h-[776px] rounded-2xl overflow-hidden">
+            <Image
+              src={Container}
+              alt="Signup Graphic"
+              width={616}
+              height={776}
+              className="w-full h-full object-contain"
+            />
+          </div>
+        </div>
       </div>
     );
   }
 
-
   // Email Step UI
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Left Side - Image (Hidden on small/medium, visible on large) */}
-      <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden p-0 m-0">
-        <Lottie
-          animationData={authAnimationData}
-          loop={true}
-          autoplay={true}
-          style={{ width: "100%", height: "100%", display: "block" }}
-          rendererSettings={{
-            preserveAspectRatio: "xMidYMid slice"
-          }}
-        />
-      </div>
-
-
-      {/* Right Side - Form */}
+      {/* Left Side - Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
         <div className="w-full max-w-md flex items-center justify-center">
           {/* Form Card */}
@@ -267,18 +219,15 @@ export default function SignupPage() {
                 <Image src={SignupLogo} alt="Signup Logo" />
               </div>
 
-
               <h1 className="text-3xl font-normal text-[#09090B]">
                 Get Started Now
               </h1>
-
 
               <p className="text-sm text-gray-500 leading-relaxed">
                 Secure your workspace, streamline due diligence, and join a
                 trusted network of dealmakers.
               </p>
             </div>
-
 
             {/* Google Sign In Button */}
             <div className="h-12">
@@ -295,7 +244,6 @@ export default function SignupPage() {
               </button>
             </div>
 
-
             {/* Divider */}
             <div className="relative flex items-center justify-center">
               <div className="absolute inset-0 flex items-center">
@@ -305,7 +253,6 @@ export default function SignupPage() {
                 <span className="text-base text-gray-500 font-medium">or</span>
               </div>
             </div>
-
 
             {/* Form Fields */}
             <div className="w-[364px] space-y-5">
@@ -324,14 +271,12 @@ export default function SignupPage() {
                 />
               </div>
 
-
               {/* Error Message */}
               {(error || emailError) && (
                 <div className="p-3 text-sm text-red-600 bg-red-50 rounded-lg">
                   {error || emailError}
                 </div>
               )}
-
 
               {/* Continue Button */}
               <Button
@@ -341,7 +286,6 @@ export default function SignupPage() {
               >
                 {isLoading ? "Sending code..." : "Continue"}
               </Button>
-
 
               {/* Navigation Options */}
               <div className="text-center">
@@ -356,10 +300,19 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
+
+      {/* Right Side - Image (Hidden on small/medium, visible on large) */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gray-50 items-center justify-center p-12">
+        <div className="w-[880px] h-[750px] rounded-2xl overflow-hidden">
+          <Image
+            src={Container}
+            alt="Signup Graphic"
+            width={880}
+            height={750}
+            className="w-full h-full object-contain"
+          />
+        </div>
+      </div>
     </div>
   );
 }
-
-
-
-
