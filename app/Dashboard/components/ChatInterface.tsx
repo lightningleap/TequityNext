@@ -239,8 +239,7 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
 
   const generateAIResponse = (): string => {
     const responses = [
-      "I understand your question. Let me help you with that",
-      ""
+      "I understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with thatI understand your question. Let me help you with that",
     ];
     return responses[Math.floor(Math.random() * responses.length)];
   };
@@ -479,7 +478,9 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
                         : "bg-gray-100 text-gray-900 border border-gray-200 dark:bg-transparent dark:border-none dark:text-white"
                     }`}
                   >
-                    <p className="text-sm">{message.text}</p>
+                    <div className="text-sm max-h-[200px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent">
+                      {message.text}
+                    </div>
                     {message.files && message.files.length > 0 && (
                       <div className="mt-2 space-y-1">
                         {message.files.map((file, fileIndex) => (
