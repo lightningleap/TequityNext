@@ -4,17 +4,20 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Plus_Jakarta_Sans, Instrument_Serif } from "next/font/google";
+import { PricingHeader } from "./components/PricingHeader";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["400", "600"],
+  weight: ["400", "500", "600"],
   variable: "--font-plus-jakarta",
+  display: "swap",
 });
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
   weight: ["400"],
   variable: "--font-instrument-serif",
+  display: "swap",
 });
 
 export default function PricingPage() {
@@ -48,50 +51,18 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8 py-6 overflow-hidden">
+    <div className="min-h-screen bg-white py-6 overflow-hidden">
       {/* Main Container - Responsive width */}
       <div className="max-w-[1280px] min-h-[947.6px] mx-auto flex items-left justify-center py-8">
         {/* Form Container */}
         <div className="w-full max-w-[1000px] min-h-[755.6px] flex flex-col items-center gap-7">
           {/* Header Section - Left Aligned */}
-          <div className="w-full max-w-[1000px] flex flex-col items-start gap-6">
+          <div className="w-full max-w-[1000px] flex flex-col items-start gap-6 px-4 sm:px-6 lg:px-8">
             {/* Main Heading and Subheading */}
-            <div className="text-left">
-              <h1 className={plusJakartaSans.className} style={{
-                fontWeight: 400,
-                fontSize: '32px',
-                lineHeight: '50px',
-                letterSpacing: '0px',
-                verticalAlign: 'middle',
-                color: '#111827',
-                margin: 0
-              }}>
-                Try Tequity{" "}
-                <span style={{
-                  fontWeight: 600,
-                  fontSize: '32px',
-                  lineHeight: '40px',
-                  letterSpacing: '0px',
-                  verticalAlign: 'middle',
-                  color: '#EC4899'
-                }}>FREE</span> for 30-Days
-              </h1>
-              <h2 className={instrumentSerif.className} style={{
-                fontWeight: 400,
-                fontSize: '32px',
-                lineHeight: '1',
-                letterSpacing: '1.5px',
-                color: '#111827',
-                display: 'flex',
-                alignItems: 'center',
-                transform: 'scale(1, 1.5)',
-                transformOrigin: 'center',
-                height: '60px',
-                width: '100%',
-              }}>
-                No credit card required.
-              </h2>
-            </div>
+            <PricingHeader
+              plusJakartaSansClass={plusJakartaSans.className}
+              instrumentSerifClass={instrumentSerif.className}
+            />
 
             {/* Billing Toggle */}
             <div className="flex items-center gap-4">
@@ -128,42 +99,60 @@ export default function PricingPage() {
           </div>
 
           {/* Pricing Cards Section */}
-          <div className="w-full min-h-[566px] flex gap-5 justify-start xl:justify-center overflow-x-auto overflow-y-visible xl:overflow-x-visible scrollbar-hide snap-x snap-mandatory px-4 xl:px-0 xl:flex-row items-center pb-4 pt-5">
+          <div className="w-full min-h-[566px] flex gap-5 justify-start xl:justify-center overflow-x-auto overflow-y-visible xl:overflow-x-visible scrollbar-hide snap-x snap-mandatory xl:flex-row items-start pb-4 pt-5 px-4 sm:px-6 lg:px-8">
             {/* Starter Plan Card */}
-            <div className={`w-[320px] min-w-[300px] flex-shrink-0 h-[600px] border-2 rounded-2xl snap-center transition-all duration-300 cursor-pointer ${
-              selectedPlan === "Starter"
-                ? "bg-[#F4F4F5] border-gray-300 hover:shadow-lg hover:shadow-gray-100/50"
-                : "bg-white border-gray-300 hover:border-gray-400 hover:shadow-lg hover:shadow-gray-100/50 hover:scale-102 hover:-translate-y-1"
-            }`}
-            onClick={() => !loadingPlan && setSelectedPlan(selectedPlan === "Starter" ? null : "Starter")}
+            <div className="w-[320px] min-w-[300px] flex-shrink-0 border-2 snap-center bg-white border-[#E4E4E7]"
+            style={{ borderRadius: '24px' }}
             >
-              <div className="w-[320px] h-[600px] flex flex-col items-start p-6 gap-4">
+              <div className="w-[320px] flex flex-col items-start" style={{ padding: '24px 16px 16px', gap: '24px' }}>
                 {/* Card Header */}
-                <div className="w-[211px] h-[116px] flex flex-col items-start gap-8">
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className={instrumentSerif.className} style={{
-                        fontWeight: 400,
-                        fontSize: '20px',
-                        lineHeight: '32px',
-                        letterSpacing: '0px',
-                        color: '#111827'
-                      }}>
-                        Starter
-                      </h3>
-                    </div>
-                    <p className="text-sm text-gray-500">
+                <div className="w-[211px] flex flex-col items-start" style={{ padding: '0px 8px', gap: '24px' }}>
+                  <div className="flex flex-col items-start" style={{ padding: '0px', gap: '2px' }}>
+                    <h3 className={plusJakartaSans.className} style={{
+                      fontWeight: 500,
+                      fontSize: '20px',
+                      lineHeight: '32px',
+                      color: '#09090B'
+                    }}>
+                      Starter
+                    </h3>
+                    <p style={{
+                      fontFamily: 'Inter',
+                      fontWeight: 400,
+                      fontSize: '14px',
+                      lineHeight: '20px',
+                      color: '#71717A'
+                    }}>
                       Best for early-stage startups.
                     </p>
                   </div>
 
-                  <div className="flex items-end gap-1">
-                    <span className="text-4xl font-medium text-gray-900">
+                  <div className="flex items-end" style={{ gap: '4px' }}>
+                    <span className={plusJakartaSans.className} style={{
+                      fontWeight: 500,
+                      fontSize: '40px',
+                      lineHeight: '44px',
+                      color: '#09090B'
+                    }}>
                       ${billingType === "yearly" ? "12" : "15"}
                     </span>
-                    <div className="flex flex-col pb-1">
-                      <span className="text-xs text-gray-500">per month</span>
-                      <span className="text-xs text-gray-500">billed yearly</span>
+                    <div className="flex flex-col" style={{ gap: '0px' }}>
+                      <span style={{
+                        fontFamily: 'Inter',
+                        fontWeight: 400,
+                        fontSize: '10px',
+                        lineHeight: '14px',
+                        letterSpacing: '-0.006em',
+                        color: '#71717A'
+                      }}>per month</span>
+                      <span style={{
+                        fontFamily: 'Inter',
+                        fontWeight: 400,
+                        fontSize: '10px',
+                        lineHeight: '14px',
+                        letterSpacing: '-0.006em',
+                        color: '#71717A'
+                      }}>billed yearly</span>
                     </div>
                   </div>
                 </div>
@@ -176,11 +165,21 @@ export default function PricingPage() {
                     handleSelectPlan("Starter");
                   }}
                   disabled={loadingPlan !== null && loadingPlan !== "Starter"}
-                  className={`w-full h-11 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-xl ${
-                    loadingPlan === "Starter" || selectedPlan === "Starter"
-                      ? "bg-gray-900 text-white border-gray-900"
-                      : "bg-gray-100 hover:bg-gray-900 hover:text-white text-gray-800 border-gray-300 hover:border-gray-900 hover:scale-105"
+                  className={`w-full disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ${
+                    selectedPlan === "Starter" ? "hover:opacity-80" : "hover:bg-[#F4F4F5]"
                   }`}
+                  style={{
+                    height: '44px',
+                    background: selectedPlan === "Starter" ? '#09090B' : 'white',
+                    border: '1px solid #E4E4E7',
+                    borderRadius: '6px',
+                    fontFamily: 'Inter',
+                    fontWeight: 500,
+                    fontSize: '14px',
+                    lineHeight: '20px',
+                    letterSpacing: '-0.006em',
+                    color: selectedPlan === "Starter" ? '#FFFFFF' : '#09090B'
+                  }}
                 >
                   {loadingPlan === "Starter" ? (
                     <span className="flex items-center justify-center gap-2">
@@ -196,7 +195,7 @@ export default function PricingPage() {
                 </Button>
 
                 {/* Features List */}
-                <div className="flex flex-col gap-3 flex-1">
+                <div className="flex flex-col items-start" style={{ padding: '0px 16px 16px 8px', gap: '20px', width: '288px' }}>
                   {/* Feature items */}
                   {[
                     "3 Paid Users",
@@ -208,71 +207,113 @@ export default function PricingPage() {
                     "Limited activity tracking (500 views)",
                     "Email support",
                   ].map((feature, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <div className="w-4 h-4 mt-0.5">
+                    <div key={index} className="flex items-start" style={{ gap: '8px', width: '264px' }}>
+                      <div style={{ width: '14px', height: '14px' }}>
                         <svg
-                          className="w-4 h-4 text-gray-900"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 14 14"
                           fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
+                            d="M11.6667 3.5L5.25 9.91667L2.33333 7"
+                            stroke="#09090B"
+                            strokeWidth="0.875"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
                           />
                         </svg>
                       </div>
-                      <span className="text-sm font-medium text-gray-900">
+                      <span style={{
+                        fontFamily: 'Inter',
+                        fontWeight: 500,
+                        fontSize: '14px',
+                        lineHeight: '100%',
+                        letterSpacing: '-0.006em',
+                        color: '#09090B',
+                        flex: 1
+                      }}>
                         {feature}
                       </span>
                     </div>
                   ))}
-
-                  {/* Navigation inside card */}
                 </div>
               </div>
             </div>
 
             {/* Professional Plan Card - Highlighted */}
-            <div className={`w-[320px] min-w-[300px] flex-shrink-0 h-[620px] border-2 rounded-2xl snap-center relative transition-all duration-300 cursor-pointer ${
-              selectedPlan === "Professional"
-                ? "bg-[#F4F4F5] border-gray-300 hover:shadow-lg hover:shadow-gray-100/50"
-                : "bg-white border-gray-300 hover:border-gray-400 hover:shadow-lg hover:shadow-gray-100/50 hover:scale-102 hover:-translate-y-1"
-            }`}
-            onClick={() => !loadingPlan && setSelectedPlan(selectedPlan === "Professional" ? null : "Professional")}
+            <div className="w-[320px] min-w-[300px] flex-shrink-0 border-2 snap-center relative bg-[#F4F4F5] border-[#E4E4E7]"
+            style={{ borderRadius: '24px' }}
             >
-              <div className="w-[320px] h-[620px] flex flex-col items-start p-6 gap-4">
+              <div className="w-[320px] flex flex-col items-start" style={{ padding: '24px 16px 16px', gap: '24px' }}>
                 {/* Card Header */}
-                <div className="w-[223px] h-[116px] flex flex-col items-start gap-8">
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className={instrumentSerif.className} style={{
-                        fontWeight: 400,
+                <div className="w-[223px] flex flex-col items-start" style={{ padding: '0px 8px', gap: '24px' }}>
+                  <div className="flex flex-col items-start" style={{ padding: '0px', gap: '2px' }}>
+                    <div className="flex items-center" style={{ gap: '12px' }}>
+                      <h3 className={plusJakartaSans.className} style={{
+                        fontWeight: 500,
                         fontSize: '20px',
                         lineHeight: '32px',
-                        letterSpacing: '0px',
-                        color: '#111827'
+                        color: '#09090B'
                       }}>
                         Professional
                       </h3>
-                      <div className="px-3 py-1.5 bg-blue-500 text-white text-xs font-semibold rounded-sm shadow">
-                        Popular
+                      <div className="flex justify-center items-center" style={{
+                        padding: '5px 10px',
+                        background: '#007AFF',
+                        boxShadow: '0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1)',
+                        borderRadius: '5.1px'
+                      }}>
+                        <span style={{
+                          fontFamily: 'Inter',
+                          fontWeight: 700,
+                          fontSize: '12px',
+                          lineHeight: '16px',
+                          textAlign: 'center',
+                          letterSpacing: '-0.006em',
+                          color: '#FFFFFF'
+                        }}>Popular</span>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-500">
+                    <p style={{
+                      fontFamily: 'Inter',
+                      fontWeight: 400,
+                      fontSize: '14px',
+                      lineHeight: '20px',
+                      color: '#71717A',
+                      whiteSpace: 'nowrap'
+                    }}>
                       For large teams & corporations.
                     </p>
                   </div>
 
-                  <div className="flex items-end gap-1">
-                    <span className="text-4xl font-medium text-gray-900">
+                  <div className="flex items-end" style={{ gap: '4px' }}>
+                    <span className={plusJakartaSans.className} style={{
+                      fontWeight: 500,
+                      fontSize: '40px',
+                      lineHeight: '44px',
+                      color: '#09090B'
+                    }}>
                       ${billingType === "yearly" ? "25" : "30"}
                     </span>
-                    <div className="flex flex-col pb-1">
-                      <span className="text-xs text-gray-500">per month</span>
-                      <span className="text-xs text-gray-500">billed yearly</span>
+                    <div className="flex flex-col" style={{ gap: '0px' }}>
+                      <span style={{
+                        fontFamily: 'Inter',
+                        fontWeight: 400,
+                        fontSize: '10px',
+                        lineHeight: '14px',
+                        letterSpacing: '-0.006em',
+                        color: '#71717A'
+                      }}>per month</span>
+                      <span style={{
+                        fontFamily: 'Inter',
+                        fontWeight: 400,
+                        fontSize: '10px',
+                        lineHeight: '14px',
+                        letterSpacing: '-0.006em',
+                        color: '#71717A'
+                      }}>billed yearly</span>
                     </div>
                   </div>
                 </div>
@@ -284,11 +325,18 @@ export default function PricingPage() {
                     handleSelectPlan("Professional");
                   }}
                   disabled={loadingPlan !== null && loadingPlan !== "Professional"}
-                  className={`w-full h-11 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-xl ${
-                    loadingPlan === "Professional" || selectedPlan === "Professional"
-                      ? "bg-gray-900 text-white border-gray-900"
-                      : "bg-gray-100 hover:bg-gray-900 hover:text-white text-gray-800 border-gray-300 hover:border-gray-900 hover:scale-105"
-                  }`}
+                  className="w-full disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:opacity-80"
+                  style={{
+                    height: '44px',
+                    background: '#09090B',
+                    borderRadius: '6px',
+                    fontFamily: 'Inter',
+                    fontWeight: 500,
+                    fontSize: '14px',
+                    lineHeight: '20px',
+                    letterSpacing: '-0.006em',
+                    color: '#FFFFFF'
+                  }}
                 >
                   {loadingPlan === "Professional" ? (
                     <span className="flex items-center justify-center gap-2">
@@ -304,7 +352,7 @@ export default function PricingPage() {
                 </Button>
 
                 {/* Features List */}
-                <div className="flex flex-col gap-3 flex-1">
+                <div className="flex flex-col items-start" style={{ padding: '0px 16px 16px 8px', gap: '20px', width: '288px' }}>
                   {/* Feature items */}
                   {[
                     "10 Paid Users",
@@ -317,68 +365,95 @@ export default function PricingPage() {
                     "Slack/CRM integrations",
                     "Email support",
                   ].map((feature, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <div className="w-4 h-4 mt-0.5">
+                    <div key={index} className="flex items-start" style={{ gap: '8px', width: '264px' }}>
+                      <div style={{ width: '14px', height: '14px' }}>
                         <svg
-                          className="w-4 h-4 text-gray-900"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 14 14"
                           fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
+                            d="M11.6667 3.5L5.25 9.91667L2.33333 7"
+                            stroke="#09090B"
+                            strokeWidth="0.875"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
                           />
                         </svg>
                       </div>
-                      <span className="text-sm font-medium text-gray-900">
+                      <span style={{
+                        fontFamily: 'Inter',
+                        fontWeight: 500,
+                        fontSize: '14px',
+                        lineHeight: '100%',
+                        letterSpacing: '-0.006em',
+                        color: '#09090B',
+                        flex: 1
+                      }}>
                         {feature}
                       </span>
                     </div>
                   ))}
-
-                  {/* Navigation inside card */}
                 </div>
               </div>
             </div>
 
             {/* Enterprise Plan Card */}
-            <div className={`w-[320px] min-w-[300px] flex-shrink-0 h-[600px] border-2 rounded-2xl snap-center transition-all duration-300 cursor-pointer ${
-              selectedPlan === "Enterprise"
-                ? "bg-[#F4F4F5] border-gray-300 hover:shadow-lg hover:shadow-gray-100/50"
-                : "bg-white border-gray-300 hover:border-gray-400 hover:shadow-lg hover:shadow-gray-100/50 hover:scale-102 hover:-translate-y-1"
-            }`}
-            onClick={() => !loadingPlan && setSelectedPlan(selectedPlan === "Enterprise" ? null : "Enterprise")}
+            <div className="w-[320px] min-w-[300px] flex-shrink-0 border-2 snap-center bg-white border-[#E4E4E7]"
+            style={{ borderRadius: '24px' }}
             >
-              <div className="w-[320px] h-[600px] flex flex-col items-start p-6 gap-4">
+              <div className="w-[320px] flex flex-col items-start" style={{ padding: '24px 16px 16px', gap: '24px' }}>
                 {/* Card Header */}
-                <div className="w-[187px] h-[116px] flex flex-col items-start gap-8">
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className={instrumentSerif.className} style={{
-                        fontWeight: 400,
-                        fontSize: '20px',
-                        lineHeight: '32px',
-                        letterSpacing: '0px',
-                        color: '#111827'
-                      }}>
-                        Enterprise
-                      </h3>
-                    </div>
-                    <p className="text-sm text-gray-500">
-                      For large organizations.
+                <div className="w-[187px] flex flex-col items-start" style={{ padding: '0px 8px', gap: '24px' }}>
+                  <div className="flex flex-col items-start" style={{ padding: '0px', gap: '2px' }}>
+                    <h3 className={plusJakartaSans.className} style={{
+                      fontWeight: 500,
+                      fontSize: '20px',
+                      lineHeight: '32px',
+                      color: '#09090B'
+                    }}>
+                      Enterprise
+                    </h3>
+                    <p style={{
+                      fontFamily: 'Inter',
+                      fontWeight: 400,
+                      fontSize: '14px',
+                      lineHeight: '20px',
+                      color: '#71717A',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      Best for business owners.
                     </p>
                   </div>
 
-                  <div className="flex items-end gap-1">
-                    <span className="text-4xl font-medium text-gray-900">
-                      ${billingType === "yearly" ? "50" : "60"}
+                  <div className="flex items-end" style={{ gap: '4px' }}>
+                    <span className={plusJakartaSans.className} style={{
+                      fontWeight: 500,
+                      fontSize: '40px',
+                      lineHeight: '44px',
+                      color: '#09090B'
+                    }}>
+                      ${billingType === "yearly" ? "59" : "70"}
                     </span>
-                    <div className="flex flex-col pb-1">
-                      <span className="text-xs text-gray-500">per month</span>
-                      <span className="text-xs text-gray-500">billed yearly</span>
+                    <div className="flex flex-col" style={{ gap: '0px' }}>
+                      <span style={{
+                        fontFamily: 'Inter',
+                        fontWeight: 400,
+                        fontSize: '10px',
+                        lineHeight: '14px',
+                        letterSpacing: '-0.006em',
+                        color: '#71717A'
+                      }}>per month</span>
+                      <span style={{
+                        fontFamily: 'Inter',
+                        fontWeight: 400,
+                        fontSize: '10px',
+                        lineHeight: '14px',
+                        letterSpacing: '-0.006em',
+                        color: '#71717A'
+                      }}>billed yearly</span>
                     </div>
                   </div>
                 </div>
@@ -391,11 +466,21 @@ export default function PricingPage() {
                     handleSelectPlan("Enterprise");
                   }}
                   disabled={loadingPlan !== null && loadingPlan !== "Enterprise"}
-                  className={`w-full h-11 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-xl ${
-                    loadingPlan === "Enterprise" || selectedPlan === "Enterprise"
-                      ? "bg-gray-900 text-white border-gray-900"
-                      : "bg-gray-100 hover:bg-gray-900 hover:text-white text-gray-800 border-gray-300 hover:border-gray-900 hover:scale-105"
+                  className={`w-full disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ${
+                    selectedPlan === "Enterprise" ? "hover:opacity-80" : "hover:bg-[#F4F4F5]"
                   }`}
+                  style={{
+                    height: '44px',
+                    background: selectedPlan === "Enterprise" ? '#09090B' : 'white',
+                    border: '1px solid #E4E4E7',
+                    borderRadius: '6px',
+                    fontFamily: 'Inter',
+                    fontWeight: 500,
+                    fontSize: '14px',
+                    lineHeight: '20px',
+                    letterSpacing: '-0.006em',
+                    color: selectedPlan === "Enterprise" ? '#FFFFFF' : '#09090B'
+                  }}
                 >
                   {loadingPlan === "Enterprise" ? (
                     <span className="flex items-center justify-center gap-2">
@@ -411,42 +496,49 @@ export default function PricingPage() {
                 </Button>
 
                 {/* Features List */}
-                <div className="flex flex-col gap-3 flex-1">
+                <div className="flex flex-col items-start" style={{ padding: '0px 16px 16px 8px', gap: '20px', width: '288px' }}>
                   {/* Feature items */}
                   {[
-                    "Unlimited Paid Users",
-                    "Unlimited Total Users",
+                    "20 Paid Users",
+                    "Unlimited Users",
                     "Unlimited Cloud Storage",
-                    "Unlimited active deal rooms",
-                    "White-label customization",
-                    "Dedicated account manager",
-                    "Custom integrations & API access",
-                    "SSO & advanced security",
-                    "Priority phone & email support",
+                    "Everything in Professional",
+                    "Unlimited deal rooms",
+                    "Multi-user teams + role-based permissions",
+                    "Audit logs & download tracking",
+                    "Priority support",
                   ].map((feature, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <div className="w-4 h-4 mt-0.5">
+                    <div key={index} className="flex items-start" style={{ gap: '8px', width: '264px' }}>
+                      <div style={{ width: '14px', height: '14px' }}>
                         <svg
-                          className="w-4 h-4 text-gray-900"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 14 14"
                           fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
+                            d="M11.6667 3.5L5.25 9.91667L2.33333 7"
+                            stroke="#09090B"
+                            strokeWidth="0.875"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
                           />
                         </svg>
                       </div>
-                      <span className="text-sm font-medium text-gray-900">
+                      <span style={{
+                        fontFamily: 'Inter',
+                        fontWeight: 500,
+                        fontSize: '14px',
+                        lineHeight: '100%',
+                        letterSpacing: '-0.006em',
+                        color: '#09090B',
+                        flex: 1
+                      }}>
                         {feature}
                       </span>
                     </div>
                   ))}
-
-                  {/* Navigation inside card */}
                 </div>
               </div>
             </div>
