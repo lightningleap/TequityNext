@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ChangePasswordDialog } from "../dialogbox/ChangePasswordDialog";
 import { LogoutDialog } from "../dialogbox/LogoutDialog";
 import { DisableAccountDialog } from "../dialogbox/DisableAccountDialog";
+import Link from "next/link";
 
 export function Account() {
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);

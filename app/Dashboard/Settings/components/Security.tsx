@@ -123,7 +123,7 @@ export function Security() {
           <p className="text-sm font-medium text-gray-900 mb-1 dark:text-white">Data trash auto-delete period</p>
           <p className="text-xs text-gray-500 dark:text-[#A1A1AA]">Set how long trashed files are kept before permanent removal.</p>
         </div>
-        <button className="whitespace-nowrap flex items-center gap-2 py-2 text-sm transition-colors dark:text-white">
+        <button className="whitespace-nowrap flex items-center gap-2 py-2 text-sm transition-colors dark:text-white cursor-pointer ">
           30 days
           <ChevronDown className="h-4 w-4" />
         </button>

@@ -95,7 +95,7 @@ export function Dataroom() {
           </p>
         </div>
         <button
-          className="whitespace-nowrap w-[145px] h-[36px] px-4 py-0 border border-gray-300 rounded-md text-sm shadow hover:bg-gray-50 dark:hover:bg-[#27272A] dark:hover:text-white transition-colors dark:border-[#27272A] dark:text-white flex items-center justify-center gap-2"
+          className="whitespace-nowrap w-[145px] h-[36px] px-4 py-0 border border-gray-300 rounded-md text-sm shadow hover:bg-gray-50 dark:hover:bg-[#27272A] dark:hover:text-white transition-colors dark:border-[#27272A] dark:text-white flex items-center justify-center gap-2 cursor-pointer"
           aria-label="Archive All Chats"
         >
           Archive all chats
@@ -115,7 +115,8 @@ export function Dataroom() {
         </div>
         <button
           onClick={() => setDeleteAllChatsOpen(true)}
-          className="whitespace-nowrap px-4 py-2 border border-red-600 text-red-600 rounded-md text-sm hover:bg-red-50 dark:hover:bg-[#27272A] dark:hover:text-white dark:border-[#27272A] transition-colors"
+          className="whitespace-nowrap w-[134px] h-[36px] px-4 py-0 border border-red-600 rounded-md text-sm hover:bg-red-50 dark:hover:bg-[#27272A] dark:hover:text-white transition-colors dark:border-[#27272A] text-red-600 flex items-center justify-center cursor-pointer"
+          aria-label="Delete all chats"
         >
           Delete all chats
         </button>
@@ -134,7 +135,8 @@ export function Dataroom() {
         </div>
         <button
           onClick={() => setLeaveDataroomOpen(true)}
-          className="whitespace-nowrap px-4 py-2 border border-red-600 text-red-600 rounded-md text-sm hover:bg-red-50 dark:hover:bg-[#27272A] dark:hover:text-white dark:border-[#27272A] transition-colors"
+          className="whitespace-nowrap w-[139px] h-9 px-4 py-0 border border-red-600 text-red-600 rounded-md text-sm hover:bg-red-50 dark:hover:bg-[#27272A] dark:hover:text-white dark:border-[#27272A] transition-colors flex items-center justify-center cursor-pointer"
+          aria-label="Leave dataroom"
         >
           Leave dataroom
         </button>
@@ -153,7 +155,8 @@ export function Dataroom() {
         </div>
         <button
           onClick={() => setDeleteDataroomOpen(true)}
-          className="whitespace-nowrap px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+          className="whitespace-nowrap w-[143px] h-9 px-4 py-0 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 transition-colors flex items-center justify-center cursor-pointer"
+          aria-label="Delete dataroom"
         >
           Delete dataroom
         </button>

@@ -20,7 +20,7 @@ export function Preferences() {
           <p className="text-sm font-medium text-gray-900 mb-1 dark:text-white">Appearance</p>
           <p className="text-xs text-gray-500 dark:text-[#A1A1AA]">Customize how Tequity looks on your device</p>
         </div>
-        <button className="flex font-semibold items-center gap-2 px-4 py-2 text-sm transition-colors dark:text-white">
+        <button className="flex font-semibold items-center gap-2 px-4 py-2 text-sm transition-colors dark:text-white cursor-pointer ">
           System
           <ChevronDown className="h-4 w-4" />
         </button>
@@ -32,7 +32,7 @@ export function Preferences() {
           <p className="text-sm font-normal text-gray-900 mb-1 dark:text-white">Language</p>
           <p className="text-xs text-gray-500 dark:text-[#A1A1AA]">Change the language used in the user interface.</p>
         </div>
-        <button className="flex font-semibold items-center gap-2 px-4 py-2 text-sm transition-colors dark:text-white">
+        <button className="flex font-semibold items-center gap-2 px-4 py-2 text-sm transition-colors dark:text-white cursor-pointer ">
           English(US)
           <ChevronDown className="h-4 w-4" />
         </button>
@@ -44,7 +44,7 @@ export function Preferences() {
           <p className="text-sm font-normal text-gray-900 mb-1 dark:text-white">Timezone</p>
           <p className="text-xs text-gray-500 dark:text-[#A1A1AA]">Current timezone setting.</p>
         </div>
-        <button className="flex font-semibold items-center gap-2 px-4 py-2 text-sm transition-colors dark:text-white">
+        <button className="flex font-semibold items-center gap-2 px-4 py-2 text-sm transition-colors dark:text-white cursor-pointer ">
           UTC+05:30(IST)
           <ChevronDown className="h-4 w-4" />
         </button>
