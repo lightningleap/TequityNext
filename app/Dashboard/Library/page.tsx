@@ -176,7 +176,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     "grid"
   );
 
-
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [filesCurrentPage, setFilesCurrentPage] = useState(1);
@@ -322,7 +321,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     return fileList.slice(startIndex, startIndex + itemsPerPage);
   };
 
-
   // Filter files based on active tab and search query
   const filteredFiles = files.filter((file) => {
     // Filter by file type
@@ -341,10 +339,8 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     return typeMatch && searchMatch;
   });
 
-
   // Calculate total pages for files
   const totalFilesPages = Math.ceil(filteredFiles.length / itemsPerPage);
-
 
   // Filter folders based on search query
   const filteredFolders = folders.filter((folder) =>
@@ -1280,7 +1276,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                     </div>
                   </div>
 
-
                   {filesExpanded && (
                     <>
                       {/* File Type Tabs */}
@@ -1299,7 +1294,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                       </span> */}
                         </button>
 
-
                         {[
                           "Documents",
                           "Photos",
@@ -1309,7 +1303,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                           "Excel",
                         ].map((tab) => {
                           const isActive = activeFileType === tab;
-
 
                           return (
                             <button
@@ -1444,7 +1437,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                     </p>
                                   </div>
 
-
                                   {/* 3-dot dropdown menu */}
                                   <div
                                     className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -1506,7 +1498,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                             <Download className="h-4 w-4" />
                                             <span>Download</span>
                                           </DropdownMenu.Item>
-
 
                                           <DropdownMenu.Item
                                             className="flex items-center gap-2 text-sm p-2 rounded text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer outline-none"
@@ -1805,7 +1796,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                     </>
                   )}
                 </section>
-
 
                 {/* Bottom spacer */}
                 <div className="h-8 sm:h-8" aria-hidden="true"></div>

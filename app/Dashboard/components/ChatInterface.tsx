@@ -2,7 +2,20 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo } from "react";
-import { X, FileText, Plus, AtSign, ArrowUp, File, Folder, Image as ImageIcon,  Copy, ThumbsUp, ThumbsDown, Search } from "lucide-react";
+import {
+  X,
+  FileText,
+  Plus,
+  AtSign,
+  ArrowUp,
+  File,
+  Folder,
+  Image as ImageIcon,
+  Copy,
+  ThumbsUp,
+  ThumbsDown,
+  Search,
+} from "lucide-react";
 import { useChatContext } from "../context/ChatContext";
 import Image from "next/image";
 import Logomark from "@/public/Logomark.svg";
@@ -29,10 +42,9 @@ const formatFileSize = (bytes: number): string => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
-export function ChatInterface({
-  selectedFile,
-}: ChatInterfaceProps) {
-  const { activeChat, activeChatId, createNewChat, addMessageToChat, chats } = useChatContext();
+export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
+  const { activeChat, activeChatId, createNewChat, addMessageToChat, chats } =
+    useChatContext();
   const [inputValue, setInputValue] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -44,16 +56,14 @@ export function ChatInterface({
   const [showContextMenu, setShowContextMenu] = useState(false);
   const uploadMenuRef = useRef<HTMLDivElement>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
-  const [messageReactions, setMessageReactions] = useState<Record<number, 'like' | 'dislike' | null>>({});
+
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  const [feedbackMessage, setFeedbackMessage] = useState<Record<number, string>>({});
-  const [visualFills, setVisualFills] = useState<Record<number, 'like' | 'dislike' | 'copy' | null>>({});
   const [contextSearchValue, setContextSearchValue] = useState("");
 
   // Auto-resize textarea function
   const adjustTextareaHeight = () => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = "auto";
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   };
@@ -67,20 +77,48 @@ export function ChatInterface({
   // Reset textarea height when input is cleared
   useEffect(() => {
     if (!inputValue && textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = "auto";
     }
   }, [inputValue]);
-  const [selectedContextItems, setSelectedContextItems] = useState<Array<{id: string, name: string, type: 'file' | 'chat', fileType?: string, size?: number}>>([]);
+  const [selectedContextItems, setSelectedContextItems] = useState<
+    Array<{
+      id: string;
+      name: string;
+      type: "file" | "chat";
+      fileType?: string;
+      size?: number;
+    }>
+  >([]);
   const hasInitialized = useRef(false);
 
   // TODO: Replace with actual file data from your backend/context
   // You can fetch this from an API or file management context
   const [userFiles] = useState<FileItem[]>([
-    { id: "1", name: "Project Proposal.pdf", type: "application/pdf", size: 2457600 },
-    { id: "2", name: "Financial Report Q1.xlsx", type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", size: 1048576 },
-    { id: "3", name: "Meeting Notes.docx", type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", size: 524288 },
+    {
+      id: "1",
+      name: "Project Proposal.pdf",
+      type: "application/pdf",
+      size: 2457600,
+    },
+    {
+      id: "2",
+      name: "Financial Report Q1.xlsx",
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      size: 1048576,
+    },
+    {
+      id: "3",
+      name: "Meeting Notes.docx",
+      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      size: 524288,
+    },
     { id: "4", name: "Design Mockups.png", type: "image/png", size: 3145728 },
-    { id: "5", name: "Contract Agreement.pdf", type: "application/pdf", size: 1572864 },
+    {
+      id: "5",
+      name: "Contract Agreement.pdf",
+      type: "application/pdf",
+      size: 1572864,
+    },
   ]);
 
   // Create a new chat only if there are no chats at all (initial app load)
@@ -91,7 +129,10 @@ export function ChatInterface({
     }
   }, [activeChatId, chats.length, createNewChat]);
 
-  const messages = useMemo(() => activeChat?.messages || [], [activeChat?.messages]);
+  const messages = useMemo(
+    () => activeChat?.messages || [],
+    [activeChat?.messages]
+  );
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -103,7 +144,10 @@ export function ChatInterface({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (uploadMenuRef.current && !uploadMenuRef.current.contains(event.target as Node)) {
+      if (
+        uploadMenuRef.current &&
+        !uploadMenuRef.current.contains(event.target as Node)
+      ) {
         setShowUploadMenu(false);
       }
     };
@@ -118,14 +162,20 @@ export function ChatInterface({
     e.preventDefault();
     if (!activeChatId) return;
 
-    if (inputValue.trim() || attachedFiles.length > 0 || selectedContextItems.length > 0) {
+    if (
+      inputValue.trim() ||
+      attachedFiles.length > 0 ||
+      selectedContextItems.length > 0
+    ) {
       // Build message text with context items
       let messageText = inputValue || "";
       if (selectedContextItems.length > 0) {
-        const contextText = selectedContextItems.map(item =>
-          `@${item.name}`
-        ).join(' ');
-        messageText = messageText ? `${contextText} ${messageText}` : contextText;
+        const contextText = selectedContextItems
+          .map((item) => `@${item.name}`)
+          .join(" ");
+        messageText = messageText
+          ? `${contextText} ${messageText}`
+          : contextText;
       }
 
       // Add user message with files
@@ -133,7 +183,7 @@ export function ChatInterface({
         text: messageText || "Uploaded files",
         isUser: true,
         timestamp: new Date(),
-        files: attachedFiles.length > 0 ? [...attachedFiles] : undefined
+        files: attachedFiles.length > 0 ? [...attachedFiles] : undefined,
       };
       addMessageToChat(activeChatId, userMessage);
 
@@ -157,7 +207,7 @@ export function ChatInterface({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newFiles = Array.from(e.target.files);
-      setAttachedFiles(prev => [...prev, ...newFiles]);
+      setAttachedFiles((prev) => [...prev, ...newFiles]);
     }
   };
 
@@ -167,22 +217,28 @@ export function ChatInterface({
     // Toggle the upload menu
     setShowUploadMenu(!showUploadMenu);
   };
-  
+
   // Handle click outside to close the menus
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (uploadMenuRef.current && !uploadMenuRef.current.contains(event.target as Node)) {
+      if (
+        uploadMenuRef.current &&
+        !uploadMenuRef.current.contains(event.target as Node)
+      ) {
         setShowUploadMenu(false);
       }
-      if (contextMenuRef.current && !contextMenuRef.current.contains(event.target as Node)) {
+      if (
+        contextMenuRef.current &&
+        !contextMenuRef.current.contains(event.target as Node)
+      ) {
         setShowContextMenu(false);
         setContextSearchValue("");
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -198,7 +254,7 @@ export function ChatInterface({
   };
 
   const removeAttachedFile = (index: number) => {
-    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+    setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const generateAIResponse = (): string => {
@@ -215,83 +271,26 @@ export function ChatInterface({
   const handleCopy = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
-    setVisualFills(prev => ({ ...prev, [index]: 'copy' }));
-    setFeedbackMessage(prev => ({ ...prev, [index]: 'Copied' }));
-    setTimeout(() => {
-      setCopiedIndex(null);
-      setVisualFills(prev => {
-        const newFills = { ...prev };
-        delete newFills[index];
-        return newFills;
-      });
-      setFeedbackMessage(prev => {
-        const newFeedback = { ...prev };
-        delete newFeedback[index];
-        return newFeedback;
-      });
-    }, 2000);
-  };
-
-  const handleLike = (index: number) => {
-    const isCurrentlyLiked = messageReactions[index] === 'like';
-    setMessageReactions(prev => ({
-      ...prev,
-      [index]: isCurrentlyLiked ? null : 'like'
-    }));
-
-    if (!isCurrentlyLiked) {
-      setVisualFills(prev => ({ ...prev, [index]: 'like' }));
-      setFeedbackMessage(prev => ({ ...prev, [index]: 'Liked' }));
-      setTimeout(() => {
-        setVisualFills(prev => {
-          const newFills = { ...prev };
-          delete newFills[index];
-          return newFills;
-        });
-        setFeedbackMessage(prev => {
-          const newFeedback = { ...prev };
-          delete newFeedback[index];
-          return newFeedback;
-        });
-      }, 2000);
-    }
-  };
-
-  const handleDislike = (index: number) => {
-    const isCurrentlyDisliked = messageReactions[index] === 'dislike';
-    setMessageReactions(prev => ({
-      ...prev,
-      [index]: isCurrentlyDisliked ? null : 'dislike'
-    }));
-    
-    if (!isCurrentlyDisliked) {
-      setVisualFills(prev => ({ ...prev, [index]: 'dislike' }));
-      setFeedbackMessage(prev => ({ ...prev, [index]: 'Disliked' }));
-      setTimeout(() => {
-        setVisualFills(prev => {
-          const newFills = { ...prev };
-          delete newFills[index];
-          return newFills;
-        });
-        setFeedbackMessage(prev => {
-          const newFeedback = { ...prev };
-          delete newFeedback[index];
-          return newFeedback;
-        });
-      }, 2000);
-    }
+    setTimeout(() => setCopiedIndex(null), 2000);
   };
 
   const handleFileSelect = (file: FileItem) => {
     // Check if file is already selected
-    if (!selectedContextItems.some(item => item.id === file.id && item.type === 'file')) {
-      setSelectedContextItems(prev => [...prev, {
-        id: file.id,
-        name: file.name,
-        type: 'file',
-        fileType: file.type,
-        size: file.size
-      }]);
+    if (
+      !selectedContextItems.some(
+        (item) => item.id === file.id && item.type === "file"
+      )
+    ) {
+      setSelectedContextItems((prev) => [
+        ...prev,
+        {
+          id: file.id,
+          name: file.name,
+          type: "file",
+          fileType: file.type,
+          size: file.size,
+        },
+      ]);
     }
     setShowContextMenu(false);
     setContextSearchValue("");
@@ -299,46 +298,84 @@ export function ChatInterface({
 
   const handleChatSelect = (chatText: string, chatId: string) => {
     // Check if chat is already selected
-    if (!selectedContextItems.some(item => item.id === chatId && item.type === 'chat')) {
-      setSelectedContextItems(prev => [...prev, { id: chatId, name: chatText, type: 'chat' }]);
+    if (
+      !selectedContextItems.some(
+        (item) => item.id === chatId && item.type === "chat"
+      )
+    ) {
+      setSelectedContextItems((prev) => [
+        ...prev,
+        { id: chatId, name: chatText, type: "chat" },
+      ]);
     }
     setShowContextMenu(false);
     setContextSearchValue("");
   };
 
-  const removeContextItem = (id: string, type: 'file' | 'chat') => {
-    setSelectedContextItems(prev => prev.filter(item => !(item.id === id && item.type === type)));
+  const removeContextItem = (id: string, type: "file" | "chat") => {
+    setSelectedContextItems((prev) =>
+      prev.filter((item) => !(item.id === id && item.type === type))
+    );
   };
 
   const getFileIcon = (type: string) => {
-    let iconPath = '/Files/TXT-icon.svg'; // default icon
+    let iconPath = "/Files/TXT-icon.svg"; // default icon
 
-    if (type.includes('image') || type.includes('jpeg') || type.includes('jpg') || type.includes('png') || type.includes('gif')) {
-      iconPath = '/Files/JPG-icon.svg';
-
-    } else if (type.includes('svg')) {
-      iconPath = '/Files/SVG-icon.svg';
-    } else if (type.includes('pdf')) {
-      iconPath = '/Files/PDF-icon.svg';
-    } else if (type.includes('spreadsheet') || type.includes('excel') || type.includes('sheet')) {
-      iconPath = '/Files/XLS-icon.svg';
-    } else if (type.includes('word') || type.includes('document') || type.includes('msword')) {
-      iconPath = '/Files/Docs-icon.svg';
-    } else if (type.includes('zip') || type.includes('compressed') || type.includes('archive')) {
-      iconPath = '/Files/ZIP-icon.svg';
-    } else if (type.includes('audio') || type.includes('mp3') || type.includes('wav')) {
-      iconPath = '/Files/MP3-icon.svg';
-    } else if (type.includes('text') || type.includes('txt')) {
-      iconPath = '/Files/TXT-icon.svg';
+    if (
+      type.includes("image") ||
+      type.includes("jpeg") ||
+      type.includes("jpg") ||
+      type.includes("png") ||
+      type.includes("gif")
+    ) {
+      iconPath = "/Files/JPG-icon.svg";
+    } else if (type.includes("svg")) {
+      iconPath = "/Files/SVG-icon.svg";
+    } else if (type.includes("pdf")) {
+      iconPath = "/Files/PDF-icon.svg";
+    } else if (
+      type.includes("spreadsheet") ||
+      type.includes("excel") ||
+      type.includes("sheet")
+    ) {
+      iconPath = "/Files/XLS-icon.svg";
+    } else if (
+      type.includes("word") ||
+      type.includes("document") ||
+      type.includes("msword")
+    ) {
+      iconPath = "/Files/Docs-icon.svg";
+    } else if (
+      type.includes("zip") ||
+      type.includes("compressed") ||
+      type.includes("archive")
+    ) {
+      iconPath = "/Files/ZIP-icon.svg";
+    } else if (
+      type.includes("audio") ||
+      type.includes("mp3") ||
+      type.includes("wav")
+    ) {
+      iconPath = "/Files/MP3-icon.svg";
+    } else if (type.includes("text") || type.includes("txt")) {
+      iconPath = "/Files/TXT-icon.svg";
     }
 
-
-    return <Image src={iconPath} alt="file icon" width={32} height={32} className="flex-shrink-0" />;
+    return (
+      <Image
+        src={iconPath}
+        alt="file icon"
+        width={32}
+        height={32}
+        className="flex-shrink-0"
+      />
+    );
   };
 
-  const filteredFiles = userFiles.filter(file =>
-    contextSearchValue === "" ||
-    file.name.toLowerCase().includes(contextSearchValue.toLowerCase())
+  const filteredFiles = userFiles.filter(
+    (file) =>
+      contextSearchValue === "" ||
+      file.name.toLowerCase().includes(contextSearchValue.toLowerCase())
   );
 
   return (
@@ -385,21 +422,24 @@ export function ChatInterface({
                   className="flex-shrink-0"
                 />
               </div>
-               <h3 
+              <h3
                 className="text-gray-900 dark:text-white"
                 style={{
-                  fontFamily: 'Plus Jakarta Sans',
+                  fontFamily: "Plus Jakarta Sans",
                   fontWeight: 500,
-                  fontStyle: 'medium',
-                  fontSize: '28px',
-                  lineHeight: '40px',
-                  letterSpacing: '0px',
-                  verticalAlign: 'middle'
+                  fontStyle: "medium",
+                  fontSize: "28px",
+                  lineHeight: "40px",
+                  letterSpacing: "0px",
+                  verticalAlign: "middle",
                 }}
               >
                 Hello Marcus
               </h3>
-              <p className="text-gray-500 text-sm leading-5 text-center dark:text-[#F4F4F5]" style={{ fontFamily: 'Inter', fontSize: '14px' }}>
+              <p
+                className="text-gray-500 text-sm leading-5 text-center dark:text-[#F4F4F5]"
+                style={{ fontFamily: "Inter", fontSize: "14px" }}
+              >
                 How can I help you today?
               </p>
             </div>
@@ -412,7 +452,9 @@ export function ChatInterface({
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`flex gap-3 ${message.isUser ? 'flex-row-reverse' : 'flex-row'}`}
+                className={`flex gap-3 ${
+                  message.isUser ? "flex-row-reverse" : "flex-row"
+                }`}
               >
                 {/* Message Content */}
                 <div className="flex flex-col gap-1 max-w-[80%]">
@@ -420,25 +462,36 @@ export function ChatInterface({
                   <div
                     className={`rounded-lg px-2 py-2 ${
                       message.isUser
-                        ? 'bg-[#F4F4F5] dark:bg-[#3F3F46] text-black dark:text-white'
-                        : 'text-black dark:text-white'
+                        ? "bg-[#F4F4F5] dark:bg-[#3F3F46] text-black dark:text-white"
+                        : "text-black dark:text-white"
                     }`}
                   >
                     <p className="text-sm">{message.text}</p>
                     {message.files && message.files.length > 0 && (
-                      <div className="mt-2 space-y-1">
+                      <div className="mt-3 space-y-2">
                         {message.files.map((file, fileIndex) => (
                           <div
                             key={fileIndex}
-                            className={`flex items-center gap-2 text-xs px-2 py-1 rounded ${
+                            className={`flex items-center gap-3 p-3 rounded-lg border ${
                               message.isUser
-                                ? 'bg-blue-500'
-                                : 'bg-gray-200 text-gray-700'
+                                ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+                                : "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                             }`}
                           >
-                            <FileText className="h-3 w-3" />
-                            <span className="truncate">{file.name}</span>
-                            <span>({formatFileSize(file.size)})</span>
+                            <div className="flex-shrink-0">
+                              {getFileIcon(file.type)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                {file.name}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {formatFileSize(file.size)}
+                              </p>
+                            </div>
+                            <div className="flex-shrink-0">
+                              <FileText className="h-4 w-4 text-gray-400" />
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -447,50 +500,36 @@ export function ChatInterface({
 
                   {/* Action Buttons - Only for AI messages */}
                   {!message.isUser && (
-                    <div className="flex flex-col items-start gap-1">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleCopy(message.text, index)}
-                          className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors cursor-pointer ${
-                            copiedIndex === index
-                              ? 'text-black dark:text-white'
-                              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-                          }`}
-                          title="Copy"
-                        >
-                          <Copy className={`h-3 w-3 ${visualFills[index] === 'copy' ? 'fill-current text-black dark:text-white' : ''}`} />
-                        </button>
-                        <button
-                        onClick={() => handleLike(index)}
-                        className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors cursor-pointer ${
-                          messageReactions[index] === 'like'
-                            ? 'text-black dark:text-white'
-                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleCopy(message.text, index)}
+                        className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors ${
+                          copiedIndex === index
+                            ? "text-black dark:text-white"
+                            : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                         }`}
-                        title="Like"
+                        title="Copy"
                       >
-                        <ThumbsUp className={`h-3 w-3 ${visualFills[index] === 'like' ? 'fill-current text-black dark:text-white' : ''}`} />
+                        {copiedIndex === index ? (
+                          <span className="text-xs">Copied to clipboard</span>
+                        ) : (
+                          <Copy
+                            className={`h-3 w-3 ${
+                              copiedIndex === index ? "fill-current" : ""
+                            }`}
+                          />
+                        )}
                       </button>
-                        <button
-                          onClick={() => handleDislike(index)}
-                          className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors cursor-pointer ${
-                            messageReactions[index] === 'dislike'
-                              ? 'text-black dark:text-white'
-                              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-                          }`}
-                          title="Dislike"
-                        >
-                          <ThumbsDown className={`h-3 w-3 ${visualFills[index] === 'dislike' ? 'fill-current text-black dark:text-white' : ''}`} />
-                        </button>
-                      </div>
-                      {feedbackMessage[index] && (
-                        <div className="flex items-center gap-1 text-xs text-black dark:text-white ml-2 animate-pulse">
-                          {feedbackMessage[index] === 'Copied' && <Copy className="h-3 w-3 text-black dark:text-white" />}
-                          {feedbackMessage[index] === 'Liked' && <ThumbsUp className="h-3 w-3 text-black dark:text-white" />}
-                          {feedbackMessage[index] === 'Disliked' && <ThumbsDown className="h-3 w-3 text-black dark:text-white" />}
-                          <span>{feedbackMessage[index]}</span>
-                        </div>
-                      )}
+                      <button
+                        className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors ${"text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}
+                      >
+                        <ThumbsUp className={`h-3 w-3 `} />
+                      </button>
+                      <button
+                        className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors ${"text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}
+                      >
+                        <ThumbsDown className={`h-3 w-3 `} />
+                      </button>
                     </div>
                   )}
                 </div>
@@ -514,14 +553,16 @@ export function ChatInterface({
                       <div
                         key={`${item.type}-${item.id}`}
                         className={`flex items-center gap-2 bg-[#E4E4E7] dark:bg-[#27272A] px-2 py-1.5 text-xs ${
-                          item.type === 'file' ? 'rounded-md h-[58px]' : 'rounded-full h-[24px]'
+                          item.type === "file"
+                            ? "rounded-md h-[58px]"
+                            : "rounded-full h-[24px]"
                         }`}
                       >
-                        {item.type === 'file' ? (
+                        {item.type === "file" ? (
                           // File display with icon, name and size
                           <>
                             <div className="flex-shrink-0">
-                              {getFileIcon(item.fileType || '')}
+                              {getFileIcon(item.fileType || "")}
                             </div>
                             <div className="flex flex-col min-w-0">
                               <span className="truncate max-w-[150px] text-gray-700 dark:text-white font-medium">
@@ -543,7 +584,7 @@ export function ChatInterface({
                         <button
                           type="button"
                           onClick={() => removeContextItem(item.id, item.type)}
-                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors flex-shrink-0 cursor-pointer"
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors flex-shrink-0"
                           aria-label="Remove"
                         >
                           <X className="h-3.5 w-3.5" />
@@ -577,7 +618,7 @@ export function ChatInterface({
                         <button
                           type="button"
                           onClick={() => removeAttachedFile(index)}
-                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors flex-shrink-0 cursor-pointer"
+                          className="text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-200 transition-colors flex-shrink-0"
                           aria-label="Remove file"
                         >
                           <X className="h-3.5 w-3.5" />
@@ -589,178 +630,230 @@ export function ChatInterface({
               )}
 
               <div className="flex items-center gap-2 mb-2">
-              <textarea
-                ref={textareaRef}
-                value={inputValue}
-                onChange={handleInputChange}
-                placeholder="Need quick insights..."
-                className="flex-1 outline-none text-sm resize-none overflow-hidden"
-                rows={1}
-                style={{ minHeight: '24px', maxHeight: '120px' }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendMessage(e);
-                  }
-                }}
-              />
-              <button
-                type="submit"
-                disabled={!inputValue.trim() && attachedFiles.length === 0 && selectedContextItems.length === 0}
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-[#D91D69] text-white hover:bg-[#D91D69] dark:bg-[#D91D69] dark:text-black dark:border-[#3F3F46] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                aria-label="Send message"
-              >
-                <ArrowUp className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="flex gap-2 relative">
-              <div ref={uploadMenuRef} className="relative">
-                <button
-                  type="button"
-                  onClick={handleUploadClick}
-                  className="flex items-center bg-[#FFFFFF] dark:bg-[#09090B] border-gray-200 dark:border-[#3F3F46] border justify-center w-8 h-8 rounded-md text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
-                  aria-label="Upload files"
-                  title="Upload files"
-                >
-                  <Plus className={`h-4 w-4 dark:text-white transition-transform duration-200 ${showUploadMenu ? 'rotate-45' : ''}`} />
-                </button>
-
-                {/* Upload Dropdown Menu */}
-                {showUploadMenu && (
-                  <div className="absolute bottom-full left-0 mb-2 w-48 bg-white dark:bg-[#09090B] dark:border-[#27272A] border border-gray-200 rounded-lg shadow-lg z-50">
-                    <div className="py-1">
-                      <button
-                        type="button"
-                        onClick={() => handleFileUpload("files")}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white transition-colors cursor-pointer"
-                      >
-                        <File className="h-4 w-4 text-blue-600" />
-                        <span>Upload Files</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleFileUpload("folder")}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white transition-colors cursor-pointer"
-                      >
-                        <Folder className="h-4 w-4 text-orange-600" />
-                        <span>Upload Folder</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleFileUpload("image")}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white transition-colors cursor-pointer"
-                      >
-                        <ImageIcon className="h-4 w-4 text-purple-600" />
-                        <span>Upload Images</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div ref={contextMenuRef} className="relative">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (showContextMenu) {
-                      setContextSearchValue("");
+                <textarea
+                  ref={textareaRef}
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  placeholder="Need quick insights..."
+                  className="flex-1 outline-none text-sm resize-none overflow-hidden"
+                  rows={1}
+                  style={{ minHeight: "24px", maxHeight: "120px" }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage(e);
                     }
-                    setShowContextMenu(!showContextMenu);
                   }}
-                  className="flex bg-[#FFFFFF] dark:text-white dark:bg-[#09090B] border-gray-200 dark:border-[#3F3F46] border items-center gap-1 px-2 h-8 rounded-md text-gray-600 hover:bg-gray-100 transition-colors text-sm cursor-pointer"
-                  aria-label="Add context"
+                />
+                <button
+                  type="submit"
+                  disabled={
+                    !inputValue.trim() &&
+                    attachedFiles.length === 0 &&
+                    selectedContextItems.length === 0
+                  }
+                  className="flex items-center justify-center w-8 h-8 rounded-full bg-[#D91D69] text-white hover:bg-[#D91D69] dark:bg-[#D91D69] dark:text-black dark:border-[#3F3F46] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                  aria-label="Send message"
                 >
-                  <AtSign className="h-3.5 w-3.5" />
-                  <span>Add context</span>
+                  <ArrowUp className="h-4 w-4" />
                 </button>
+              </div>
+              <div className="flex gap-2 relative">
+                <div ref={uploadMenuRef} className="relative">
+                  <button
+                    type="button"
+                    onClick={handleUploadClick}
+                    className="flex items-center bg-white dark:bg-[#09090B] border border-gray-200 dark:border-[#3F3F46] justify-center rounded-md text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      paddingTop: "6px",
+                      paddingRight: "6px",
+                      paddingBottom: "6px",
+                      paddingLeft: "6px",
+                      gap: "8px",
+                      borderWidth: "0.83px",
+                      borderRadius: "6.67px",
+                      opacity: 1,
+                    }}
+                    aria-label="Upload files"
+                    title="Upload files"
+                  >
+                    <Plus
+                      className={`h-4 w-4 dark:text-white transition-transform duration-200 ${
+                        showUploadMenu ? "rotate-45" : ""
+                      }`}
+                    />
+                  </button>
 
-                {/* Context Dropdown Menu */}
-                {showContextMenu && (
-                  <div className="absolute bottom-full left-0 mb-2 w-80 bg-white dark:bg-[#09090B] border border-gray-200 dark:border-[#27272A] rounded-lg shadow-lg z-50">
-                    <div className="">
-                      {/* Search Bar */}
-                      <div className="">
-                        <div className="flex items-center gap-2 px-2 py-2 dark:bg-[#18181B] rounded-t-md">
-                          <Search className="h-4 w-4 text-gray-400" />
-                          <input
-                            type="text"
-                            value={contextSearchValue}
-                            onChange={(e) => setContextSearchValue(e.target.value)}
-                            placeholder="Search..."
-                            className="flex-1 bg-transparent outline-none text-sm text-gray-700 dark:text-white placeholder:text-gray-400"
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                        </div>
+                  {/* Upload Dropdown Menu */}
+                  {showUploadMenu && (
+                    <div className="absolute bottom-full left-0 mb-2 w-48 bg-white dark:bg-[#09090B] dark:border-[#27272A] border border-gray-200 rounded-lg shadow-lg z-50">
+                      <div className="py-1">
+                        <button
+                          type="button"
+                          onClick={() => handleFileUpload("files")}
+                          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white transition-colors"
+                        >
+                          <File className="h-4 w-4 text-blue-600" />
+                          <span>Upload Files</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleFileUpload("folder")}
+                          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white transition-colors"
+                        >
+                          <Folder className="h-4 w-4 text-orange-600" />
+                          <span>Upload Folder</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleFileUpload("image")}
+                          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white transition-colors"
+                        >
+                          <ImageIcon className="h-4 w-4 text-purple-600" />
+                          <span>Upload Images</span>
+                        </button>
                       </div>
+                    </div>
+                  )}
+                </div>
 
-                      {/* Show Files Section */}
-                      <div className="border-t border-gray-200 dark:border-[#27272A] pt-2">
-                        <div className="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400">
-                          Files
+                <div ref={contextMenuRef} className="relative">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (showContextMenu) {
+                        setContextSearchValue("");
+                      }
+                      setShowContextMenu(!showContextMenu);
+                    }}
+                    className="flex bg-white dark:bg-[#09090B] border border-gray-200 dark:border-[#3F3F46] items-center gap-2 px-4 h-8 rounded-md text-gray-600 hover:bg-gray-100 transition-colors text-sm cursor-pointer"
+                    style={{
+                      width: "137.33px",
+                      height: "30px",
+                      paddingTop: "0px",
+                      paddingRight: "16px",
+                      paddingBottom: "0px",
+                      paddingLeft: "16px",
+                      gap: "8px",
+                      borderWidth: "0.83px",
+                      borderRadius: "6.67px",
+                      opacity: 1,
+                    }}
+                    aria-label="Add context"
+                  >
+                    <AtSign className="h-3.5 w-3.5" />
+                    <span>Add context</span>
+                  </button>
+
+                  {/* Context Dropdown Menu */}
+                  {showContextMenu && (
+                    <div className="absolute bottom-full left-0 mb-2 w-80 bg-white dark:bg-[#09090B] border border-gray-200 dark:border-[#27272A] rounded-lg shadow-lg z-50">
+                      <div className="">
+                        {/* Search Bar */}
+                        <div className="">
+                          <div className="flex items-center gap-2 px-2 py-2 dark:bg-[#18181B] rounded-t-md">
+                            <Search className="h-4 w-4 text-gray-400" />
+                            <input
+                              type="text"
+                              value={contextSearchValue}
+                              onChange={(e) =>
+                                setContextSearchValue(e.target.value)
+                              }
+                              placeholder="Search..."
+                              className="flex-1 bg-transparent outline-none text-sm text-gray-700 dark:text-white placeholder:text-gray-400"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </div>
                         </div>
-                        <div className="max-h-25 overflow-y-auto scrollbar-hide">
-                          {filteredFiles.length > 0 ? (
-                            filteredFiles.map((file) => (
-                              <button
-                                key={file.id}
-                                type="button"
-                                onClick={() => handleFileSelect(file)}
-                                className="w-full flex items-center gap-2 px-4 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
-                              >
-                                {getFileIcon(file.type)}
-                                <div className="flex-1 text-left min-w-0">
-                                  <div className="truncate font-medium">{file.name}</div>
-                                  {/* <div className="text-xs text-gray-500 dark:text-gray-400">
+
+                        {/* Show Files Section */}
+                        <div className="border-t border-gray-200 dark:border-[#27272A] pt-2">
+                          <div className="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+                            Files
+                          </div>
+                          <div className="max-h-25 overflow-y-auto scrollbar-hide">
+                            {filteredFiles.length > 0 ? (
+                              filteredFiles.map((file) => (
+                                <button
+                                  key={file.id}
+                                  type="button"
+                                  onClick={() => handleFileSelect(file)}
+                                  className="w-full flex items-center gap-2 px-4 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors"
+                                >
+                                  {getFileIcon(file.type)}
+                                  <div className="flex-1 text-left min-w-0">
+                                    <div className="truncate font-medium">
+                                      {file.name}
+                                    </div>
+                                    {/* <div className="text-xs text-gray-500 dark:text-gray-400">
                                     {formatFileSize(file.size)}
                                   </div> */}
-                                </div>
-                              </button>
-                            ))
-                          ) : (
-                            <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
-                              {contextSearchValue ? "No files found" : "No files available"}
-                            </div>
-                          )}
+                                  </div>
+                                </button>
+                              ))
+                            ) : (
+                              <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+                                {contextSearchValue
+                                  ? "No files found"
+                                  : "No files available"}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Previous Chats Section */}
-                      <div className="border-t border-gray-200 dark:border-[#27272A] pt-2 mt-2">
-                        <div className="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400">
-                          Chats
-                        </div>
-                        <div className="max-h-40 overflow-y-auto scrollbar-hide">
-                        {messages.length > 0 ? (
-                          messages
-                            .filter(msg => msg.isUser)
-                            .filter(msg =>
-                              contextSearchValue === "" ||
-                              msg.text.toLowerCase().includes(contextSearchValue.toLowerCase())
-                            )
-                            .slice(0, 3)
-                            .map((msg, idx) => (
-                              <button
-                                key={idx}
-                                type="button"
-                                onClick={() => handleChatSelect(msg.text, `chat-${idx}-${msg.timestamp.getTime()}`)}
-                                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
-                                title={msg.text}
-                              >
-                                <div className="truncate">
-                                  {msg.text.length > 35 ? `${msg.text.substring(0, 35)}...` : msg.text}
-                                </div>
-                              </button>
-                            ))
-                        ) : (
-                          <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">No previous chats</div>
-                        )}
+                        {/* Previous Chats Section */}
+                        <div className="border-t border-gray-200 dark:border-[#27272A] pt-2 mt-2">
+                          <div className="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+                            Chats
+                          </div>
+                          <div className="max-h-40 overflow-y-auto scrollbar-hide">
+                            {messages.length > 0 ? (
+                              messages
+                                .filter((msg) => msg.isUser)
+                                .filter(
+                                  (msg) =>
+                                    contextSearchValue === "" ||
+                                    msg.text
+                                      .toLowerCase()
+                                      .includes(
+                                        contextSearchValue.toLowerCase()
+                                      )
+                                )
+                                .slice(0, 3)
+                                .map((msg, idx) => (
+                                  <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={() =>
+                                      handleChatSelect(
+                                        msg.text,
+                                        `chat-${idx}-${msg.timestamp.getTime()}`
+                                      )
+                                    }
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors"
+                                    title={msg.text}
+                                  >
+                                    <div className="truncate">
+                                      {msg.text.length > 35
+                                        ? `${msg.text.substring(0, 35)}...`
+                                        : msg.text}
+                                    </div>
+                                  </button>
+                                ))
+                            ) : (
+                              <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+                                No previous chats
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
             </div>
           </div>
 
