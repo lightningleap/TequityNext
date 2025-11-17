@@ -68,7 +68,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
             onClick={() => onOpenChange(false)}
             className="absolute right-4 top-4 z-[100] rounded-full p-1.5 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4 cursor-pointer" />
             <span className="sr-only">Close</span>
           </button>
 

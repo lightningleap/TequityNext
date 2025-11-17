@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+
 import { useState, useRef, useEffect, useMemo } from "react";
 import { X, FileText, Plus, AtSign, ArrowUp, File, Folder, Image as ImageIcon,  Copy, ThumbsUp, ThumbsDown, Search } from "lucide-react";
 import { useChatContext } from "../context/ChatContext";
 import Image from "next/image";
 import Logomark from "@/public/Logomark.svg";
+
 
 export interface FileItem {
   id: string;
@@ -16,6 +18,7 @@ export interface FileItem {
   url?: string;
 }
 
+
 interface ChatInterfaceProps {
   selectedFile: FileItem | null;
   onClose?: () => void;
@@ -23,11 +26,13 @@ interface ChatInterfaceProps {
   key?: string | number; // Add key to the interface
 }
 
+
 const formatFileSize = (bytes: number): string => {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
+
 
 export function ChatInterface({
   selectedFile,
@@ -48,6 +53,7 @@ export function ChatInterface({
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [contextSearchValue, setContextSearchValue] = useState("");
 
+
   // Auto-resize textarea function
   const adjustTextareaHeight = () => {
     if (textareaRef.current) {
@@ -56,11 +62,13 @@ export function ChatInterface({
     }
   };
 
+
   // Handle input change with auto-resize
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputValue(e.target.value);
     adjustTextareaHeight();
   };
+
 
   // Reset textarea height when input is cleared
   useEffect(() => {
@@ -70,6 +78,7 @@ export function ChatInterface({
   }, [inputValue]);
   const [selectedContextItems, setSelectedContextItems] = useState<Array<{id: string, name: string, type: 'file' | 'chat', fileType?: string, size?: number}>>([]);
   const hasInitialized = useRef(false);
+
 
   // TODO: Replace with actual file data from your backend/context
   // You can fetch this from an API or file management context
@@ -81,6 +90,7 @@ export function ChatInterface({
     { id: "5", name: "Contract Agreement.pdf", type: "application/pdf", size: 1572864 },
   ]);
 
+
   // Create a new chat only if there are no chats at all (initial app load)
   useEffect(() => {
     if (!hasInitialized.current && !activeChatId && chats.length === 0) {
@@ -89,15 +99,19 @@ export function ChatInterface({
     }
   }, [activeChatId, chats.length, createNewChat]);
 
+
   const messages = useMemo(() => activeChat?.messages || [], [activeChat?.messages]);
+
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -106,15 +120,18 @@ export function ChatInterface({
       }
     };
 
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
+
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeChatId) return;
+
 
     if (inputValue.trim() || attachedFiles.length > 0 || selectedContextItems.length > 0) {
       // Build message text with context items
@@ -126,6 +143,7 @@ export function ChatInterface({
         messageText = messageText ? `${contextText} ${messageText}` : contextText;
       }
 
+
       // Add user message with files
       const userMessage = {
         text: messageText || "Uploaded files",
@@ -134,6 +152,7 @@ export function ChatInterface({
         files: attachedFiles.length > 0 ? [...attachedFiles] : undefined
       };
       addMessageToChat(activeChatId, userMessage);
+
 
       // Simulate AI response
       setTimeout(() => {
@@ -146,11 +165,13 @@ export function ChatInterface({
         addMessageToChat(activeChatId, aiMessage);
       }, 1000);
 
+
       setInputValue("");
       setAttachedFiles([]);
       setSelectedContextItems([]);
     }
   };
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -159,13 +180,14 @@ export function ChatInterface({
     }
   };
 
+
   const handleUploadClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     // Toggle the upload menu
     setShowUploadMenu(!showUploadMenu);
   };
-  
+ 
   // Handle click outside to close the menus
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -178,11 +200,13 @@ export function ChatInterface({
       }
     };
 
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
 
   const handleFileUpload = (type: "files" | "folder" | "image") => {
     setShowUploadMenu(false);
@@ -195,9 +219,11 @@ export function ChatInterface({
     }
   };
 
+
   const removeAttachedFile = (index: number) => {
     setAttachedFiles(prev => prev.filter((_, i) => i !== index));
   };
+
 
   const generateAIResponse = (): string => {
     const responses = [
@@ -210,11 +236,13 @@ export function ChatInterface({
     return responses[Math.floor(Math.random() * responses.length)];
   };
 
+
   const handleCopy = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
   };
+
 
   const handleLike = (index: number) => {
     setMessageReactions(prev => ({
@@ -223,12 +251,14 @@ export function ChatInterface({
     }));
   };
 
+
   const handleDislike = (index: number) => {
     setMessageReactions(prev => ({
       ...prev,
       [index]: prev[index] === 'dislike' ? null : 'dislike'
     }));
   };
+
 
   const handleFileSelect = (file: FileItem) => {
     // Check if file is already selected
@@ -245,6 +275,7 @@ export function ChatInterface({
     setContextSearchValue("");
   };
 
+
   const handleChatSelect = (chatText: string, chatId: string) => {
     // Check if chat is already selected
     if (!selectedContextItems.some(item => item.id === chatId && item.type === 'chat')) {
@@ -254,15 +285,19 @@ export function ChatInterface({
     setContextSearchValue("");
   };
 
+
   const removeContextItem = (id: string, type: 'file' | 'chat') => {
     setSelectedContextItems(prev => prev.filter(item => !(item.id === id && item.type === type)));
   };
 
+
   const getFileIcon = (type: string) => {
     let iconPath = '/Files/TXT-icon.svg'; // default icon
 
+
     if (type.includes('image') || type.includes('jpeg') || type.includes('jpg') || type.includes('png') || type.includes('gif')) {
       iconPath = '/Files/JPG-icon.svg';
+
 
     } else if (type.includes('svg')) {
       iconPath = '/Files/SVG-icon.svg';
@@ -281,13 +316,17 @@ export function ChatInterface({
     }
 
 
+
+
     return <Image src={iconPath} alt="file icon" width={32} height={32} className="flex-shrink-0" />;
   };
+
 
   const filteredFiles = userFiles.filter(file =>
     contextSearchValue === "" ||
     file.name.toLowerCase().includes(contextSearchValue.toLowerCase())
   );
+
 
   return (
     <div className="h-full bg-white dark:bg-[#09090B] flex flex-col items-center">
@@ -305,6 +344,7 @@ export function ChatInterface({
                 </p>
               </div>
             </div>
+
 
             {selectedFile.url ? (
               <div className="mt-4 border rounded-md overflow-hidden">
@@ -333,7 +373,7 @@ export function ChatInterface({
                   className="flex-shrink-0"
                 />
               </div>
-               <h3 
+               <h3
                 className="text-gray-900 dark:text-white"
                 style={{
                   fontFamily: 'Plus Jakarta Sans',
@@ -353,6 +393,7 @@ export function ChatInterface({
             </div>
           </div>
         ) : null}
+
 
         {/* Messages Display Area */}
         {messages.length > 0 && (
@@ -392,6 +433,7 @@ export function ChatInterface({
                       </div>
                     )}
                   </div>
+
 
                   {/* Action Buttons - Only for AI messages */}
                   {!message.isUser && (
@@ -438,6 +480,7 @@ export function ChatInterface({
           </div>
         )}
       </div>
+
 
       {/* Input at bottom */}
       <div className="p-4 bg-white dark:bg-[#09090B] w-full flex justify-center">
@@ -492,6 +535,7 @@ export function ChatInterface({
                 </div>
               )}
 
+
               {/* Attached Files Preview - Inside Input */}
               {attachedFiles.length > 0 && (
                 <div className="pb-2 mb-2 border-b border-gray-200 dark:border-[#27272A]">
@@ -525,6 +569,7 @@ export function ChatInterface({
                   </div>
                 </div>
               )}
+
 
               <div className="flex items-center gap-2 mb-2">
               <textarea
@@ -563,6 +608,7 @@ export function ChatInterface({
                   <Plus className={`h-4 w-4 dark:text-white transition-transform duration-200 ${showUploadMenu ? 'rotate-45' : ''}`} />
                 </button>
 
+
                 {/* Upload Dropdown Menu */}
                 {showUploadMenu && (
                   <div className="absolute bottom-full left-0 mb-2 w-48 bg-white dark:bg-[#09090B] dark:border-[#27272A] border border-gray-200 rounded-lg shadow-lg z-50">
@@ -596,6 +642,7 @@ export function ChatInterface({
                 )}
               </div>
 
+
               <div ref={contextMenuRef} className="relative">
                 <button
                   type="button"
@@ -611,6 +658,7 @@ export function ChatInterface({
                   <AtSign className="h-3.5 w-3.5" />
                   <span>Add context</span>
                 </button>
+
 
                 {/* Context Dropdown Menu */}
                 {showContextMenu && (
@@ -630,6 +678,7 @@ export function ChatInterface({
                           />
                         </div>
                       </div>
+
 
                       {/* Show Files Section */}
                       <div className="border-t border-gray-200 dark:border-[#27272A] pt-2">
@@ -661,6 +710,7 @@ export function ChatInterface({
                           )}
                         </div>
                       </div>
+
 
                       {/* Previous Chats Section */}
                       <div className="border-t border-gray-200 dark:border-[#27272A] pt-2 mt-2">
@@ -702,6 +752,7 @@ export function ChatInterface({
             </div>
           </div>
 
+
           {/* Hidden file inputs */}
           <input
             ref={fileInputRef}
@@ -732,3 +783,7 @@ export function ChatInterface({
     </div>
   );
 }
+
+
+
+

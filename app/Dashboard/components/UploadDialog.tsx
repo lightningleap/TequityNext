@@ -15,11 +15,7 @@ import PdfIcon from "../../../public/uploadModal/File Type Icon.svg";
 import XlsIcon from "../../../public/uploadModal/File Type Icon-2.svg";
 import FolderIcon from "../../../public/uploadModal/File Type Icon-1.svg";
 import PlusIcon from "../../../public/uploadModal/Icon.svg";
-import {
-  X,
-  CheckCircle,
-  RefreshCw,
-} from "lucide-react";
+import { X, CheckCircle, RefreshCw } from "lucide-react";
 import Image from "next/image";
 import { UploadGraphic } from "./UploadGraphic";
 
@@ -91,8 +87,6 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
   const [uploadMode, setUploadMode] = useState<"files" | "folder">("files");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
-
-
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -200,9 +194,11 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
       // Group files by folder
       const folderMap = new Map<string, File[]>();
 
-      successfulFiles.forEach((file : File) => {
+      successfulFiles.forEach((file: File) => {
         // webkitRelativePath is available on File objects from directory inputs
-        const path = (file as File & { webkitRelativePath?: string }).webkitRelativePath || file.name;
+        const path =
+          (file as File & { webkitRelativePath?: string }).webkitRelativePath ||
+          file.name;
         const pathParts = path.split("/");
 
         if (pathParts.length > 1) {
@@ -267,7 +263,6 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
     setIsOpen(false);
   };
 
-
   const handleButtonClick = (mode: "files" | "folder") => {
     setUploadMode(mode);
     if (mode === "files") {
@@ -285,7 +280,9 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
           onClick={() => setIsOpen(true)}
         >
           <FiUploadCloud className="h-4 w-4 dark:text-white" />
-          <span className="hidden md:inline text-xs font-medium dark:text-white">Upload</span>
+          <span className="hidden md:inline text-xs font-medium dark:text-white">
+            Upload
+          </span>
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[calc(100vw-32px)] max-w-[352px] h-[400px] sm:w-[560px] sm:max-w-[560px] p-[16px] overflow-y-auto scrollbar-hide border border-[#E2E8F0] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)]">
@@ -321,7 +318,14 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
               {/* Text */}
               <div className="flex flex-col justify-center items-center gap-1.5 w-full">
                 <p className="font-['Inter'] font-medium text-2xl leading-8 tracking-[-0.006em] text-[#09090B]">
-                  {isDragging ? "Drop files here" : <><span className="sm:hidden">Select or Paste</span><span className="hidden sm:inline">Drop or Select</span></>}
+                  {isDragging ? (
+                    "Drop files here"
+                  ) : (
+                    <>
+                      <span className="sm:hidden">Select or Paste</span>
+                      <span className="hidden sm:inline">Drop or Select</span>
+                    </>
+                  )}
                 </p>
                 <p className="font-['Inter'] font-normal text-sm leading-5 text-center text-[#71717A] w-full">
                   {isDragging
@@ -345,13 +349,16 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
             multiple
             onChange={handleFileChange}
             className="hidden"
-            {...({ webkitdirectory: "", directory: "" } as React.InputHTMLAttributes<HTMLInputElement>)}
+            {...({
+              webkitdirectory: "",
+              directory: "",
+            } as React.InputHTMLAttributes<HTMLInputElement>)}
           />
 
           {files.length > 0 && (
             <div className="flex flex-col gap-[16px] w-full flex-1">
               {/* Files Grid */}
-              <div className="grid grid-cols-3 grid-rows-2 gap-[12px] w-full overflow-y-auto flex-1">
+              <div className="grid grid-cols-2 grid-rows-2 gap-[12px] w-full overflow-y-auto flex-1">
                 {files.map((file, index) => {
                   const status = uploadStatus[index] || "pending";
                   const progress = uploadProgress[index] || 0;
@@ -415,9 +422,13 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                           <p className="font-['Inter'] font-medium text-[12px] leading-[20px] text-[#020617] line-clamp-2 w-full overflow-ellipsis overflow-hidden">
                             {file.name}
                           </p>
-                          <p className={`font-['Inter'] font-normal text-[10px] leading-[14px] w-full ${
-                            status === "error" ? "text-[#E60000]" : "text-[#64748B]"
-                          }`}>
+                          <p
+                            className={`font-['Inter'] font-normal text-[10px] leading-[14px] w-full ${
+                              status === "error"
+                                ? "text-[#E60000]"
+                                : "text-[#64748B]"
+                            }`}
+                          >
                             {status === "error"
                               ? "Upload failed try again"
                               : `${(file.size / (1024 * 1024)).toFixed(1)}MB`}
@@ -435,7 +446,11 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                     onClick={() => handleButtonClick("files")}
                     className="flex flex-col justify-center items-center p-[12px] gap-[8px] bg-[#FAFAFA] rounded-xl hover:bg-gray-200 transition-colors h-[126px]"
                   >
-                    <Image src={PlusIcon} alt="Add files" className="w-10 h-10" />
+                    <Image
+                      src={PlusIcon}
+                      alt="Add files"
+                      className="w-10 h-10"
+                    />
                     <p className="font-['Inter'] font-normal text-[14px] leading-[20px] text-[#020617]">
                       Add files
                     </p>
