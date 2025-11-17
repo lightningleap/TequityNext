@@ -21,6 +21,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import Image from "next/image";
+import { UploadGraphic } from "./UploadGraphic";
 
 function getFileIcon(fileName: string) {
   const extension = fileName.split(".").pop()?.toLowerCase();
@@ -310,30 +311,11 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
             >
               {/* Graphic - Custom File Icons */}
               <div
-                className={`relative flex items-center justify-center group ${
+                className={`relative flex items-center justify-center ${
                   isDragging ? "opacity-70" : ""
                 }`}
               >
-                <div className="relative flex items-center gap-3 transition-all duration-300 group-hover:gap-5">
-                  <Image
-                    src={PdfIcon}
-                    alt="PDF"
-                    className="w-[70px] h-[70px] -rotate-[20deg] transition-all duration-300 group-hover:scale-110 group-hover:-translate-x-2"
-                  />
-                  <Image
-                    src={FolderIcon}
-                    alt="Folder"
-                    className="w-[60px] h-[60px] transition-all duration-300 group-hover:scale-110"
-                  />
-                  <Image
-                    src={XlsIcon}
-                    alt="Excel"
-                    className="w-[70px] h-[70px] rotate-[20deg] transition-all duration-300 group-hover:scale-110 group-hover:translate-x-2"
-                  />
-                </div>
-                <div className="absolute top-[20px] transition-all duration-300 group-hover:scale-110">
-                  <Image src={PlusIcon} alt="Add" className="w-[60px] h-[60px]" />
-                </div>
+                <UploadGraphic />
               </div>
 
               {/* Text */}

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps, cva } from "class-variance-authority";
+import { IoIosSearch } from "react-icons/io";
 import {
   FileText,
   PanelLeftIcon,
@@ -345,7 +346,7 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
             }}
           >
             <span className="flex items-center gap-2 w-full group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:gap-0">
-              <CiSearch className="h-4 w-4 flex-shrink-0 text-black dark:text-white" />
+              <IoIosSearch className="h-6 w-5 flex-shrink-0 text-black dark:text-white" />
               <span className="overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:hidden">Search</span>
             </span>
           </SidebarMenuButton>
@@ -379,8 +380,8 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
 
       {/* Starred Section - Only visible on Library page */}
       {pathname === "/Dashboard/Library" && starredFiles.length > 0 && (
-        <div className="flex flex-col gap-0 items-start px-2 w-full mt-2 group-data-[collapsible=icon]:hidden">
-          <div className="flex h-8 items-center px-2 w-full">
+        <div className="flex flex-col gap-0 items-start px-2 border-t w-full mt-2 group-data-[collapsible=icon]:hidden">
+          <div className="flex h-8 items-center px-2 py-2 mt-2 w-full">
             <span className="text-xs font-medium text-[#3f3f46] dark:text-[#A1A1AA] opacity-70 overflow-ellipsis overflow-hidden whitespace-nowrap">
               Starred
             </span>
@@ -392,7 +393,7 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
                 className="flex gap-2 h-8 items-center px-2 w-full rounded-md hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
               >
                 <FileText className="h-4 w-4 flex-shrink-0 text-[#3f3f46] dark:text-[#A1A1AA]" />
-                <span className="text-sm font-normal text-[#3f3f46] dark:text-[#A1A1AA] overflow-ellipsis overflow-hidden whitespace-nowrap leading-5">
+                <span className="text-sm font-normal text-[#3f3f46] dark:text-[#F4F4F5] overflow-ellipsis overflow-hidden whitespace-nowrap leading-5">
                   {file.name}
                 </span>
               </div>

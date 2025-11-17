@@ -36,6 +36,7 @@ export function ChatInterface({
   const [inputValue, setInputValue] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -46,6 +47,27 @@ export function ChatInterface({
   const [messageReactions, setMessageReactions] = useState<Record<number, 'like' | 'dislike' | null>>({});
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [contextSearchValue, setContextSearchValue] = useState("");
+
+  // Auto-resize textarea function
+  const adjustTextareaHeight = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  };
+
+  // Handle input change with auto-resize
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputValue(e.target.value);
+    adjustTextareaHeight();
+  };
+
+  // Reset textarea height when input is cleared
+  useEffect(() => {
+    if (!inputValue && textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
+  }, [inputValue]);
   const [selectedContextItems, setSelectedContextItems] = useState<Array<{id: string, name: string, type: 'file' | 'chat', fileType?: string, size?: number}>>([]);
   const hasInitialized = useRef(false);
 
@@ -311,7 +333,18 @@ export function ChatInterface({
                   className="flex-shrink-0"
                 />
               </div>
-               <h3 className="text-[28px] font-normal text-gray-900 dark:text-white leading-10 font-[family-name:var(--font-instrument-serif)]">
+               <h3 
+                className="text-gray-900 dark:text-white"
+                style={{
+                  fontFamily: 'Plus Jakarta Sans',
+                  fontWeight: 500,
+                  fontStyle: 'medium',
+                  fontSize: '28px',
+                  lineHeight: '40px',
+                  letterSpacing: '0px',
+                  verticalAlign: 'middle'
+                }}
+              >
                 Hello Marcus
               </h3>
               <p className="text-gray-500 text-sm leading-5 text-center dark:text-[#F4F4F5]" style={{ fontFamily: 'Inter', fontSize: '14px' }}>
@@ -329,47 +362,14 @@ export function ChatInterface({
                 key={index}
                 className={`flex gap-3 ${message.isUser ? 'flex-row-reverse' : 'flex-row'}`}
               >
-                {/* Profile Image */}
-                {/* <div className="flex-shrink-0">
-                  {message.isUser ? (
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                      <User className="h-5 w-5 text-gray-600" />
-                    </div>
-                  ) : (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="transition-transform duration-200 hover:scale-110 cursor-pointer">
-                            <Image
-                              src={Logomark}
-                              alt="Tequity AI"
-                              width={32}
-                              height={32}
-                              className="flex-shrink-0"
-                            />
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Tequity</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
-                </div> */}
-
                 {/* Message Content */}
                 <div className="flex flex-col gap-1 max-w-[80%]">
-                  {/* Name Label */}
-                  {/* <span className={`text-xs font-medium ${message.isUser ? 'text-right' : 'text-left'} text-gray-600`}>
-                    {message.isUser ? 'You' : 'Tequity AI'}
-                  </span> */}
-
                   {/* Message Bubble */}
                   <div
                     className={`rounded-lg px-2 py-2 ${
                       message.isUser
-                        ? 'bg-blue-600 text-white dark:bg-[#27272A] dark:text-white'
-                        : 'bg-gray-100 text-gray-900 border border-gray-200 dark:bg-transparent dark:border-none dark:text-white'
+                        ? 'bg-[#F4F4F5] dark:bg-[#3F3F46] text-black dark:text-white'
+                        : 'text-black dark:text-white'
                     }`}
                   >
                     <p className="text-sm">{message.text}</p>
@@ -451,8 +451,8 @@ export function ChatInterface({
                     {selectedContextItems.map((item) => (
                       <div
                         key={`${item.type}-${item.id}`}
-                        className={`flex items-center gap-2 bg-gray-100 dark:bg-[#27272A] px-2 py-1.5 text-xs ${
-                          item.type === 'file' ? 'rounded-md' : 'rounded-full'
+                        className={`flex items-center gap-2 bg-[#E4E4E7] dark:bg-[#27272A] px-2 py-1.5 text-xs ${
+                          item.type === 'file' ? 'rounded-md h-[58px]' : 'rounded-full h-[24px]'
                         }`}
                       >
                         {item.type === 'file' ? (
@@ -499,7 +499,7 @@ export function ChatInterface({
                     {attachedFiles.map((file, index) => (
                       <div
                         key={index}
-                        className="flex items-center gap-2 bg-gray-100 dark:bg-[#27272A] rounded-md px-2 py-1.5 text-xs"
+                        className="flex items-center gap-2 bg-[#E4E4E7] dark:bg-[#27272A] rounded-md px-2 py-1.5 text-xs"
                       >
                         <div className="flex-shrink-0">
                           {getFileIcon(file.type)}
@@ -527,17 +527,25 @@ export function ChatInterface({
               )}
 
               <div className="flex items-center gap-2 mb-2">
-              <input
-                type="text"
+              <textarea
+                ref={textareaRef}
                 value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
+                onChange={handleInputChange}
                 placeholder="Need quick insights..."
-                className="flex-1 outline-none text-sm"
+                className="flex-1 outline-none text-sm resize-none overflow-hidden"
+                rows={1}
+                style={{ minHeight: '24px', maxHeight: '120px' }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage(e);
+                  }
+                }}
               />
               <button
                 type="submit"
                 disabled={!inputValue.trim() && attachedFiles.length === 0 && selectedContextItems.length === 0}
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-black text-white hover:bg-black dark:bg-[#FAFAFA] dark:text-black dark:border-[#3F3F46] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-[#D91D69] text-white hover:bg-[#D91D69] dark:bg-[#D91D69] dark:text-black dark:border-[#3F3F46] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 aria-label="Send message"
               >
                 <ArrowUp className="h-4 w-4" />
