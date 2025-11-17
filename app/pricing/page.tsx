@@ -65,7 +65,7 @@ export default function PricingPage() {
             />
 
             {/* Billing Toggle */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1">
               <div className="relative inline-flex items-center bg-white p-1 rounded-full border border-gray-200">
                 <div className="flex">
                   <button
@@ -90,11 +90,9 @@ export default function PricingPage() {
                   </button>
                 </div>
               </div>
-              {billingType === "yearly" && (
-                <span className="px-2 py-2 text-[#71717A] text-xs font-semibold rounded-full whitespace-nowrap">
-                  <span className="text-blue-500">Save 33%</span> on a yearly subscription
-                </span>
-              )}
+              <span className="px-2 py-2 text-[#71717A] text-xs font-semibold rounded-full sm:whitespace-nowrap text-left">
+                <span className="text-blue-500">Save 33%</span> on a<br className="sm:hidden" /> yearly subscription
+              </span>
             </div>
           </div>
 
@@ -165,7 +163,7 @@ export default function PricingPage() {
                     handleSelectPlan("Starter");
                   }}
                   disabled={loadingPlan !== null && loadingPlan !== "Starter"}
-                  className={`w-full disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ${
+                  className={`w-full disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer ${
                     selectedPlan === "Starter" ? "hover:opacity-80" : "hover:bg-[#F4F4F5]"
                   }`}
                   style={{
@@ -208,24 +206,19 @@ export default function PricingPage() {
                     "Email support",
                   ].map((feature, index) => (
                     <div key={index} className="flex items-start" style={{ gap: '8px', width: '264px' }}>
-                      <div style={{ width: '14px', height: '14px' }}>
+                      <div style={{ width: '18px', height: '18px' }}>
                         <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 14 14"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
                         >
-                          <path
-                            d="M11.6667 3.5L5.25 9.91667L2.33333 7"
-                            stroke="#09090B"
-                            strokeWidth="0.875"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
+                          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
+                          <path d="M8 12.5L11 15.5L16 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                       </div>
-                      <span style={{
+                      <span className="truncate" style={{
                         fontFamily: 'Inter',
                         fontWeight: 500,
                         fontSize: '14px',
@@ -325,7 +318,7 @@ export default function PricingPage() {
                     handleSelectPlan("Professional");
                   }}
                   disabled={loadingPlan !== null && loadingPlan !== "Professional"}
-                  className="w-full disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:opacity-80"
+                  className="w-full disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:opacity-80 cursor-pointer"
                   style={{
                     height: '44px',
                     background: '#09090B',
@@ -366,24 +359,19 @@ export default function PricingPage() {
                     "Email support",
                   ].map((feature, index) => (
                     <div key={index} className="flex items-start" style={{ gap: '8px', width: '264px' }}>
-                      <div style={{ width: '14px', height: '14px' }}>
+                      <div style={{ width: '18px', height: '18px' }}>
                         <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 14 14"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
                         >
-                          <path
-                            d="M11.6667 3.5L5.25 9.91667L2.33333 7"
-                            stroke="#09090B"
-                            strokeWidth="0.875"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
+                          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
+                          <path d="M8 12.5L11 15.5L16 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                       </div>
-                      <span style={{
+                      <span className="truncate" style={{
                         fontFamily: 'Inter',
                         fontWeight: 500,
                         fontSize: '14px',
@@ -466,7 +454,7 @@ export default function PricingPage() {
                     handleSelectPlan("Enterprise");
                   }}
                   disabled={loadingPlan !== null && loadingPlan !== "Enterprise"}
-                  className={`w-full disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ${
+                  className={`w-full disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer ${
                     selectedPlan === "Enterprise" ? "hover:opacity-80" : "hover:bg-[#F4F4F5]"
                   }`}
                   style={{
@@ -509,24 +497,19 @@ export default function PricingPage() {
                     "Priority support",
                   ].map((feature, index) => (
                     <div key={index} className="flex items-start" style={{ gap: '8px', width: '264px' }}>
-                      <div style={{ width: '14px', height: '14px' }}>
+                      <div style={{ width: '18px', height: '18px' }}>
                         <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 14 14"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
                         >
-                          <path
-                            d="M11.6667 3.5L5.25 9.91667L2.33333 7"
-                            stroke="#09090B"
-                            strokeWidth="0.875"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
+                          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
+                          <path d="M8 12.5L11 15.5L16 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                       </div>
-                      <span style={{
+                      <span className="truncate" style={{
                         fontFamily: 'Inter',
                         fontWeight: 500,
                         fontSize: '14px',
