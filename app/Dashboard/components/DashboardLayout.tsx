@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Sidebar } from "@/components/ui/sidebar";
@@ -44,6 +44,30 @@ export function DashboardLayout({
   const { theme, setTheme } = useTheme();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const chatContext = useChatContextOptional();
+  const [dataroomName, setDataroomName] = useState("LLA");
+
+  // Load dataroom name from localStorage
+  useEffect(() => {
+    const savedName = localStorage.getItem('dataroomName');
+    if (savedName) {
+      setDataroomName(savedName);
+    }
+
+    // Listen for storage changes to update in real-time
+    const handleStorageChange = () => {
+      const updatedName = localStorage.getItem('dataroomName');
+      if (updatedName) {
+        setDataroomName(updatedName);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  // Format dataroom name with suffix
+  const formattedDataroomName = `${dataroomName}'s Dataroom`;
+
 
   const handleLogout = () => {
     // Add your logout logic here
@@ -75,7 +99,7 @@ export function DashboardLayout({
                     />
                     <div className="flex items-center gap-2 flex-1 overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">
                       <p className="font-sans font-medium text-sm leading-none tracking-[-0.084px] whitespace-nowrap overflow-hidden text-left">
-                        LLA&apos;s DATAROOM
+                        {formattedDataroomName}
                       </p>
                     </div>
                   </div>
@@ -95,7 +119,7 @@ export function DashboardLayout({
                     height={20}
                     className="flex-shrink-0"
                   />
-                  <span className="font-medium">LLA&apos;s DATAROOM</span>
+                  <span className="font-medium">{formattedDataroomName}</span>
                 </DropdownMenuItem>
 
                 {/* Add Dataroom */}
@@ -223,7 +247,7 @@ export function DashboardLayout({
                   priority
                   className="flex-shrink-0"
                 />
-                <span className="text-sm font-semibold text-[#3f3f46] dark:text-white">LLA&apos;s Dataroom</span>
+                <span className="text-sm font-semibold text-[#3f3f46] dark:text-white">{formattedDataroomName}</span>
               </div>
             )}
 
