@@ -58,7 +58,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     const newChatId = `chat-${Date.now()}`;
     const newChat: Chat = {
       id: newChatId,
-      title: "New Chat",
+      title: "New Chat" ,
       messages: [],
       createdAt: new Date(),
       updatedAt: new Date(),

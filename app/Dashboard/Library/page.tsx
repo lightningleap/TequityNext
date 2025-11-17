@@ -5,11 +5,22 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { ChevronDown, ChevronsRight, Maximize2, Star, Download, Edit, ArrowLeft } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronsRight,
+  Maximize2,
+  Star,
+  Download,
+  Edit,
+  ArrowLeft,
+} from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { FileItem } from "../components/filegrid";
 import { SearchBar } from "../components/searchbar";
-import { UploadDialog, FolderItem as UploadedFolder } from "../components/UploadDialog";
+import {
+  UploadDialog,
+  FolderItem as UploadedFolder,
+} from "../components/UploadDialog";
 import {
   Table,
   TableBody,
@@ -21,7 +32,7 @@ import {
 import { LuClock } from "react-icons/lu";
 import { IoGridOutline } from "react-icons/io5";
 import { FaListUl } from "react-icons/fa";
-import { ChevronUp,  MoreHorizontal } from "lucide-react";
+import { ChevronUp, MoreHorizontal } from "lucide-react";
 import { FiTrash } from "react-icons/fi";
 import { ChatInterface } from "../components/ChatInterface";
 import { useFiles } from "../context/FilesContext";
@@ -33,9 +44,15 @@ import Image from "next/image";
 import Logomark from "@/public/Logomark.svg";
 
 // Dynamically import PDFViewer to prevent SSR issues with react-pdf
-const PDFViewer = dynamic(() => import("../components/PDFViewer").then(mod => ({ default: mod.PDFViewer })), {
-  ssr: false,
-});
+const PDFViewer = dynamic(
+  () =>
+    import("../components/PDFViewer").then((mod) => ({
+      default: mod.PDFViewer,
+    })),
+  {
+    ssr: false,
+  }
+);
 import {
   Tooltip,
   TooltipContent,
@@ -94,9 +111,16 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
   const [starredFileIds, setStarredFileIds] = useState<Set<string>>(new Set());
   const [fileToDelete, setFileToDelete] = useState<FileItem | null>(null);
   const [isViewingFolder, setIsViewingFolder] = useState(false);
-  const [currentFolder, setCurrentFolder] = useState<{ id: string; name: string; fileCount: number; files: FileItem[] } | null>(null);
-  const [folderContentView, setFolderContentView] = useState<"grid" | "list">("grid");
-  
+  const [currentFolder, setCurrentFolder] = useState<{
+    id: string;
+    name: string;
+    fileCount: number;
+    files: FileItem[];
+  } | null>(null);
+  const [folderContentView, setFolderContentView] = useState<"grid" | "list">(
+    "grid"
+  );
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [filesCurrentPage, setFilesCurrentPage] = useState(1);
@@ -133,7 +157,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     const startIndex = (page - 1) * itemsPerPage;
     return fileList.slice(startIndex, startIndex + itemsPerPage);
   };
-  
+
   // Filter files based on active tab and search query
   const filteredFiles = files.filter((file) => {
     // Filter by file type
@@ -149,10 +173,9 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
 
     return typeMatch && searchMatch;
   });
-  
+
   // Calculate total pages for files
   const totalFilesPages = Math.ceil(filteredFiles.length / itemsPerPage);
-
 
   // Filter folders based on search query
   const filteredFolders = folders.filter((folder) =>
@@ -302,13 +325,17 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
 
   // Prevent body scroll when chat is open on mobile
   useEffect(() => {
-    if (isAIChatOpen && typeof window !== 'undefined' && window.innerWidth < 640) {
-      document.body.style.overflow = 'hidden';
+    if (
+      isAIChatOpen &&
+      typeof window !== "undefined" &&
+      window.innerWidth < 640
+    ) {
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, [isAIChatOpen]);
 
@@ -323,12 +350,15 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
       <div className="flex-1 flex overflow-hidden">
         <main
           className={`flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide p-3 sm:p-4 md:p-6 flex justify-center transition-all duration-300 scroll-smooth
-            ${isAIChatOpen ? 'sm:mr-[400px]' : ''}
-            ${isPDFViewerOpen && !isPDFMaximized ? 'sm:mr-[400px]' : ''}
+            ${isAIChatOpen ? "sm:mr-[400px]" : ""}
+            ${isPDFViewerOpen && !isPDFMaximized ? "sm:mr-[400px]" : ""}
           `}
           style={{
-            scrollbarGutter: 'stable',
-            marginRight: isPDFViewerOpen && isPDFMaximized ? `calc(100% - ${sidebarWidth})` : undefined
+            scrollbarGutter: "stable",
+            marginRight:
+              isPDFViewerOpen && isPDFMaximized
+                ? `calc(100% - ${sidebarWidth})`
+                : undefined,
           }}
         >
           <div className="w-full max-w-[792px] px-2 sm:px-0">
@@ -346,7 +376,9 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                   </button>
                   <div className="flex items-center gap-3 mb-4">
                     <img src="/Folder.svg" alt="Folder" className="h-8 w-8" />
-                    <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">{currentFolder.name}</h1>
+                    <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                      {currentFolder.name}
+                    </h1>
                   </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     {currentFolder.files.length} items
@@ -354,7 +386,10 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                 </div>
 
                 {/* Folder Files Section */}
-                <section aria-labelledby="folder-files" className="space-y-3 sm:space-y-4">
+                <section
+                  aria-labelledby="folder-files"
+                  className="space-y-3 sm:space-y-4"
+                >
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <h2 className="text-sm font-medium text-muted-foreground">
                       Files in this folder
@@ -362,20 +397,22 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                     <div className="flex items-center gap-1 bg-gray-100 dark:bg-[#27272A] p-1 rounded-md">
                       <button
                         onClick={() => setFolderContentView("grid")}
-                        className={`p-1.5 rounded transition-colors ${folderContentView === "grid"
+                        className={`p-1.5 rounded transition-colors ${
+                          folderContentView === "grid"
                             ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
                             : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
-                          }`}
+                        }`}
                         aria-label="Grid view"
                       >
                         <IoGridOutline className="size-4" />
                       </button>
                       <button
                         onClick={() => setFolderContentView("list")}
-                        className={`p-1.5 rounded transition-colors ${folderContentView === "list"
+                        className={`p-1.5 rounded transition-colors ${
+                          folderContentView === "list"
                             ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
                             : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
-                          }`}
+                        }`}
                         aria-label="List view"
                       >
                         <FaListUl className="size-4" />
@@ -392,23 +429,49 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                           className="flex items-center rounded-lg bg-[#F4F4F5] dark:bg-[#27272A] border border-gray-200 dark:border-[#27272A] px-3 py-2 hover:bg-gray-50 dark:hover:bg-[#27272A]/80 cursor-pointer transition-colors"
                           role="button"
                           tabIndex={0}
-                          onKeyDown={(e) => e.key === "Enter" && handleFileSelect(file)}
+                          onKeyDown={(e) =>
+                            e.key === "Enter" && handleFileSelect(file)
+                          }
                         >
                           <div className="w-6 h-6 flex items-center justify-center">
                             {file.type === "PDF" ? (
-                              <img src="/Files/PDF-icon.svg" alt="PDF" className="max-w-[34px] max-h-[34px] object-contain" />
+                              <img
+                                src="/Files/PDF-icon.svg"
+                                alt="PDF"
+                                className="max-w-[34px] max-h-[34px] object-contain"
+                              />
                             ) : file.type === "DOCX" || file.type === "DOC" ? (
-                              <img src="/Files/Docs-icon.svg" alt="Document" className="max-w-[34px] max-h-[34px] object-contain" />
-                            ) : file.type === "XLSX" || file.type === "XLS" || file.type === "CSV" ? (
-                              <img src="/Files/XLS-icon.svg" alt="Spreadsheet" className="max-w-[34px] max-h-[34px] object-contain" />
+                              <img
+                                src="/Files/Docs-icon.svg"
+                                alt="Document"
+                                className="max-w-[34px] max-h-[34px] object-contain"
+                              />
+                            ) : file.type === "XLSX" ||
+                              file.type === "XLS" ||
+                              file.type === "CSV" ? (
+                              <img
+                                src="/Files/XLS-icon.svg"
+                                alt="Spreadsheet"
+                                className="max-w-[34px] max-h-[34px] object-contain"
+                              />
                             ) : file.type === "PPTX" || file.type === "PPT" ? (
-                              <img src="/Files/PDF-icon.svg" alt="Presentation" className="max-w-[34px] max-h-[34px] object-contain" />
+                              <img
+                                src="/Files/PDF-icon.svg"
+                                alt="Presentation"
+                                className="max-w-[34px] max-h-[34px] object-contain"
+                              />
                             ) : (
-                              <img src="/Files/file.svg" alt="File" className="max-w-[34px] max-h-[34px] object-contain" />
+                              <img
+                                src="/Files/file.svg"
+                                alt="File"
+                                className="max-w-[34px] max-h-[34px] object-contain"
+                              />
                             )}
                           </div>
                           <div className="flex-1 min-w-0 ml-2">
-                            <p className="truncate text-sm font-medium">{file.name}</p>
+                            <p className="truncate text-sm font-medium">
+                              {file.name}
+                            </p>
                           </div>
                         </div>
                       ))}
@@ -420,87 +483,112 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                           <TableRow className="dark:border-[#3F3F46]">
                             <TableHead className="w-[30px] sm:w-[40px] px-2 sm:px-4"></TableHead>
                             <TableHead className="px-2 sm:px-4">Name</TableHead>
-                            <TableHead className="w-[70px] sm:w-[100px] text-xs whitespace-nowrap px-2 sm:px-4">Size</TableHead>
-                            <TableHead className="w-[100px] sm:w-[120px] text-xs whitespace-nowrap px-2 sm:px-4">Date Created</TableHead>
+                            <TableHead className="w-[70px] sm:w-[100px] text-xs whitespace-nowrap px-2 sm:px-4">
+                              Size
+                            </TableHead>
+                            <TableHead className="w-[100px] sm:w-[120px] text-xs whitespace-nowrap px-2 sm:px-4">
+                              Date Created
+                            </TableHead>
                             <TableHead className="w-[40px] sm:w-[50px] px-2 sm:px-4"></TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {currentFolder.files
-                            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                            .slice(
+                              (currentPage - 1) * itemsPerPage,
+                              currentPage * itemsPerPage
+                            )
                             .map((file) => {
-                            const getFileIcon = () => {
-                              if (file.type === "PDF") return "/Files/PDF-icon.svg";
-                              if (file.type === "DOCX" || file.type === "DOC") return "/Files/Docs-icon.svg";
-                              if (file.type === "XLSX" || file.type === "XLS" || file.type === "CSV") return "/Files/XLS-icon.svg";
-                              if (file.type === "PPTX" || file.type === "PPT") return "/Files/PDF-icon.svg";
-                              return "/Files/file.svg";
-                            };
+                              const getFileIcon = () => {
+                                if (file.type === "PDF")
+                                  return "/Files/PDF-icon.svg";
+                                if (file.type === "DOCX" || file.type === "DOC")
+                                  return "/Files/Docs-icon.svg";
+                                if (
+                                  file.type === "XLSX" ||
+                                  file.type === "XLS" ||
+                                  file.type === "CSV"
+                                )
+                                  return "/Files/XLS-icon.svg";
+                                if (file.type === "PPTX" || file.type === "PPT")
+                                  return "/Files/PDF-icon.svg";
+                                return "/Files/file.svg";
+                              };
 
-                            const fileId = file.id || file.name;
+                              const fileId = file.id || file.name;
 
-                            return (
-                              <TableRow
-                                key={fileId}
-                                onClick={() => handleFileSelect(file)}
-                                className="cursor-pointer dark:border-[#3F3F46]"
-                              >
-                                <TableCell className="px-2 sm:px-4">
-                                  <input
-                                    type="checkbox"
-                                    checked={selectedFiles.has(fileId)}
-                                    onChange={(e) => toggleFileSelection(fileId, e as any)}
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary cursor-pointer"
-                                  />
-                                </TableCell>
-                                <TableCell className="px-2 sm:px-4">
-                                  <div className="flex items-center gap-2 sm:gap-3">
-                                    <img
-                                      src={getFileIcon()}
-                                      alt={file.type}
-                                      className="h-[16px] w-[16px] sm:h-[20px] sm:w-[20px] flex-shrink-0 object-contain"
+                              return (
+                                <TableRow
+                                  key={fileId}
+                                  onClick={() => handleFileSelect(file)}
+                                  className="cursor-pointer dark:border-[#3F3F46]"
+                                >
+                                  <TableCell className="px-2 sm:px-4">
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedFiles.has(fileId)}
+                                      onChange={(e) =>
+                                        toggleFileSelection(fileId, e as any)
+                                      }
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary cursor-pointer"
                                     />
-                                    <span className="truncate font-medium text-gray-900 dark:text-white text-xs sm:text-sm">{file.name}</span>
-                                  </div>
-                                </TableCell>
-                                <TableCell className="text-gray-500 dark:text-white text-[10px] sm:text-xs whitespace-nowrap px-2 sm:px-4">
-                                  {formatFileSize(file.size || 0)}
-                                </TableCell>
-                                <TableCell className="text-gray-500 dark:text-white text-[10px] sm:text-xs whitespace-nowrap px-2 sm:px-4">
-                                  {formatDate(file.uploadedAt || new Date())}
-                                </TableCell>
-                                <TableCell className="px-2 sm:px-4">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      console.log("Open menu for file:", file.name);
-                                    }}
-                                    className="p-1 sm:p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white rounded transition-colors"
-                                    title="More actions"
-                                  >
-                                    <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
-                                  </button>
-                                </TableCell>
-                              </TableRow>
-                            );
-                          })}
+                                  </TableCell>
+                                  <TableCell className="px-2 sm:px-4">
+                                    <div className="flex items-center gap-2 sm:gap-3">
+                                      <img
+                                        src={getFileIcon()}
+                                        alt={file.type}
+                                        className="w-12 h-12 shrink-0 object-contain"
+                                      />
+                                      <span className="truncate font-medium text-gray-900 dark:text-white text-xs sm:text-sm">
+                                        {file.name}
+                                      </span>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="text-gray-500 dark:text-white text-[10px] sm:text-xs whitespace-nowrap px-2 sm:px-4">
+                                    {formatFileSize(file.size || 0)}
+                                  </TableCell>
+                                  <TableCell className="text-gray-500 dark:text-white text-[10px] sm:text-xs whitespace-nowrap px-2 sm:px-4">
+                                    {formatDate(file.uploadedAt || new Date())}
+                                  </TableCell>
+                                  <TableCell className="px-2 sm:px-4">
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        console.log(
+                                          "Open menu for file:",
+                                          file.name
+                                        );
+                                      }}
+                                      className="p-1 sm:p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white rounded transition-colors"
+                                      title="More actions"
+                                    >
+                                      <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
+                                    </button>
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
                         </TableBody>
                       </Table>
                       {/* Pagination */}
                       {currentFolder.files.length > itemsPerPage && (
                         <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-[#3F3F46] bg-white dark:bg-[#09090B]">
                           <div className="text-sm text-gray-500 dark:text-gray-400">
-                            {selectedFiles.size} of {currentFolder.files.length} row(s) selected
+                            {selectedFiles.size} of {currentFolder.files.length}{" "}
+                            row(s) selected
                           </div>
                           <div className="flex items-center space-x-2">
                             <button
-                              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                              onClick={() =>
+                                setCurrentPage((p) => Math.max(1, p - 1))
+                              }
                               disabled={currentPage === 1}
                               className={`px-3 py-1 border rounded-md text-sm font-medium ${
                                 currentPage === 1
-                                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-[#18181B] dark:text-gray-600 dark:border-[#3F3F46]'
-                                  : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:border-[#3F3F46] dark:hover:bg-[#18181B]'
+                                  ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-[#18181B] dark:text-gray-600 dark:border-[#3F3F46]"
+                                  : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:border-[#3F3F46] dark:hover:bg-[#18181B]"
                               }`}
                             >
                               Previous
@@ -509,12 +597,29 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                               {/* {currentPage} of {Math.ceil(currentFolder.files.length / itemsPerPage)} */}
                             </div>
                             <button
-                              onClick={() => setCurrentPage(p => Math.min(Math.ceil(currentFolder.files.length / itemsPerPage), p + 1))}
-                              disabled={currentPage >= Math.ceil(currentFolder.files.length / itemsPerPage)}
+                              onClick={() =>
+                                setCurrentPage((p) =>
+                                  Math.min(
+                                    Math.ceil(
+                                      currentFolder.files.length / itemsPerPage
+                                    ),
+                                    p + 1
+                                  )
+                                )
+                              }
+                              disabled={
+                                currentPage >=
+                                Math.ceil(
+                                  currentFolder.files.length / itemsPerPage
+                                )
+                              }
                               className={`px-3 py-1 border rounded-md text-sm font-medium ${
-                                currentPage >= Math.ceil(currentFolder.files.length / itemsPerPage)
-                                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-[#18181B] dark:text-gray-600 dark:border-[#3F3F46]'
-                                  : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:border-[#3F3F46] dark:hover:bg-[#18181B]'
+                                currentPage >=
+                                Math.ceil(
+                                  currentFolder.files.length / itemsPerPage
+                                )
+                                  ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-[#18181B] dark:text-gray-600 dark:border-[#3F3F46]"
+                                  : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:border-[#3F3F46] dark:hover:bg-[#18181B]"
                               }`}
                             >
                               Next
@@ -553,330 +658,363 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                   </div>
                 </header>
 
-            <section
-              aria-labelledby="recently-visited"
-              className="mb-6 sm:mb-10"
-            >
-              <h2
-                id="recently-visited"
-                className="mb-4 sm:mb-6 flex gap-2 text-sm font-medium text-muted-foreground"
-              >
-                <LuClock className="size-4 text-muted-foreground" />
-                Recently visited
-              </h2>
-              <div className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 md:grid md:grid-cols-3 lg:grid-cols-4 md:overflow-x-visible">
-                <div className="flex flex-col items-center min-w-[160px] w-[160px] md:w-full md:min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3 flex-shrink-0">
-                  <div className="flex items-center justify-center mb-3 sm:mb-4">
-                    <img
-                      src="/blueFolder.svg"
-                      alt="Recent Files"
-                      className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]"
-                    />
-                  </div>
-                  <div className="w-full">
-                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">
-                      Opened 3 hours ago
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      5 items
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-col items-center min-w-[160px] w-[160px] md:w-full md:min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3 flex-shrink-0">
-                  <div className="flex items-center justify-center mb-3 sm:mb-4">
-                    <img
-                      src="/blackFolder.svg"
-                      alt="Created Files"
-                      className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]"
-                    />
-                  </div>
-                  <div className="w-full">
-                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">
-                      Created
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      12 documents
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-col items-center min-w-[160px] w-[160px] md:w-full md:min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3 flex-shrink-0">
-                  <div className="flex items-center justify-center mb-3 sm:mb-4">
-                    <img
-                      src="/yellowFolder.svg"
-                      alt="Received Files"
-                      className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]"
-                    />
-                  </div>
-                  <div className="w-full">
-                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">
-                      Received
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      8 folders
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-col items-center min-w-[160px] w-[160px] md:w-full md:min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3 flex-shrink-0">
-                  <div className="flex items-center justify-center mb-3 sm:mb-4">
-                    <img
-                      src="/redFolder.svg"
-                      alt="Updated Files"
-                      className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]"
-                    />
-                  </div>
-                  <div className="w-full">
-                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">
-                      Updated
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      15 files
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section
-              aria-labelledby="all-folders"
-              className="space-y-3 sm:space-y-4 mb-6 sm:mb-10"
-            >
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-sm font-medium text-muted-foreground">
-                    All Categories
+                <section
+                  aria-labelledby="recently-visited"
+                  className="mb-6 sm:mb-10"
+                >
+                  <h2
+                    id="recently-visited"
+                    className="mb-4 sm:mb-6 flex gap-2 text-sm font-medium text-muted-foreground"
+                  >
+                    <LuClock className="size-4 text-muted-foreground" />
+                    Recently visited
                   </h2>
-                  <button
-                    onClick={() => setFoldersExpanded(!foldersExpanded)}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label={
-                      foldersExpanded ? "Collapse folders" : "Expand folders"
-                    }
-                  >
-                    {foldersExpanded ? (
-                      <ChevronUp className="size-4" />
-                    ) : (
-                      <ChevronDown className="size-4" />
-                    )}
-                  </button>
-                </div>
-                <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-md dark:bg-[#27272A]">
-                  <button
-                    onClick={() => setFolderView("grid")}
-                    className={`p-1.5 rounded transition-colors ${
-                      folderView === "grid"
-                        ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
-                        : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
-                    }`}
-                    aria-label="Grid view"
-                  >
-                    <IoGridOutline className="size-4" />
-                  </button>
-                  <button
-                    onClick={() => setFolderView("list")}
-                    className={`p-1.5 rounded transition-colors ${
-                      folderView === "list"
-                        ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
-                        : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
-                    }`}
-                    aria-label="List view"
-                  >
-                    <FaListUl className="size-4" />
-                  </button>
-                </div>
-              </div>
-
-              {foldersExpanded && (
-                <>
-                  {folderView === "grid" ? (
-                    <div className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                      {filteredFolders.length > 0 ? (
-                        filteredFolders.map((folder) => (
-                          <div
-                            key={folder.id}
-                            onClick={() => handleFolderSelect(folder)}
-                            className="flex items-center gap-3 rounded-lg bg-muted px-4 py-3 hover:bg-muted/80 cursor-pointer transition-colors dark:bg-[#27272A]"
-                            role="button"
-                            tabIndex={0}
-                            onKeyDown={(e) =>
-                              e.key === "Enter" && handleFolderSelect(folder)
-                            }
-                          >
-                            <img
-                              src="/Folder.svg"
-                              alt="Folder"
-                              className="h-[20px] w-[20px]"
-                            />
-                            <div className="flex-1 min-w-0 ">
-                              <p className="truncate text-sm font-medium">
-                                {folder.name}
-                              </p>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
-                          No folders found
-                        </div>
-                      )}
+                  <div className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 md:grid md:grid-cols-3 lg:grid-cols-4 md:overflow-x-visible">
+                    <div className="flex flex-col items-center min-w-[160px] w-[160px] md:w-full md:min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3 flex-shrink-0">
+                      <div className="flex items-center justify-center mb-3 sm:mb-4">
+                        <img
+                          src="/blueFolder.svg"
+                          alt="Recent Files"
+                          className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]"
+                        />
+                      </div>
+                      <div className="w-full">
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">
+                          Opened 3 hours ago
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          5 items
+                        </p>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="rounded-md border dark:border-[#3F3F46]">
-                      <Table>
-                        <TableHeader>
-                          <TableRow className="dark:border-[#3F3F46]">
-                            <TableHead className="w-[30px] sm:w-[40px] px-2 sm:px-4"></TableHead>
-                            <TableHead className="px-2 sm:px-4">Name</TableHead>
-                            <TableHead className="w-[70px] sm:w-[100px] text-xs whitespace-nowrap px-2 sm:px-4">Size</TableHead>
-                            <TableHead className="w-[100px] sm:w-[120px] text-xs whitespace-nowrap px-2 sm:px-4">Date Created</TableHead>
-                            <TableHead className="w-[40px] sm:w-[50px] px-2 sm:px-4"></TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
+
+                    <div className="flex flex-col items-center min-w-[160px] w-[160px] md:w-full md:min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3 flex-shrink-0">
+                      <div className="flex items-center justify-center mb-3 sm:mb-4">
+                        <img
+                          src="/blackFolder.svg"
+                          alt="Created Files"
+                          className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]"
+                        />
+                      </div>
+                      <div className="w-full">
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">
+                          Created
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          12 documents
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col items-center min-w-[160px] w-[160px] md:w-full md:min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3 flex-shrink-0">
+                      <div className="flex items-center justify-center mb-3 sm:mb-4">
+                        <img
+                          src="/yellowFolder.svg"
+                          alt="Received Files"
+                          className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]"
+                        />
+                      </div>
+                      <div className="w-full">
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">
+                          Received
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          8 folders
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col items-center min-w-[160px] w-[160px] md:w-full md:min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3 flex-shrink-0">
+                      <div className="flex items-center justify-center mb-3 sm:mb-4">
+                        <img
+                          src="/redFolder.svg"
+                          alt="Updated Files"
+                          className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]"
+                        />
+                      </div>
+                      <div className="w-full">
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">
+                          Updated
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          15 files
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section
+                  aria-labelledby="all-folders"
+                  className="space-y-3 sm:space-y-4 mb-6 sm:mb-10"
+                >
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-sm font-medium text-muted-foreground">
+                        All Categories
+                      </h2>
+                      <button
+                        onClick={() => setFoldersExpanded(!foldersExpanded)}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                        aria-label={
+                          foldersExpanded
+                            ? "Collapse folders"
+                            : "Expand folders"
+                        }
+                      >
+                        {foldersExpanded ? (
+                          <ChevronUp className="size-4" />
+                        ) : (
+                          <ChevronDown className="size-4" />
+                        )}
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-md dark:bg-[#27272A]">
+                      <button
+                        onClick={() => setFolderView("grid")}
+                        className={`p-1.5 rounded transition-colors ${
+                          folderView === "grid"
+                            ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
+                            : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
+                        }`}
+                        aria-label="Grid view"
+                      >
+                        <IoGridOutline className="size-4" />
+                      </button>
+                      <button
+                        onClick={() => setFolderView("list")}
+                        className={`p-1.5 rounded transition-colors ${
+                          folderView === "list"
+                            ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
+                            : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
+                        }`}
+                        aria-label="List view"
+                      >
+                        <FaListUl className="size-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {foldersExpanded && (
+                    <>
+                      {folderView === "grid" ? (
+                        <div className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                           {filteredFolders.length > 0 ? (
                             filteredFolders.map((folder) => (
-                              <TableRow
+                              <div
                                 key={folder.id}
                                 onClick={() => handleFolderSelect(folder)}
-                                className="cursor-pointer dark:border-[#3F3F46]"
+                                className="flex items-center gap-3 rounded-lg bg-muted px-4 py-3 hover:bg-muted/80 cursor-pointer transition-colors dark:bg-[#27272A]"
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) =>
+                                  e.key === "Enter" &&
+                                  handleFolderSelect(folder)
+                                }
                               >
-                                <TableCell className="px-2 sm:px-4">
-                                  <input
-                                    type="checkbox"
-                                    checked={selectedFolders.has(folder.id)}
-                                    onChange={(e) => toggleFolderSelection(folder.id, e as any)}
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary cursor-pointer"
-                                  />
-                                </TableCell>
-                                <TableCell className="px-2 sm:px-4">
-                                  <div className="flex items-center gap-2 sm:gap-3">
-                                    <img src="/Folder.svg" alt="Folder" className="h-[16px] w-[16px] sm:h-[20px] sm:w-[20px] flex-shrink-0" />
-                                    <span className="truncate font-medium text-gray-900 dark:text-white text-xs sm:text-sm">{folder.name}</span>
-                                  </div>
-                                </TableCell>
-                                <TableCell className="text-gray-500 dark:text-white text-[10px] sm:text-xs whitespace-nowrap px-2 sm:px-4">
-                                  {folder.fileCount} items
-                                </TableCell>
-                                <TableCell className="text-gray-500 dark:text-white text-[10px] sm:text-xs whitespace-nowrap px-2 sm:px-4">
-                                  {formatDate(new Date())}
-                                </TableCell>
-                                <TableCell className="px-2 sm:px-4">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      console.log("Open menu for folder:", folder.name);
-                                    }}
-                                    className="p-1 sm:p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white rounded transition-colors"
-                                    title="More actions"
-                                  >
-                                    <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
-                                  </button>
-                                </TableCell>
-                              </TableRow>
+                                <img
+                                  src="/Folder.svg"
+                                  alt="Folder"
+                                  className="h-[20px] w-[20px]"
+                                />
+                                <div className="flex-1 min-w-0 ">
+                                  <p className="truncate text-sm font-medium">
+                                    {folder.name}
+                                  </p>
+                                </div>
+                              </div>
                             ))
                           ) : (
-                            <TableRow>
-                              <TableCell colSpan={5} className="text-center py-8 text-gray-500 dark:text-gray-400">
-                                No folders found
-                              </TableCell>
-                            </TableRow>
+                            <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
+                              No folders found
+                            </div>
                           )}
-                        </TableBody>
-                      </Table>
-                    </div>
+                        </div>
+                      ) : (
+                        <div className="rounded-md border dark:border-[#3F3F46]">
+                          <Table>
+                            <TableHeader>
+                              <TableRow className="dark:border-[#3F3F46]">
+                                <TableHead className="w-[30px] sm:w-[40px] px-2 sm:px-4"></TableHead>
+                                <TableHead className="px-2 sm:px-4">
+                                  Name
+                                </TableHead>
+                                <TableHead className="w-[70px] sm:w-[100px] text-xs whitespace-nowrap px-2 sm:px-4">
+                                  Size
+                                </TableHead>
+                                <TableHead className="w-[100px] sm:w-[120px] text-xs whitespace-nowrap px-2 sm:px-4">
+                                  Date Created
+                                </TableHead>
+                                <TableHead className="w-[40px] sm:w-[50px] px-2 sm:px-4"></TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {filteredFolders.length > 0 ? (
+                                filteredFolders.map((folder) => (
+                                  <TableRow
+                                    key={folder.id}
+                                    onClick={() => handleFolderSelect(folder)}
+                                    className="cursor-pointer dark:border-[#3F3F46]"
+                                  >
+                                    <TableCell className="px-2 sm:px-4">
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedFolders.has(folder.id)}
+                                        onChange={(e) =>
+                                          toggleFolderSelection(
+                                            folder.id,
+                                            e as any
+                                          )
+                                        }
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary cursor-pointer"
+                                      />
+                                    </TableCell>
+                                    <TableCell className="px-2 sm:px-4">
+                                      <div className="flex items-center gap-2 sm:gap-3">
+                                        <img
+                                          src="/Folder.svg"
+                                          alt="Folder"
+                                          className="w-12 h-12 shrink-0"
+                                        />
+                                        <span className="truncate font-medium text-gray-900 dark:text-white text-xs sm:text-sm">
+                                          {folder.name}
+                                        </span>
+                                      </div>
+                                    </TableCell>
+                                    <TableCell className="text-gray-500 dark:text-white text-[10px] sm:text-xs whitespace-nowrap px-2 sm:px-4">
+                                      {folder.fileCount} items
+                                    </TableCell>
+                                    <TableCell className="text-gray-500 dark:text-white text-[10px] sm:text-xs whitespace-nowrap px-2 sm:px-4">
+                                      {formatDate(new Date())}
+                                    </TableCell>
+                                    <TableCell className="px-2 sm:px-4">
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          console.log(
+                                            "Open menu for folder:",
+                                            folder.name
+                                          );
+                                        }}
+                                        className="p-1 sm:p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white rounded transition-colors"
+                                        title="More actions"
+                                      >
+                                        <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
+                                      </button>
+                                    </TableCell>
+                                  </TableRow>
+                                ))
+                              ) : (
+                                <TableRow>
+                                  <TableCell
+                                    colSpan={5}
+                                    className="text-center py-8 text-gray-500 dark:text-gray-400"
+                                  >
+                                    No folders found
+                                  </TableCell>
+                                </TableRow>
+                              )}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      )}
+                    </>
                   )}
-                </>
-              )}
-            </section>
+                </section>
 
-            <section
-              aria-labelledby="all-files"
-              className="space-y-3 sm:space-y-4"
-            >
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-sm font-medium text-muted-foreground">
-                    All Files
-                  </h2>
-                  <button
-                    onClick={() => setFilesExpanded(!filesExpanded)}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label={
-                      filesExpanded ? "Collapse files" : "Expand files"
-                    }
-                  >
-                    {filesExpanded ? (
-                      <ChevronUp className="size-4" />
-                    ) : (
-                      <ChevronDown className="size-4" />
-                    )}
-                  </button>
-                </div>
+                <section
+                  aria-labelledby="all-files"
+                  className="space-y-3 sm:space-y-4"
+                >
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2">
+                      <button className="text-sm font-medium text-muted-foreground cursor-pointer hover:text-foreground transition-colors hover:bg-gray-100 bg-gray-50">
+                        All Files
+                      </button>
+                      <button
+                        onClick={() => setFilesExpanded(!filesExpanded)}
+                        className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                        aria-label={
+                          filesExpanded ? "Collapse files" : "Expand files"
+                        }
+                      >
+                        {filesExpanded ? (
+                          <ChevronUp className="size-4" />
+                        ) : (
+                          <ChevronDown className="size-4" />
+                        )}
+                      </button>
+                    </div>
 
-                <div className="flex items-center gap-1 bg-gray-100 dark:bg-[#27272A] p-1 rounded-md">
-                  <button
-                    onClick={() => setFileView("grid")}
-                    className={`p-1.5 rounded transition-colors ${
-                      fileView === "grid"
-                        ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
-                        : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
-                    }`}
-                    aria-label="Grid view"
-                  >
-                    <IoGridOutline className="size-4" />
-                  </button>
-                  <button
-                    onClick={() => setFileView("list")}
-                    className={`p-1.5 rounded transition-colors ${
-                      fileView === "list"
-                        ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
-                        : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
-                    }`}
-                    aria-label="List view"
-                  >
-                    <FaListUl className="size-4" />
-                  </button>
-                </div>
-              </div>
+                    <div className="flex items-center gap-1 bg-gray-100 dark:bg-[#27272A] p-1 rounded-md">
+                      <button
+                        onClick={() => setFileView("grid")}
+                        className={`p-1.5 rounded transition-colors ${
+                          fileView === "grid"
+                            ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
+                            : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
+                        }`}
+                        aria-label="Grid view"
+                      >
+                        <IoGridOutline className="size-4" />
+                      </button>
+                      <button
+                        onClick={() => setFileView("list")}
+                        className={`p-1.5 rounded transition-colors ${
+                          fileView === "list"
+                            ? "text-foreground bg-white shadow-sm dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
+                            : "text-muted-foreground hover:text-foreground hover:bg-gray-200 dark:bg-[#27272A] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
+                        }`}
+                        aria-label="List view"
+                      >
+                        <FaListUl className="size-4" />
+                      </button>
+                    </div>
+                  </div>
 
-              {filesExpanded && (
-                <>
-                  {/* File Type Tabs */}
-                  <div className="flex items-center gap-2 bg-white dark:bg-[#09090B] py-3 sm:py-4 overflow-x-auto pb-3 sm:pb-4 scrollbar-hide -mx-2 px-2 sm:mx-0 sm:px-0">
-                    <button
-                      onClick={() => setActiveFileType(null)}
-                      className={`shrink-0 cursor-pointer rounded-md px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
-                        activeFileType === null
-                          ? "bg-primary/10 text-primary border border-primary/20 shadow-sm"
-                          : "text-gray-600 hover:bg-gray-50 border border-gray-200 bg-white hover:border-gray-300 dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
-                      }`}
-                    >
-                      <span>All Files</span>
-                      {/* <span className="text-xs cursor-pointer bg-gray-100 text-gray-600 rounded-full px-2 py-0.5">
-                        {getFileCount('All Files')}
-                      </span> */}
-                    </button>
-                    
-                    {['Documents', 'Photos', 'Videos', 'Compressed ZIPs', 'Audio', 'Excel'].map((tab) => {
-                      const isActive = activeFileType === tab;
-
-                      return (
+                  {filesExpanded && (
+                    <>
+                      {/* File Type Tabs */}
+                      <div className="flex items-center gap-2 bg-white dark:bg-[#09090B] py-3 sm:py-4 overflow-x-auto pb-3 sm:pb-4 scrollbar-hide -mx-2 px-2 sm:mx-0 sm:px-0">
                         <button
-                          key={tab}
-                          onClick={() =>
-                            setActiveFileType(isActive ? null : tab)
-                          }
-                          className={`shrink-0 cursor-pointer rounded-md px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 dark:bg-[#09090B] ${
-                            isActive
-                              ? "bg-primary/10 text-primary dark:border-[#3F3F46] border border-primary/20 shadow-sm dark:bg-[#27272A]"
-                              : "text-gray-600 hover:bg-gray-50 border border-gray-200 bg-white hover:border-gray-300 dark:border-[#3F3F46] dark:text-[#A1A1AA] dark:bg-[#09090B]"
+                          onClick={() => setActiveFileType(null)}
+                          className={`shrink-0 cursor-pointer rounded-md px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                            activeFileType === null
+                              ? "bg-primary/10 text-primary border border-primary/20 shadow-sm"
+                              : "text-gray-600 hover:bg-gray-50 border border-gray-200 bg-white hover:border-gray-300 dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
                           }`}
                         >
-                          <span>{tab}</span>
-                          {/* {count > 0 && (
+                          <span>All Files</span>
+                          {/* <span className="text-xs cursor-pointer bg-gray-100 text-gray-600 rounded-full px-2 py-0.5">
+                        {getFileCount('All Files')}
+                      </span> */}
+                        </button>
+
+                        {[
+                          "Documents",
+                          "Photos",
+                          "Videos",
+                          "Compressed ZIPs",
+                          "Audio",
+                          "Excel",
+                        ].map((tab) => {
+                          const isActive = activeFileType === tab;
+
+                          return (
+                            <button
+                              key={tab}
+                              onClick={() =>
+                                setActiveFileType(isActive ? null : tab)
+                              }
+                              className={`shrink-0 cursor-pointer rounded-md px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 dark:bg-[#09090B] ${
+                                isActive
+                                  ? "bg-primary/10 text-primary dark:border-[#3F3F46] border border-primary/20 shadow-sm dark:bg-[#27272A]"
+                                  : "text-gray-600 hover:bg-gray-50 border border-gray-200 bg-white hover:border-gray-300 dark:border-[#3F3F46] dark:text-[#A1A1AA] dark:bg-[#09090B]"
+                              }`}
+                            >
+                              <span>{tab}</span>
+                              {/* {count > 0 && (
                             <span className={`text-xs rounded-full px-2 py-0.5 ${
                               isActive 
                                 ? 'bg-primary/20 text-primary' 
@@ -885,364 +1023,460 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                               {count}
                             </span>
                           )} */}
-                        </button>
-                      );
-                    })}
-                  </div>
+                            </button>
+                          );
+                        })}
+                      </div>
 
-                  {fileView === "grid" ? (
-                    <div className="space-y-4">
-                      <div className={`transition-all duration-300 grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ${
-                        filteredFiles.length === 0 ? 'min-h-[200px] flex items-center justify-center' : ''
-                      }`}>
-                      {filteredFiles.length === 0 ? (
-                        <div className="col-span-full text-center py-8 text-gray-500">
-                          <p className="text-sm">
-                            {activeFileType
-                              ? `No ${activeFileType.toLowerCase()} files found`
-                              : "No files found"}
-                          </p>
+                      {fileView === "grid" ? (
+                        <div className="space-y-4">
+                          <div
+                            className={`transition-all duration-300 grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ${
+                              filteredFiles.length === 0
+                                ? "min-h-[200px] flex items-center justify-center"
+                                : ""
+                            }`}
+                          >
+                            {filteredFiles.length === 0 ? (
+                              <div className="col-span-full text-center py-8 text-gray-500">
+                                <p className="text-sm">
+                                  {activeFileType
+                                    ? `No ${activeFileType.toLowerCase()} files found`
+                                    : "No files found"}
+                                </p>
+                              </div>
+                            ) : (
+                              paginatedFiles(
+                                filteredFiles,
+                                filesCurrentPage
+                              ).map((file) => (
+                                <div
+                                  key={file.id}
+                                  onClick={() => handleFileSelect(file)}
+                                  className="group relative flex items-center rounded-lg bg-[#F4F4F5] dark:bg-[#27272A] dark:border-[#27272A] border border-gray-200 px-3 py-2 hover:bg-gray-50 cursor-pointer transition-colors"
+                                  role="button"
+                                  tabIndex={0}
+                                  onKeyDown={(e) =>
+                                    e.key === "Enter" && handleFileSelect(file)
+                                  }
+                                >
+                                  <div className="w-6 h-6 flex items-center justify-center">
+                                    {file.type === "PDF" ? (
+                                      <img
+                                        src="/Files/PDF-icon.svg"
+                                        alt="PDF"
+                                        className="max-w-[34px] max-h-[34px] object-contain"
+                                      />
+                                    ) : file.type === "DOCX" ||
+                                      file.type === "DOC" ? (
+                                      <img
+                                        src="/Files/Docs-icon.svg"
+                                        alt="Document"
+                                        className="max-w-[34px] max-h-[34px] object-contain"
+                                      />
+                                    ) : file.type === "XLSX" ||
+                                      file.type === "XLS" ? (
+                                      <img
+                                        src="/Files/XLS-icon.svg"
+                                        alt="Spreadsheet"
+                                        className="max-w-[34px] max-h-[34px] object-contain"
+                                      />
+                                    ) : file.type === "PPTX" ||
+                                      file.type === "PPT" ? (
+                                      <img
+                                        src="/Files/PDF-icon.svg"
+                                        alt="Presentation"
+                                        className="max-w-[34px] max-h-[34px] object-contain"
+                                      />
+                                    ) : file.type === "JPG" ||
+                                      file.type === "JPEG" ||
+                                      file.type === "PNG" ||
+                                      file.type === "GIF" ? (
+                                      <img
+                                        src="/Files/JPG-icon.svg"
+                                        alt="Image"
+                                        className="max-w-[44px] max-h-[44px] object-contain"
+                                      />
+                                    ) : file.type === "MP3" ||
+                                      file.type === "WAV" ||
+                                      file.type === "AAC" ? (
+                                      <img
+                                        src="/Files/MP3-icon.svg"
+                                        alt="Audio"
+                                        className="max-w-[44px] max-h-[44px] object-contain"
+                                      />
+                                    ) : file.type === "ZIP" ||
+                                      file.type === "RAR" ||
+                                      file.type === "7Z" ? (
+                                      <img
+                                        src="/Files/ZIP-icon.svg"
+                                        alt="Archive"
+                                        className="max-w-[44px] max-h-[44px] object-contain"
+                                      />
+                                    ) : file.type === "TXT" ? (
+                                      <img
+                                        src="/Files/TXT-icon.svg"
+                                        alt="Text"
+                                        className="max-w-[44px] max-h-[44px] object-contain"
+                                      />
+                                    ) : (
+                                      <img
+                                        src="/Files/file.svg"
+                                        alt="File"
+                                        className="max-w-[34px] max-h-[34px] object-contain"
+                                      />
+                                    )}
+                                  </div>
+                                  <div className="flex-1 min-w-0 ml-2">
+                                    <p className="truncate text-sm font-medium">
+                                      {file.name}
+                                    </p>
+                                  </div>
+
+                                  {/* 3-dot dropdown menu */}
+                                  <div
+                                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <DropdownMenu.Root>
+                                      <DropdownMenu.Trigger asChild>
+                                        <button
+                                          onClick={(e) => e.stopPropagation()}
+                                          className="p-1 text-gray-500 hover:text-gray-900 dark:text-white dark:hover:bg-[#27272A] hover:bg-gray-100 rounded transition-colors"
+                                          title="More actions"
+                                        >
+                                          <MoreHorizontal className="h-4 w-4" />
+                                        </button>
+                                      </DropdownMenu.Trigger>
+                                      <DropdownMenu.Portal>
+                                        <DropdownMenu.Content
+                                          align="end"
+                                          className="min-w-[180px] bg-white dark:bg-[#09090B] rounded-md shadow-lg border border-gray-100 dark:border-[#3F3F46] p-1 z-50"
+                                          side="bottom"
+                                          sideOffset={5}
+                                          onCloseAutoFocus={(e) =>
+                                            e.preventDefault()
+                                          }
+                                        >
+                                          <DropdownMenu.Item
+                                            className="flex items-center gap-2 text-sm p-2 rounded hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer outline-none"
+                                            onSelect={() => {
+                                              toggleFileStar(
+                                                file.id || "",
+                                                file.name
+                                              );
+                                            }}
+                                          >
+                                            <Star
+                                              className={`h-4 w-4 ${
+                                                starredFileIds.has(
+                                                  file.id || ""
+                                                )
+                                                  ? "fill-yellow-400 text-yellow-400"
+                                                  : ""
+                                              }`}
+                                            />
+                                            <span>
+                                              {starredFileIds.has(file.id || "")
+                                                ? "Unstar"
+                                                : "Star"}
+                                            </span>
+                                          </DropdownMenu.Item>
+                                          <DropdownMenu.Item
+                                            className="flex items-center gap-2 text-sm p-2 rounded hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer outline-none"
+                                            onSelect={() => {
+                                              console.log(
+                                                "Download file:",
+                                                file.name
+                                              );
+                                            }}
+                                          >
+                                            <Download className="h-4 w-4" />
+                                            <span>Download</span>
+                                          </DropdownMenu.Item>
+
+                                          <DropdownMenu.Item
+                                            className="flex items-center gap-2 text-sm p-2 rounded text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer outline-none"
+                                            onSelect={() => {
+                                              setFileToDelete(file);
+                                            }}
+                                          >
+                                            <FiTrash className="h-4 w-4" />
+                                            <span>Delete</span>
+                                          </DropdownMenu.Item>
+                                        </DropdownMenu.Content>
+                                      </DropdownMenu.Portal>
+                                    </DropdownMenu.Root>
+                                  </div>
+                                </div>
+                              ))
+                            )}
+                          </div>
                         </div>
                       ) : (
-                        paginatedFiles(filteredFiles, filesCurrentPage).map((file) => (
-                          <div
-                            key={file.id}
-                            onClick={() => handleFileSelect(file)}
-                            className="group relative flex items-center rounded-lg bg-[#F4F4F5] dark:bg-[#27272A] dark:border-[#27272A] border border-gray-200 px-3 py-2 hover:bg-gray-50 cursor-pointer transition-colors"
-                            role="button"
-                            tabIndex={0}
-                            onKeyDown={(e) =>
-                              e.key === "Enter" && handleFileSelect(file)
-                            }
-                          >
-                            <div className="w-6 h-6 flex items-center justify-center">
-                              {file.type === "PDF" ? (
-                                <img
-                                  src="/Files/PDF-icon.svg"
-                                  alt="PDF"
-                                  className="max-w-[34px] max-h-[34px] object-contain"
-                                />
-                              ) : file.type === "DOCX" ||
-                                file.type === "DOC" ? (
-                                <img
-                                  src="/Files/Docs-icon.svg"
-                                  alt="Document"
-                                  className="max-w-[34px] max-h-[34px] object-contain"
-                                />
-                              ) : file.type === "XLSX" ||
-                                file.type === "XLS" ? (
-                                <img
-                                  src="/Files/XLS-icon.svg"
-                                  alt="Spreadsheet"
-                                  className="max-w-[34px] max-h-[34px] object-contain"
-                                />
-                              ) : file.type === "PPTX" ||
-                                file.type === "PPT" ? (
-                                <img
-                                  src="/Files/PDF-icon.svg"
-                                  alt="Presentation"
-                                  className="max-w-[34px] max-h-[34px] object-contain"
-                                />
-                              ) : file.type === "JPG" ||
-                                file.type === "JPEG" ||
-                                file.type === "PNG" ||
-                                file.type === "GIF" ? (
-                                <img
-                                  src="/Files/JPG-icon.svg"
-                                  alt="Image"
-                                  className="max-w-[44px] max-h-[44px] object-contain"
-                                />
-                              ) : file.type === "MP3" ||
-                                file.type === "WAV" ||
-                                file.type === "AAC" ? (
-                                <img
-                                  src="/Files/MP3-icon.svg"
-                                  alt="Audio"
-                                  className="max-w-[44px] max-h-[44px] object-contain"
-                                />
-                              ) : file.type === "ZIP" ||
-                                file.type === "RAR" ||
-                                file.type === "7Z" ? (
-                                <img
-                                  src="/Files/ZIP-icon.svg"
-                                  alt="Archive"
-                                  className="max-w-[44px] max-h-[44px] object-contain"
-                                />
-                              ) : file.type === "TXT" ? (
-                                <img
-                                  src="/Files/TXT-icon.svg"
-                                  alt="Text"
-                                  className="max-w-[44px] max-h-[44px] object-contain"
-                                />
-                              ) : (
-                                <img
-                                  src="/Files/file.svg"
-                                  alt="File"
-                                  className="max-w-[34px] max-h-[34px] object-contain"
-                                />
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0 ml-2">
-                              <p className="truncate text-sm font-medium">
-                                {file.name}
-                              </p>
-                            </div>
-
-                            {/* 3-dot dropdown menu */}
-                            <div
-                              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <DropdownMenu.Root>
-                                <DropdownMenu.Trigger asChild>
-                                  <button
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="p-1 text-gray-500 hover:text-gray-900 dark:text-white dark:hover:bg-[#27272A] hover:bg-gray-100 rounded transition-colors"
-                                    title="More actions"
+                        <div className="rounded-md border dark:border-[#3F3F46]">
+                          <Table>
+                            <TableHeader>
+                              <TableRow className="dark:border-[#3F3F46]">
+                                <TableHead className="w-[30px] sm:w-[40px] px-2 sm:px-4"></TableHead>
+                                <TableHead className="px-2 sm:px-4">
+                                  Name
+                                </TableHead>
+                                <TableHead className="w-[70px] sm:w-[100px] text-xs whitespace-nowrap px-2 sm:px-4">
+                                  Size
+                                </TableHead>
+                                <TableHead className="w-[100px] sm:w-[120px] text-xs whitespace-nowrap px-2 sm:px-4">
+                                  Date Created
+                                </TableHead>
+                                <TableHead className="w-[40px] sm:w-[50px] px-2 sm:px-4"></TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {filteredFiles.length === 0 ? (
+                                <TableRow>
+                                  <TableCell
+                                    colSpan={5}
+                                    className="text-center py-8 text-gray-500 dark:text-gray-400"
                                   >
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </button>
-                                </DropdownMenu.Trigger>
-                                <DropdownMenu.Portal>
-                                  <DropdownMenu.Content
-                                    align="end"
-                                    className="min-w-[180px] bg-white dark:bg-[#09090B] rounded-md shadow-lg border border-gray-100 dark:border-[#3F3F46] p-1 z-50"
-                                    side="bottom"
-                                    sideOffset={5}
-                                    onCloseAutoFocus={(e) => e.preventDefault()}
-                                  >
-                                    <DropdownMenu.Item
-                                      className="flex items-center gap-2 text-sm p-2 rounded hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer outline-none"
-                                      onSelect={() => {
-                                        toggleFileStar(
-                                          file.id || "",
-                                          file.name
-                                        );
-                                      }}
-                                    >
-                                      <Star
-                                        className={`h-4 w-4 ${
-                                          starredFileIds.has(file.id || "")
-                                            ? "fill-yellow-400 text-yellow-400"
-                                            : ""
-                                        }`}
-                                      />
-                                      <span>
-                                        {starredFileIds.has(file.id || "")
-                                          ? "Unstar"
-                                          : "Star"}
-                                      </span>
-                                    </DropdownMenu.Item>
-                                    <DropdownMenu.Item
-                                      className="flex items-center gap-2 text-sm p-2 rounded hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer outline-none"
-                                      onSelect={() => {
-                                        console.log(
-                                          "Download file:",
-                                          file.name
-                                        );
-                                      }}
-                                    >
-                                      <Download className="h-4 w-4" />
-                                      <span>Download</span>
-                                    </DropdownMenu.Item>
-
-                                    <DropdownMenu.Item
-                                      className="flex items-center gap-2 text-sm p-2 rounded text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer outline-none"
-                                      onSelect={() => {
-                                        setFileToDelete(file);
-                                      }}
-                                    >
-                                      <FiTrash className="h-4 w-4" />
-                                      <span>Delete</span>
-                                    </DropdownMenu.Item>
-                                  </DropdownMenu.Content>
-                                </DropdownMenu.Portal>
-                              </DropdownMenu.Root>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                  ) : (
-                    <div className="rounded-md border dark:border-[#3F3F46]">
-                      <Table>
-                        <TableHeader>
-                          <TableRow className="dark:border-[#3F3F46]">
-                            <TableHead className="w-[30px] sm:w-[40px] px-2 sm:px-4"></TableHead>
-                            <TableHead className="px-2 sm:px-4">Name</TableHead>
-                            <TableHead className="w-[70px] sm:w-[100px] text-xs whitespace-nowrap px-2 sm:px-4">Size</TableHead>
-                            <TableHead className="w-[100px] sm:w-[120px] text-xs whitespace-nowrap px-2 sm:px-4">Date Created</TableHead>
-                            <TableHead className="w-[40px] sm:w-[50px] px-2 sm:px-4"></TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {filteredFiles.length === 0 ? (
-                            <TableRow>
-                              <TableCell colSpan={5} className="text-center py-8 text-gray-500 dark:text-gray-400">
-                                {activeFileType
-                                  ? `No ${activeFileType.toLowerCase()} files found`
-                                  : 'No files found'}
-                              </TableCell>
-                            </TableRow>
-                          ) : (
-                            paginatedFiles(filteredFiles, filesCurrentPage).map((file) => {
-                              const getFileIcon = () => {
-                                if (file.type === "PDF") return "/Files/PDF-icon.svg";
-                                if (file.type === "DOCX" || file.type === "DOC") return "/Files/Docs-icon.svg";
-                                if (file.type === "XLSX" || file.type === "XLS") return "/Files/XLS-icon.svg";
-                                if (file.type === "PPTX" || file.type === "PPT") return "/Files/PDF-icon.svg";
-                                if (file.type === "JPG" || file.type === "JPEG" || file.type === "PNG" || file.type === "GIF") return "/Files/JPG-icon.svg";
-                                if (file.type === "MP3" || file.type === "WAV" || file.type === "AAC") return "/Files/MP3-icon.svg";
-                                if (file.type === "ZIP" || file.type === "RAR" || file.type === "7Z") return "/Files/ZIP-icon.svg";
-                                if (file.type === "TXT") return "/Files/TXT-icon.svg";
-                                return "/Files/file.svg";
-                              };
-
-                              const fileId = file.id || file.name;
-
-                              return (
-                                <TableRow
-                                  key={fileId}
-                                  onClick={() => handleFileSelect(file)}
-                                  className="cursor-pointer dark:border-[#3F3F46]"
-                                >
-                                  <TableCell className="px-2 sm:px-4">
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedFiles.has(fileId)}
-                                      onChange={(e) => toggleFileSelection(fileId, e as any)}
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary cursor-pointer"
-                                    />
-                                  </TableCell>
-                                  <TableCell className="px-2 sm:px-4">
-                                    <div className="flex items-center gap-2 sm:gap-3">
-                                      <img
-                                        src={getFileIcon()}
-                                        alt={file.type}
-                                        className="h-[16px] w-[16px] sm:h-[20px] sm:w-[20px] flex-shrink-0 object-contain"
-                                      />
-                                      <span className="truncate font-medium text-gray-900 dark:text-white text-xs sm:text-sm">{file.name}</span>
-                                    </div>
-                                  </TableCell>
-                                  <TableCell className="text-gray-500 dark:text-white text-[10px] sm:text-xs whitespace-nowrap px-2 sm:px-4">
-                                    {formatFileSize(file.size || 0)}
-                                  </TableCell>
-                                  <TableCell className="text-gray-500 dark:text-white text-[10px] sm:text-xs whitespace-nowrap px-2 sm:px-4">
-                                    {formatDate(file.uploadedAt || new Date())}
-                                  </TableCell>
-                                  <TableCell className="px-2 sm:px-4">
-                                    <div 
-                                      className="flex items-center justify-center"
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      <DropdownMenu.Root>
-                                        <DropdownMenu.Trigger asChild>
-                                          <button
-                                            onClick={(e) => e.stopPropagation()}
-                                            className="p-1 sm:p-1.5 text-gray-500 hover:text-gray-900 dark:text-white dark:hover:bg-[#27272A] hover:bg-gray-100 rounded transition-colors"
-                                            title="More actions"
-                                          >
-                                            <MoreHorizontal className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                                          </button>
-                                        </DropdownMenu.Trigger>
-                                        <DropdownMenu.Portal>
-                                          <DropdownMenu.Content
-                                            align="end"
-                                            className="min-w-[180px] bg-white dark:bg-[#09090B] rounded-md shadow-lg border border-gray-100 dark:border-[#3F3F46] p-1 z-50"
-                                            side="bottom"
-                                            sideOffset={5}
-                                            onCloseAutoFocus={(e) => e.preventDefault()}
-                                          >
-                                            <DropdownMenu.Item
-                                              className="flex items-center gap-2 text-sm p-2 rounded hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer outline-none"
-                                              onSelect={() => {
-                                                toggleFileStar(file.id || "", file.name);
-                                              }}
-                                            >
-                                              <Star
-                                                className={`h-4 w-4 ${
-                                                  starredFileIds.has(file.id || "")
-                                                    ? "fill-yellow-400 text-yellow-400"
-                                                    : ""
-                                                }`}
-                                              />
-                                              <span>
-                                                {starredFileIds.has(file.id || "") ? "Unstar" : "Star"}
-                                              </span>
-                                            </DropdownMenu.Item>
-                                            <DropdownMenu.Item
-                                              className="flex items-center gap-2 text-sm p-2 rounded hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer outline-none"
-                                              onSelect={() => {
-                                                console.log("Download file:", file.name);
-                                              }}
-                                            >
-                                              <Download className="h-4 w-4" />
-                                              <span>Download</span>
-                                            </DropdownMenu.Item>
-                                            <DropdownMenu.Item
-                                              className="flex items-center gap-2 text-sm p-2 rounded text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer outline-none"
-                                              onSelect={() => {
-                                                setFileToDelete(file);
-                                              }}
-                                            >
-                                              <FiTrash className="h-4 w-4" />
-                                              <span>Delete</span>
-                                            </DropdownMenu.Item>
-                                          </DropdownMenu.Content>
-                                        </DropdownMenu.Portal>
-                                      </DropdownMenu.Root>
-                                    </div>
+                                    {activeFileType
+                                      ? `No ${activeFileType.toLowerCase()} files found`
+                                      : "No files found"}
                                   </TableCell>
                                 </TableRow>
-                              );
-                            })
-                          )}
-                        </TableBody>
-                      </Table>
-                      {filteredFiles.length > itemsPerPage && (
-                        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-[#3F3F46] bg-white dark:bg-[#09090B]">
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
-                            Showing {Math.min((filesCurrentPage - 1) * itemsPerPage + 1, filteredFiles.length)} to {Math.min(filesCurrentPage * itemsPerPage, filteredFiles.length)} of {filteredFiles.length} items
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => setFilesCurrentPage(p => Math.max(1, p - 1))}
-                              disabled={filesCurrentPage === 1}
-                              className={`px-3 py-1 border rounded-md text-sm font-medium ${
-                                filesCurrentPage === 1
-                                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-[#18181B] dark:text-gray-600 dark:border-[#3F3F46]'
-                                  : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:border-[#3F3F46] dark:hover:bg-[#18181B]'
-                              }`}
-                            >
-                              Previous
-                            </button>
-                            <div className="text-sm text-gray-700 dark:text-gray-300 px-2">
-                              {filesCurrentPage} of {totalFilesPages}
+                              ) : (
+                                paginatedFiles(
+                                  filteredFiles,
+                                  filesCurrentPage
+                                ).map((file) => {
+                                  const getFileIcon = () => {
+                                    if (file.type === "PDF")
+                                      return "/Files/PDF-icon.svg";
+                                    if (
+                                      file.type === "DOCX" ||
+                                      file.type === "DOC"
+                                    )
+                                      return "/Files/Docs-icon.svg";
+                                    if (
+                                      file.type === "XLSX" ||
+                                      file.type === "XLS"
+                                    )
+                                      return "/Files/XLS-icon.svg";
+                                    if (
+                                      file.type === "PPTX" ||
+                                      file.type === "PPT"
+                                    )
+                                      return "/Files/PDF-icon.svg";
+                                    if (
+                                      file.type === "JPG" ||
+                                      file.type === "JPEG" ||
+                                      file.type === "PNG" ||
+                                      file.type === "GIF"
+                                    )
+                                      return "/Files/JPG-icon.svg";
+                                    if (
+                                      file.type === "MP3" ||
+                                      file.type === "WAV" ||
+                                      file.type === "AAC"
+                                    )
+                                      return "/Files/MP3-icon.svg";
+                                    if (
+                                      file.type === "ZIP" ||
+                                      file.type === "RAR" ||
+                                      file.type === "7Z"
+                                    )
+                                      return "/Files/ZIP-icon.svg";
+                                    if (file.type === "TXT")
+                                      return "/Files/TXT-icon.svg";
+                                    return "/Files/file.svg";
+                                  };
+
+                                  const fileId = file.id || file.name;
+
+                                  return (
+                                    <TableRow
+                                      key={fileId}
+                                      onClick={() => handleFileSelect(file)}
+                                      className="cursor-pointer dark:border-[#3F3F46]"
+                                    >
+                                      <TableCell className="px-2 sm:px-4">
+                                        <input
+                                          type="checkbox"
+                                          checked={selectedFiles.has(fileId)}
+                                          onChange={(e) =>
+                                            toggleFileSelection(
+                                              fileId,
+                                              e as any
+                                            )
+                                          }
+                                          onClick={(e) => e.stopPropagation()}
+                                          className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary cursor-pointer"
+                                        />
+                                      </TableCell>
+                                      <TableCell className="px-2 sm:px-4">
+                                        <div className="flex items-center gap-2 sm:gap-3">
+                                          <img
+                                            src={getFileIcon()}
+                                            alt={file.type}
+                                            className="w-12 h-12 shrink-0 object-contain"
+                                          />
+                                          <span className="truncate font-medium text-gray-900 dark:text-white text-xs sm:text-sm">
+                                            {file.name}
+                                          </span>
+                                        </div>
+                                      </TableCell>
+                                      <TableCell className="text-gray-500 dark:text-white text-[10px] sm:text-xs whitespace-nowrap px-2 sm:px-4">
+                                        {formatFileSize(file.size || 0)}
+                                      </TableCell>
+                                      <TableCell className="text-gray-500 dark:text-white text-[10px] sm:text-xs whitespace-nowrap px-2 sm:px-4">
+                                        {formatDate(
+                                          file.uploadedAt || new Date()
+                                        )}
+                                      </TableCell>
+                                      <TableCell className="px-2 sm:px-4">
+                                        <div
+                                          className="flex items-center justify-center"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          <DropdownMenu.Root>
+                                            <DropdownMenu.Trigger asChild>
+                                              <button
+                                                onClick={(e) =>
+                                                  e.stopPropagation()
+                                                }
+                                                className="p-1 sm:p-1.5 text-gray-500 hover:text-gray-900 dark:text-white dark:hover:bg-[#27272A] hover:bg-gray-100 rounded transition-colors"
+                                                title="More actions"
+                                              >
+                                                <MoreHorizontal className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                              </button>
+                                            </DropdownMenu.Trigger>
+                                            <DropdownMenu.Portal>
+                                              <DropdownMenu.Content
+                                                align="end"
+                                                className="min-w-[180px] bg-white dark:bg-[#09090B] rounded-md shadow-lg border border-gray-100 dark:border-[#3F3F46] p-1 z-50"
+                                                side="bottom"
+                                                sideOffset={5}
+                                                onCloseAutoFocus={(e) =>
+                                                  e.preventDefault()
+                                                }
+                                              >
+                                                <DropdownMenu.Item
+                                                  className="flex items-center gap-2 text-sm p-2 rounded hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer outline-none"
+                                                  onSelect={() => {
+                                                    toggleFileStar(
+                                                      file.id || "",
+                                                      file.name
+                                                    );
+                                                  }}
+                                                >
+                                                  <Star
+                                                    className={`h-4 w-4 ${
+                                                      starredFileIds.has(
+                                                        file.id || ""
+                                                      )
+                                                        ? "fill-yellow-400 text-yellow-400"
+                                                        : ""
+                                                    }`}
+                                                  />
+                                                  <span>
+                                                    {starredFileIds.has(
+                                                      file.id || ""
+                                                    )
+                                                      ? "Unstar"
+                                                      : "Star"}
+                                                  </span>
+                                                </DropdownMenu.Item>
+                                                <DropdownMenu.Item
+                                                  className="flex items-center gap-2 text-sm p-2 rounded hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer outline-none"
+                                                  onSelect={() => {
+                                                    console.log(
+                                                      "Download file:",
+                                                      file.name
+                                                    );
+                                                  }}
+                                                >
+                                                  <Download className="h-4 w-4" />
+                                                  <span>Download</span>
+                                                </DropdownMenu.Item>
+                                                <DropdownMenu.Item
+                                                  className="flex items-center gap-2 text-sm p-2 rounded text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer outline-none"
+                                                  onSelect={() => {
+                                                    setFileToDelete(file);
+                                                  }}
+                                                >
+                                                  <FiTrash className="h-4 w-4" />
+                                                  <span>Delete</span>
+                                                </DropdownMenu.Item>
+                                              </DropdownMenu.Content>
+                                            </DropdownMenu.Portal>
+                                          </DropdownMenu.Root>
+                                        </div>
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                })
+                              )}
+                            </TableBody>
+                          </Table>
+                          {filteredFiles.length > itemsPerPage && (
+                            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-[#3F3F46] bg-white dark:bg-[#09090B]">
+                              <div className="text-sm text-gray-500 dark:text-gray-400">
+                                Showing{" "}
+                                {Math.min(
+                                  (filesCurrentPage - 1) * itemsPerPage + 1,
+                                  filteredFiles.length
+                                )}{" "}
+                                to{" "}
+                                {Math.min(
+                                  filesCurrentPage * itemsPerPage,
+                                  filteredFiles.length
+                                )}{" "}
+                                of {filteredFiles.length} items
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  onClick={() =>
+                                    setFilesCurrentPage((p) =>
+                                      Math.max(1, p - 1)
+                                    )
+                                  }
+                                  disabled={filesCurrentPage === 1}
+                                  className={`px-3 py-1 border rounded-md text-sm font-medium ${
+                                    filesCurrentPage === 1
+                                      ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-[#18181B] dark:text-gray-600 dark:border-[#3F3F46]"
+                                      : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:border-[#3F3F46] dark:hover:bg-[#18181B]"
+                                  }`}
+                                >
+                                  Previous
+                                </button>
+                                <div className="text-sm text-gray-700 dark:text-gray-300 px-2">
+                                  {filesCurrentPage} of {totalFilesPages}
+                                </div>
+                                <button
+                                  onClick={() =>
+                                    setFilesCurrentPage((p) =>
+                                      Math.min(totalFilesPages, p + 1)
+                                    )
+                                  }
+                                  disabled={filesCurrentPage >= totalFilesPages}
+                                  className={`px-3 py-1 border rounded-md text-sm font-medium ${
+                                    filesCurrentPage >= totalFilesPages
+                                      ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-[#18181B] dark:text-gray-600 dark:border-[#3F3F46]"
+                                      : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:border-[#3F3F46] dark:hover:bg-[#18181B]"
+                                  }`}
+                                >
+                                  Next
+                                </button>
+                              </div>
                             </div>
-                            <button
-                              onClick={() => setFilesCurrentPage(p => Math.min(totalFilesPages, p + 1))}
-                              disabled={filesCurrentPage >= totalFilesPages}
-                              className={`px-3 py-1 border rounded-md text-sm font-medium ${
-                                filesCurrentPage >= totalFilesPages
-                                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-[#18181B] dark:text-gray-600 dark:border-[#3F3F46]'
-                                  : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:border-[#3F3F46] dark:hover:bg-[#18181B]'
-                              }`}
-                            >
-                              Next
-                            </button>
-                          </div>
+                          )}
                         </div>
                       )}
-                    </div>
+                    </>
                   )}
-                </>
-              )}
-            </section>
+                </section>
 
-            {/* Bottom spacer */}
-            <div className="h-8 sm:h-8" aria-hidden="true"></div>
+                {/* Bottom spacer */}
+                <div className="h-8 sm:h-8" aria-hidden="true"></div>
               </>
             )}
           </div>
@@ -1259,14 +1493,16 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
         {/* AI Chat Sidebar - Slides from bottom on mobile, from right on desktop */}
         <div
           className={`fixed bg-white dark:bg-[#09090B] border-gray-200 dark:border-[#3F3F46] shadow-lg transition-all duration-300 ease-in-out z-40
-            ${/* Mobile - from bottom, no X translation */ ''}
+            ${/* Mobile - from bottom, no X translation */ ""}
             bottom-0 left-0 right-0 w-full h-[85vh] rounded-t-2xl border-t translate-x-0
-            ${/* Desktop - from right */ ''}
+            ${/* Desktop - from right */ ""}
             sm:top-0 sm:bottom-auto sm:left-auto sm:right-0 sm:h-full sm:w-[400px] sm:rounded-none sm:border-t-0 sm:border-l
-            ${/* Mobile Animation - ONLY Y axis */ ''}
-            ${isAIChatOpen ? 'translate-y-0' : 'translate-y-full'}
-            ${/* Desktop Animation - ONLY X axis, reset Y */ ''}
-            sm:translate-y-0 ${isAIChatOpen ? 'sm:translate-x-0' : 'sm:translate-x-full'}
+            ${/* Mobile Animation - ONLY Y axis */ ""}
+            ${isAIChatOpen ? "translate-y-0" : "translate-y-full"}
+            ${/* Desktop Animation - ONLY X axis, reset Y */ ""}
+            sm:translate-y-0 ${
+              isAIChatOpen ? "sm:translate-x-0" : "sm:translate-x-full"
+            }
           `}
         >
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-[#3F3F46]">
