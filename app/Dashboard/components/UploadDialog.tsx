@@ -380,7 +380,7 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
           {files.length > 0 && (
             <div className="flex flex-col gap-[16px] w-full flex-1">
               {/* Files Grid */}
-              <div className="grid grid-cols-3 grid-rows-2 gap-[12px] w-full overflow-y-auto flex-1">
+              <div className="grid grid-cols-2 grid-rows-2 gap-[12px] w-full overflow-y-auto flex-1">
                 {files.map((file, index) => {
                   const status = uploadStatus[index] || "pending";
                   const progress = uploadProgress[index] || 0;
