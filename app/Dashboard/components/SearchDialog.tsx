@@ -176,6 +176,7 @@ export function SearchDialog({ open, onOpenChange, folders = [], files = [], onF
                   {filteredCategories.map((category) => (
                     <CommandItem
                       key={category.id}
+                      value={category.name}
                       onSelect={() => {
                         console.log("Category selected:", category.name);
                         // Handle category selection
@@ -193,24 +194,7 @@ export function SearchDialog({ open, onOpenChange, folders = [], files = [], onF
                         }
                         onOpenChange(false);
                       }}
-                      onClick={() => {
-                        console.log("Category clicked:", category.name);
-                        // Handle category selection
-                        if (onFolderSelect) {
-                          const folder = folders.find(f => f.name === category.name);
-                          if (folder) {
-                            onFolderSelect(folder);
-                          }
-                        } else {
-                          // Fallback: dispatch custom event for folder selection
-                          const folder = folders.find(f => f.name === category.name);
-                          if (folder) {
-                            window.dispatchEvent(new CustomEvent('selectFolder', { detail: folder }));
-                          }
-                        }
-                        onOpenChange(false);
-                      }}
-                      className="flex items-center gap-2 px-4 py-2 text-sm cursor-pointer text-black dark:text-white hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 text-sm cursor-pointer text-black dark:text-white"
                     >
                       <Image
                         src={category.icon}
@@ -232,6 +216,7 @@ export function SearchDialog({ open, onOpenChange, folders = [], files = [], onF
                   {filteredFiles.map((file) => (
                     <CommandItem
                       key={file.id}
+                      value={file.name}
                       onSelect={() => {
                         console.log("File selected:", file.name);
                         // Handle file selection
@@ -249,24 +234,7 @@ export function SearchDialog({ open, onOpenChange, folders = [], files = [], onF
                         }
                         onOpenChange(false);
                       }}
-                      onClick={() => {
-                        console.log("File clicked:", file.name);
-                        // Handle file selection
-                        if (onFileSelect) {
-                          const selectedFile = files.find(f => f.name === file.name);
-                          if (selectedFile) {
-                            onFileSelect(selectedFile);
-                          }
-                        } else {
-                          // Fallback: dispatch custom event for file selection
-                          const selectedFile = files.find(f => f.name === file.name);
-                          if (selectedFile) {
-                            window.dispatchEvent(new CustomEvent('selectFile', { detail: selectedFile }));
-                          }
-                        }
-                        onOpenChange(false);
-                      }}
-                      className="flex items-center gap-2 px-4 py-2 text-sm cursor-pointer text-black dark:text-white hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 text-sm cursor-pointer text-black dark:text-white"
                     >
                       <Image
                         src={getFileIcon(file.name)}
