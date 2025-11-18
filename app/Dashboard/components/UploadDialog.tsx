@@ -6,6 +6,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogTitle,
   DialogTrigger,
 } from "../../../components/ui/dialog";
 import { Button } from "../../../components/ui/button";
@@ -98,6 +99,8 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
     if (e.target.files && e.target.files.length > 0) {
       const newFiles = Array.from(e.target.files);
       setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+      // Automatically start uploading new files
+      setTimeout(() => startUpload(newFiles, files.length), 100);
     }
   };
 
@@ -121,8 +124,10 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const droppedFiles = Array.from(e.dataTransfer.files);
       setFiles((prevFiles) => [...prevFiles, ...droppedFiles]);
+      // Automatically start uploading dropped files
+      setTimeout(() => startUpload(droppedFiles, files.length), 100);
     }
-  }, []);
+  }, [files.length]);
 
   const removeFile = (index: number) => {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
@@ -133,75 +138,63 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
     });
   };
 
-  const handleUpload = async () => {
-    if (files.length === 0) return;
-
-    setIsUploading(true);
-
-    // Track status locally
-    const statusMap: Record<number, UploadStatus> = {};
-
-    // Set all files to uploading status
+  const startUpload = async (filesToUpload: File[], startIndex: number) => {
     const initialStatus: Record<number, UploadStatus> = {};
-    files.forEach((_, index) => {
-      initialStatus[index] = "uploading";
-      statusMap[index] = "uploading";
+    filesToUpload.forEach((_, index) => {
+      const actualIndex = startIndex + index;
+      initialStatus[actualIndex] = "uploading";
     });
-    setUploadStatus(initialStatus);
+    setUploadStatus((prev) => ({ ...prev, ...initialStatus }));
 
-    // Upload each file with simulated progress
-    for (let index = 0; index < files.length; index++) {
+    for (let i = 0; i < filesToUpload.length; i++) {
+      const actualIndex = startIndex + i;
+      const file = filesToUpload[i];
+
       try {
-        // Simulate upload progress
         for (let progress = 0; progress <= 100; progress += 10) {
           setUploadProgress((prev) => ({
             ...prev,
-            [index]: progress,
+            [actualIndex]: progress,
           }));
           await new Promise((resolve) => setTimeout(resolve, 50));
         }
 
-        // All uploads succeed
-        statusMap[index] = "success";
         setUploadStatus((prev) => ({
           ...prev,
-          [index]: "success",
+          [actualIndex]: "success",
         }));
       } catch (error) {
-        statusMap[index] = "error";
         setUploadStatus((prev) => ({
           ...prev,
-          [index]: "error",
+          [actualIndex]: "error",
         }));
       }
     }
+  };
 
-    // Wait a bit to show the final status
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Only upload successful files using local statusMap
-    const successfulFiles = files.filter(
-      (_, index) => statusMap[index] === "success"
-    );
+  const handleUpload = async () => {
     const failedFiles = files.filter(
-      (_, index) => statusMap[index] === "error"
+      (_, index) => uploadStatus[index] === "error"
+    );
+    const pendingFiles = files.filter(
+      (_, index) => uploadStatus[index] === "pending"
     );
 
-    // If there are any failed files, don't close the dialog
-    if (failedFiles.length > 0) {
-      setIsUploading(false);
+    if (failedFiles.length > 0 || pendingFiles.length > 0) {
       return;
     }
+
+    const successfulFiles = files.filter(
+      (_, index) => uploadStatus[index] === "success"
+    );
 
     let fileItems: FileItem[] = [];
     let folderItems: FolderItem[] = [];
 
     if (uploadMode === "folder") {
-      // Group files by folder
       const folderMap = new Map<string, File[]>();
 
-      successfulFiles.forEach((file : File) => {
-        // webkitRelativePath is available on File objects from directory inputs
+      successfulFiles.forEach((file: File) => {
         const path = (file as File & { webkitRelativePath?: string }).webkitRelativePath || file.name;
         const pathParts = path.split("/");
 
@@ -214,7 +207,6 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
         }
       });
 
-      // Create folder items
       folderItems = Array.from(folderMap.entries()).map(
         ([folderName, folderFiles], index) => ({
           id: `folder-${Date.now()}-${index}`,
@@ -223,7 +215,6 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
         })
       );
     } else {
-      // Create file items for all successful files
       fileItems = successfulFiles.map((file, idx) => {
         const extension = file.name.split(".").pop()?.toUpperCase() || "TXT";
         const fileType = [
@@ -239,7 +230,6 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
           ? (extension as FileType)
           : "TXT";
 
-        // Create a blob URL for the file so it can be previewed
         const fileUrl = URL.createObjectURL(file);
 
         return {
@@ -248,11 +238,14 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
           type: fileType,
           size: file.size,
           uploadedAt: new Date(),
-          url: fileUrl, // Add the blob URL for preview
+          url: fileUrl,
         };
       });
     }
 
+    if (onUpload) {
+      onUpload(fileItems, folderItems);
+    }
     // Always call onUpload with both parameters
     console.log("Upload mode:", uploadMode);
     console.log("File items:", fileItems);
@@ -281,17 +274,18 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
-          className="flex items-center justify-center size-9 md:w-auto md:h-9 bg-[#f1f5f9] gap-0 md:gap-2 text-[#0f172a] dark:bg-[#27272A] hover:bg-gray-200 md:px-3 rounded-md"
+          className="flex cursor-pointer items-center justify-center size-9 md:w-auto md:h-9 bg-[#f1f5f9] gap-0 md:gap-2 text-[#0f172a] dark:bg-[#27272A] hover:bg-gray-200 md:px-3 rounded-md"
           onClick={() => setIsOpen(true)}
         >
           <FiUploadCloud className="h-4 w-4 dark:text-white" />
           <span className="hidden md:inline text-xs font-medium dark:text-white">Upload</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[calc(100vw-32px)] max-w-[352px] h-[400px] sm:w-[560px] sm:max-w-[560px] p-[16px] overflow-y-auto scrollbar-hide border border-[#E2E8F0] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)]">
+      <DialogContent className="w-[calc(100vw-32px)] max-w-[352px] h-[400px] sm:w-[560px] sm:max-w-[560px] p-[16px] border border-[#E2E8F0] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)] flex flex-col">
+        <DialogTitle className="sr-only">Upload Files</DialogTitle>
         <div className="flex flex-col items-center w-full h-full">
           {/* Header */}
-          <div className="flex flex-row items-center gap-3 w-full h-9 mb-0">
+          <div className="flex flex-row items-center gap-3 w-full h-9 mb-0 flex-shrink-0">
             <h2 className="flex-1 font-['Inter'] font-medium text-[20px] leading-[28px] tracking-[-0.12px] text-[#020617]">
               Upload
             </h2>
@@ -349,9 +343,9 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
           />
 
           {files.length > 0 && (
-            <div className="flex flex-col gap-[16px] w-full flex-1">
+            <div className="flex flex-col gap-[16px] w-full flex-1 overflow-hidden">
               {/* Files Grid */}
-              <div className="grid grid-cols-3 grid-rows-2 gap-[12px] w-full overflow-y-auto flex-1">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-[12px] w-full overflow-y-auto flex-1 pr-2 scrollbar-hide">
                 {files.map((file, index) => {
                   const status = uploadStatus[index] || "pending";
                   const progress = uploadProgress[index] || 0;
@@ -433,7 +427,7 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                   <button
                     type="button"
                     onClick={() => handleButtonClick("files")}
-                    className="flex flex-col justify-center items-center p-[12px] gap-[8px] bg-[#FAFAFA] rounded-xl hover:bg-gray-200 transition-colors h-[126px]"
+                    className="flex flex-col justify-center items-center p-[12px] gap-[8px] bg-[#FAFAFA] rounded-xl hover:bg-gray-200 transition-colors h-[126px] cursor-pointer"
                   >
                     <Image src={PlusIcon} alt="Add files" className="w-10 h-10" />
                     <p className="font-['Inter'] font-normal text-[14px] leading-[20px] text-[#020617]">
@@ -442,12 +436,16 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                   </button>
                 )}
               </div>
+            </div>
+          )}
 
-              {/* Done Button */}
+          {/* Fixed Bottom Button Area */}
+          {files.length > 0 && (
+            <div className="flex-shrink-0 mt-auto pt-4 w-full">
               <Button
-                className="w-full h-10 bg-[#020617] text-white rounded-lg font-['Inter'] font-medium text-[14px] leading-[20px] tracking-[-0.084px] hover:bg-[#020617]/90"
+                className="w-full h-10 bg-zinc-900 text-white rounded-lg font-['Inter'] font-medium text-[14px] leading-[20px] tracking-[-0.084px] hover:bg-zinc-800"
                 onClick={handleUpload}
-                disabled={isUploading}
+                disabled={files.some((_, index) => uploadStatus[index] === "uploading" || uploadStatus[index] === "error")}
               >
                 Done
               </Button>

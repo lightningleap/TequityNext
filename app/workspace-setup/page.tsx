@@ -152,6 +152,12 @@ export default function WorkspaceSetupPage() {
                   type="text"
                   value={workspaceName}
                   onChange={handleInputChange}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleStep1Submit(e as any);
+                    }
+                  }}
                   placeholder="Dataroom Name"
                   className={`w-full h-10 px-3 border rounded-lg focus:outline-none focus:ring-2 text-sm transition-colors ${
                     error
@@ -178,14 +184,6 @@ export default function WorkspaceSetupPage() {
                   <div className="h-full bg-gray-900 rounded-full transition-all duration-500 ease-out" style={{ width: progressWidth }}></div>
                 </div>
               </div>
-
-              <div className="text-center">
-                <Link href="/login">
-                  <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                    Back to login
-                  </span>
-                </Link>
-              </div>
             </div>
           </>
         )}
@@ -208,6 +206,12 @@ export default function WorkspaceSetupPage() {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && selectedOption) {
+                          e.preventDefault();
+                          handleStep2Submit(e as any);
+                        }
+                      }}
                       className="w-full justify-between h-10 px-3 border border-gray-300 rounded-lg hover:bg-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
                     >
                       {selectedOption ?
@@ -249,15 +253,6 @@ export default function WorkspaceSetupPage() {
                   <div className="h-full bg-gray-900 rounded-full transition-all duration-500 ease-out" style={{ width: progressWidth }}></div>
                 </div>
               </div>
-
-              <div className="text-center">
-                <button
-                  onClick={() => setCurrentStep(1)}
-                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
-                >
-                  Back to workspace name
-                </button>
-              </div>
             </div>
           </>
         )}
@@ -280,6 +275,14 @@ export default function WorkspaceSetupPage() {
                   type="email"
                   value={email1}
                   onChange={(e) => setEmail1(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (email1.trim()) {
+                        handleStep3Submit(e as any);
+                      }
+                    }
+                  }}
                   placeholder="email@example.com"
                   className="w-full h-10 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
                 />
@@ -287,6 +290,14 @@ export default function WorkspaceSetupPage() {
                   type="email"
                   value={email2}
                   onChange={(e) => setEmail2(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (email2.trim()) {
+                        handleStep3Submit(e as any);
+                      }
+                    }
+                  }}
                   placeholder="email@example.com"
                   className="w-full h-10 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
                 />
@@ -294,6 +305,14 @@ export default function WorkspaceSetupPage() {
                   type="email"
                   value={email3}
                   onChange={(e) => setEmail3(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (email3.trim()) {
+                        handleStep3Submit(e as any);
+                      }
+                    }
+                  }}
                   placeholder="email@example.com"
                   className="w-full h-10 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
                 />
@@ -319,15 +338,6 @@ export default function WorkspaceSetupPage() {
                 <div className="w-full max-w-[120px] h-1 bg-gray-200 rounded-full overflow-hidden">
                   <div className="h-full bg-gray-900 rounded-full transition-all duration-500 ease-out" style={{ width: progressWidth }}></div>
                 </div>
-              </div>
-
-              <div className="text-center">
-                <button
-                  onClick={() => setCurrentStep(2)}
-                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
-                >
-                  Back to use case selection
-                </button>
               </div>
             </div>
           </>

@@ -101,10 +101,10 @@ export default function LoginPage() {
         </div>
 
         {/* Right Side - Verification Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
-          <div className="w-full max-w-md flex items-center justify-center">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-16 bg-white overflow-y-auto scrollbar-hide">
+          <div className="w-full max-w-sm sm:max-w-md flex items-center justify-center">
             {/* Form Card */}
-            <div className="w-[412px] h-[430px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-6 flex flex-col gap-8">
+            <div className="w-full max-w-[412px] min-h-[430px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-4 sm:p-6 flex flex-col gap-6 sm:gap-8">
               {/* Logo and Heading */}
               <div className="flex flex-col gap-2.5">
                 {/* Company Logo */}
@@ -112,17 +112,17 @@ export default function LoginPage() {
                   <Image src={SignupLogo} alt="Signup Logo" />
                 </div>
 
-                <h1 className="text-3xl font-normal text-[#09090B] w-[364px] h-10">
+                <h1 className="text-2xl sm:text-3xl font-normal text-[#09090B] w-full">
                   Welcome Back
                 </h1>
 
-                <p className="text-sm text-gray-500 w-[364px] h-10">
+                <p className="text-sm text-gray-500 w-full">
                   We sent a temporary login code to {email}. Not you?
                 </p>
               </div>
 
               {/* Form Fields */}
-              <div className="flex flex-col gap-5 w-[364px]">
+              <div className="flex flex-col gap-5 w-full">
                 {/* Error Message */}
                 {error && (
                   <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -131,12 +131,18 @@ export default function LoginPage() {
                 )}
 
                 {/* Verification Code Input with Error Handling */}
-                <div className="space-y-1.5 w-[364px]">
+                <div className="space-y-1.5 w-full">
                   <div className="relative">
                     <input
                       type="text"
                       value={verificationCode}
                       onChange={(e) => setVerificationCode(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleVerificationSubmit(e as any);
+                        }
+                      }}
                       placeholder="Enter verification code"
                       className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
                         error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
@@ -202,10 +208,10 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side - Email Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
-        <div className="w-full max-w-md flex items-center justify-center">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-16 bg-white overflow-y-auto scrollbar-hide">
+        <div className="w-full max-w-sm sm:max-w-md flex items-center justify-center">
           {/* Form Card */}
-          <div className="w-[412px] h-[484px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-6 flex flex-col gap-8">
+          <div className="w-full max-w-[412px] min-h-[484px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-4 sm:p-6 flex flex-col gap-6 sm:gap-8">
             {/* Logo and Heading */}
             <div className="flex flex-col gap-2.5">
               {/* Company Logo */}
@@ -213,7 +219,7 @@ export default function LoginPage() {
                 <Image src={SignupLogo} alt="Signup Logo" />
               </div>
 
-              <h1 className="text-3xl font-normal text-[#09090B] w-[364px] h-10">
+              <h1 className="text-2xl sm:text-3xl font-normal text-[#09090B] w-full">
                 Welcome Back
               </h1>
             </div>
@@ -244,7 +250,7 @@ export default function LoginPage() {
             </div>
 
             {/* Form Fields */}
-            <div className="w-[364px] space-y-5">
+            <div className="w-full space-y-5">
               {/* Email Input with Error Message */}
               <div className="space-y-1.5">
                 <div className="relative">
@@ -252,6 +258,12 @@ export default function LoginPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleEmailSubmit(e as any);
+                      }
+                    }}
                     placeholder="Enter your email address"
                     className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
                       error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'

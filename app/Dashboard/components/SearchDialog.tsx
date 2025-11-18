@@ -26,6 +26,8 @@ interface SearchDialogProps {
   onOpenChange: (open: boolean) => void;
   folders?: Array<{ id: string; name: string; fileCount?: number }>;
   files?: Array<{ id?: string; name: string; type: string; size?: number }>;
+  onFileSelect?: (file: { id?: string; name: string; type: string; size?: number }) => void;
+  onFolderSelect?: (folder: { id: string; name: string; fileCount?: number }) => void;
 }
 
 interface CategoryItem {
@@ -74,7 +76,7 @@ const getFileIcon = (fileName: string): string => {
   }
 };
 
-export function SearchDialog({ open, onOpenChange, folders = [], files = [] }: SearchDialogProps) {
+export function SearchDialog({ open, onOpenChange, folders = [], files = [], onFileSelect, onFolderSelect }: SearchDialogProps) {
   const [searchQuery, setSearchQuery] = React.useState("");
 
   // Convert folders to categories format
@@ -175,10 +177,40 @@ export function SearchDialog({ open, onOpenChange, folders = [], files = [] }: S
                     <CommandItem
                       key={category.id}
                       onSelect={() => {
+                        console.log("Category selected:", category.name);
                         // Handle category selection
+                        if (onFolderSelect) {
+                          const folder = folders.find(f => f.name === category.name);
+                          if (folder) {
+                            onFolderSelect(folder);
+                          }
+                        } else {
+                          // Fallback: dispatch custom event for folder selection
+                          const folder = folders.find(f => f.name === category.name);
+                          if (folder) {
+                            window.dispatchEvent(new CustomEvent('selectFolder', { detail: folder }));
+                          }
+                        }
                         onOpenChange(false);
                       }}
-                      className="flex items-center gap-2 px-4 py-2 text-sm cursor-pointer"
+                      onClick={() => {
+                        console.log("Category clicked:", category.name);
+                        // Handle category selection
+                        if (onFolderSelect) {
+                          const folder = folders.find(f => f.name === category.name);
+                          if (folder) {
+                            onFolderSelect(folder);
+                          }
+                        } else {
+                          // Fallback: dispatch custom event for folder selection
+                          const folder = folders.find(f => f.name === category.name);
+                          if (folder) {
+                            window.dispatchEvent(new CustomEvent('selectFolder', { detail: folder }));
+                          }
+                        }
+                        onOpenChange(false);
+                      }}
+                      className="flex items-center gap-2 px-4 py-2 text-sm cursor-pointer text-black dark:text-white hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors"
                     >
                       <Image
                         src={category.icon}
@@ -201,10 +233,40 @@ export function SearchDialog({ open, onOpenChange, folders = [], files = [] }: S
                     <CommandItem
                       key={file.id}
                       onSelect={() => {
+                        console.log("File selected:", file.name);
                         // Handle file selection
+                        if (onFileSelect) {
+                          const selectedFile = files.find(f => f.name === file.name);
+                          if (selectedFile) {
+                            onFileSelect(selectedFile);
+                          }
+                        } else {
+                          // Fallback: dispatch custom event for file selection
+                          const selectedFile = files.find(f => f.name === file.name);
+                          if (selectedFile) {
+                            window.dispatchEvent(new CustomEvent('selectFile', { detail: selectedFile }));
+                          }
+                        }
                         onOpenChange(false);
                       }}
-                      className="flex items-center gap-2 px-4 py-2 text-sm cursor-pointer"
+                      onClick={() => {
+                        console.log("File clicked:", file.name);
+                        // Handle file selection
+                        if (onFileSelect) {
+                          const selectedFile = files.find(f => f.name === file.name);
+                          if (selectedFile) {
+                            onFileSelect(selectedFile);
+                          }
+                        } else {
+                          // Fallback: dispatch custom event for file selection
+                          const selectedFile = files.find(f => f.name === file.name);
+                          if (selectedFile) {
+                            window.dispatchEvent(new CustomEvent('selectFile', { detail: selectedFile }));
+                          }
+                        }
+                        onOpenChange(false);
+                      }}
+                      className="flex items-center gap-2 px-4 py-2 text-sm cursor-pointer text-black dark:text-white hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors"
                     >
                       <Image
                         src={getFileIcon(file.name)}

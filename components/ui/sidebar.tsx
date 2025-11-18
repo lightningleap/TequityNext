@@ -339,7 +339,9 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
         {/* Search Item - Clickable to open dialog */}
         <SidebarMenuItem>
           <SidebarMenuButton
-            className="w-full justify-start h-8 px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-150 ease-in-out"
+            className={`w-full justify-start h-8 px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-150 ease-in-out cursor-pointer ${
+              searchDialogOpen ? 'bg-[#F4F4F5] dark:bg-[#27272A] dark:text-white' : 'bg-transparent hover:bg-gray-100 dark:hover:bg-[#27272A]'
+            }`}
             onClick={handleSearchOpen}
             tooltip={{
               children: "Search",
@@ -359,7 +361,7 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
             asChild
             isActive={pathname === item.href}
             className={`w-full justify-start h-8 px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-150 ease-in-out ${
-              pathname === item.href ? 'bg-[#F4F4F5] dark:bg-[#27272A] dark:text-white' : ''
+              pathname === item.href && !searchDialogOpen ? 'bg-[#F4F4F5] dark:bg-[#27272A] dark:text-white' : 'hover:bg-gray-100 dark:hover:bg-[#27272A]'
             }`}
             tooltip={{
               children: item.title,
@@ -391,6 +393,18 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
               <div
                 key={file.id}
                 className="flex gap-2 h-8 items-center px-2 w-full rounded-md hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
+                onClick={() => {
+                  // Dispatch custom event to open PDF viewer
+                  const event = new CustomEvent('openPDFViewer', { 
+                    detail: { 
+                      id: file.id, 
+                      name: file.name, 
+                      type: file.type,
+                      url: `/files/${file.id}`, // Construct URL based on file ID
+                    } 
+                  });
+                  window.dispatchEvent(event);
+                }}
               >
                 <FileText className="h-4 w-4 flex-shrink-0 text-[#3f3f46] dark:text-[#A1A1AA]" />
                 <span className="text-sm font-normal text-[#3f3f46] dark:text-[#F4F4F5] overflow-ellipsis overflow-hidden whitespace-nowrap leading-5">
