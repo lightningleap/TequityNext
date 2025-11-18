@@ -24,7 +24,7 @@ export function Notifications() {
         </div>
         <button
           onClick={() => setActivityNotifications(!activityNotifications)}
-          className={`relative inline-flex h-6 sm:w-16  w-24 items-center rounded-full transition-colors ${
+          className={`relative inline-flex h-6 sm:w-16  w-24 items-center rounded-full cursor-pointer transition-colors ${
             activityNotifications ? "bg-black dark:bg-white" : "bg-gray-300 dark:bg-[#27272A]"
           }`}
         >
@@ -44,7 +44,7 @@ export function Notifications() {
         </div>
         <button
           onClick={() => setAlwaysSendEmail(!alwaysSendEmail)}
-          className={`relative inline-flex h-6 sm:w-11 w-13 items-center rounded-full transition-colors ${
+          className={`relative inline-flex h-6 sm:w-11 w-13 items-center rounded-full cursor-pointer transition-colors ${
             alwaysSendEmail ? "bg-black dark:bg-white" : "bg-gray-300 dark:bg-[#27272A]"
           }`}
         >
@@ -64,7 +64,7 @@ export function Notifications() {
         </div>
         <button
           onClick={() => setDocumentUpdates(!documentUpdates)}
-          className={`relative inline-flex h-6 sm:w-11 w-14 items-center rounded-full transition-colors ${
+          className={`relative inline-flex h-6 sm:w-11 w-14 items-center rounded-full cursor-pointer transition-colors ${
             documentUpdates ? "bg-black dark:bg-white" : "bg-gray-300 dark:bg-[#27272A]"
           }`}
         >
@@ -84,7 +84,7 @@ export function Notifications() {
         </div>
         <button
           onClick={() => setDataroomDigest(!dataroomDigest)}
-          className={`relative inline-flex h-6 sm:w-11 w-17 items-center rounded-full transition-colors ${
+          className={`relative inline-flex h-6 sm:w-11 w-17 items-center rounded-full cursor-pointer transition-colors ${
             dataroomDigest ? "bg-black dark:bg-white" : "bg-gray-300 dark:bg-[#27272A]"
           }`}
         >
@@ -104,7 +104,7 @@ export function Notifications() {
         </div>
         <button
           onClick={() => setTequityAnnouncements(!tequityAnnouncements)}
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+          className={`relative inline-flex h-6 w-11 items-center rounded-full cursor-pointer transition-colors ${
             tequityAnnouncements ? "bg-black dark:bg-white" : "bg-gray-300 dark:bg-[#27272A]"
           }`}
         >

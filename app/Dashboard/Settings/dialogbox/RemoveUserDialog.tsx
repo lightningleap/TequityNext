@@ -19,7 +19,7 @@ export function RemoveUserDialog({
   open,
   onOpenChange,
   userName = "User",
-  userEmail = ""
+  // userEmail = ""
 }: RemoveUserDialogProps) {
   useEffect(() => {
     if (open) {
@@ -36,14 +36,14 @@ export function RemoveUserDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
-      <DialogContent className="w-[368px] sm:max-w-[425px] z-[100] !fixed !left-[50%] !top-[50%] !translate-x-[-50%] !translate-y-[-50%] dark:bg-[#09090B] dark:border">
+      <DialogContent className="w-[368px] sm:max-w-[425px] z-100 fixed left-[50%]! top-[50%]! translate-x-[-50%]! translate-y-[-50%]! dark:bg-[#09090B] dark:border">
         <DialogHeader className="items-center font-bold">
           <DialogTitle>Remove User</DialogTitle>
         </DialogHeader>
         <div className=" text-center">
           <p className="text-xs text-gray-600 dark:text-[#A1A1AA] mb-2">
-            Are you sure you want to remove <strong>{userName}</strong>
-            {userEmail && ` (${userEmail})`} from this dataroom?
+           Once you remove <strong>{userName}</strong> they’ll lose access to all data. You can re-invite them anytime later.
+             
           </p>
           {/* <p className="text-sm text-gray-600">
             They will lose access to all data and conversations immediately.
