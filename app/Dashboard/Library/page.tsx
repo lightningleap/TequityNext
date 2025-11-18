@@ -11,13 +11,8 @@ import {
   Maximize2,
   Star,
   Download,
-<<<<<<< HEAD
   ArrowLeft,
   ChevronRight,
-=======
-  Edit,
-  ArrowLeft,
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
 } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { FileItem } from "../components/filegrid";
@@ -37,11 +32,7 @@ import {
 import { LuClock } from "react-icons/lu";
 import { IoGridOutline } from "react-icons/io5";
 import { FaListUl } from "react-icons/fa";
-<<<<<<< HEAD
 import { MoreHorizontal } from "lucide-react";
-=======
-import { ChevronUp, MoreHorizontal } from "lucide-react";
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
 import { FiTrash } from "react-icons/fi";
 import { ChatInterface } from "../components/ChatInterface";
 import { useFiles } from "../context/FilesContext";
@@ -149,7 +140,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     fileCount: number;
     files: FileItem[];
   } | null>(null);
-<<<<<<< HEAD
   const [recentlyVisited, setRecentlyVisited] = useState<
     Array<{
       id: string;
@@ -180,8 +170,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     }
     return [];
   });
-=======
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
   const [folderContentView, setFolderContentView] = useState<"grid" | "list">(
     "grid"
   );
@@ -652,22 +640,9 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     <>
       <div className="flex-1 flex overflow-hidden relative">
         <main
-<<<<<<< HEAD
           className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide p-3 sm:p-4 md:p-6 flex justify-center transition-all duration-300 scroll-smooth"
           style={{
             scrollbarGutter: "stable",
-=======
-          className={`flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide p-3 sm:p-4 md:p-6 flex justify-center transition-all duration-300 scroll-smooth
-            ${isAIChatOpen ? "sm:mr-[400px]" : ""}
-            ${isPDFViewerOpen && !isPDFMaximized ? "sm:mr-[400px]" : ""}
-          `}
-          style={{
-            scrollbarGutter: "stable",
-            marginRight:
-              isPDFViewerOpen && isPDFMaximized
-                ? `calc(100% - ${sidebarWidth})`
-                : undefined,
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
           }}
         >
           <div className="w-full max-w-[792px] px-2 sm:px-0">
@@ -852,11 +827,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                 <TableRow
                                   key={fileId}
                                   onClick={() => handleFileSelect(file)}
-<<<<<<< HEAD
                                   className="cursor-pointer"
-=======
-                                  className="cursor-pointer dark:border-[#3F3F46]"
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                                 >
                                   <TableCell className="px-2 sm:px-4">
                                     <input
@@ -874,11 +845,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                       <img
                                         src={getFileIcon()}
                                         alt={file.type}
-<<<<<<< HEAD
                                         className="h-[16px] w-[16px] sm:h-[20px] sm:w-[20px] shrink-0 object-contain"
-=======
-                                        className="w-12 h-12 shrink-0 object-contain"
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                                       />
                                       <span className="truncate font-medium text-gray-900 dark:text-white text-xs sm:text-sm">
                                         {file.name}
@@ -926,13 +893,8 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                               disabled={currentPage === 1}
                               className={`px-3 py-1 rounded-md text-sm font-medium ${
                                 currentPage === 1
-<<<<<<< HEAD
                                   ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-[#18181B] dark:text-gray-600"
                                   : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:hover:bg-[#18181B]"
-=======
-                                  ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-[#18181B] dark:text-gray-600 dark:border-[#3F3F46]"
-                                  : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:border-[#3F3F46] dark:hover:bg-[#18181B]"
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                               }`}
                             >
                               Previous
@@ -957,22 +919,13 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                   currentFolder.files.length / itemsPerPage
                                 )
                               }
-<<<<<<< HEAD
                               className={`px-3 py-1 rounded-md text-sm font-medium ${
-=======
-                              className={`px-3 py-1 border rounded-md text-sm font-medium ${
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                                 currentPage >=
                                 Math.ceil(
                                   currentFolder.files.length / itemsPerPage
                                 )
-<<<<<<< HEAD
                                   ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-[#18181B] dark:text-gray-600"
                                   : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:hover:bg-[#18181B]"
-=======
-                                  ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-[#18181B] dark:text-gray-600 dark:border-[#3F3F46]"
-                                  : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:border-[#3F3F46] dark:hover:bg-[#18181B]"
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                               }`}
                             >
                               Next
@@ -1011,7 +964,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                   </div>
                 </header>
 
-<<<<<<< HEAD
                 {recentlyVisited.length > 0 && (
                   <section
                     aria-labelledby="recently-visited"
@@ -1111,93 +1063,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                     </div>
                   </section>
                 )}
-=======
-                <section
-                  aria-labelledby="recently-visited"
-                  className="mb-6 sm:mb-10"
-                >
-                  <h2
-                    id="recently-visited"
-                    className="mb-4 sm:mb-6 flex gap-2 text-sm font-medium text-muted-foreground"
-                  >
-                    <LuClock className="size-4 text-muted-foreground" />
-                    Recently visited
-                  </h2>
-                  <div className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 md:grid md:grid-cols-3 lg:grid-cols-4 md:overflow-x-visible">
-                    <div className="flex flex-col items-center min-w-[160px] w-[160px] md:w-full md:min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3 flex-shrink-0">
-                      <div className="flex items-center justify-center mb-3 sm:mb-4">
-                        <img
-                          src="/blueFolder.svg"
-                          alt="Recent Files"
-                          className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]"
-                        />
-                      </div>
-                      <div className="w-full">
-                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">
-                          Opened 3 hours ago
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          5 items
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col items-center min-w-[160px] w-[160px] md:w-full md:min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3 flex-shrink-0">
-                      <div className="flex items-center justify-center mb-3 sm:mb-4">
-                        <img
-                          src="/blackFolder.svg"
-                          alt="Created Files"
-                          className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]"
-                        />
-                      </div>
-                      <div className="w-full">
-                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">
-                          Created
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          12 documents
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col items-center min-w-[160px] w-[160px] md:w-full md:min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3 flex-shrink-0">
-                      <div className="flex items-center justify-center mb-3 sm:mb-4">
-                        <img
-                          src="/yellowFolder.svg"
-                          alt="Received Files"
-                          className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]"
-                        />
-                      </div>
-                      <div className="w-full">
-                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">
-                          Received
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          8 folders
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col items-center min-w-[160px] w-[160px] md:w-full md:min-w-0 h-auto sm:h-[161.59px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center pt-4 sm:pt-5 px-2 sm:px-3 pb-3 flex-shrink-0">
-                      <div className="flex items-center justify-center mb-3 sm:mb-4">
-                        <img
-                          src="/redFolder.svg"
-                          alt="Updated Files"
-                          className="h-[55px] w-[55px] sm:h-[75.59px] sm:w-[75.48px]"
-                        />
-                      </div>
-                      <div className="w-full">
-                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate px-1 dark:text-white">
-                          Updated
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          15 files
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </section>
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
 
                 <section
                   aria-labelledby="all-folders"
@@ -1205,36 +1070,20 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                 >
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-2">
-<<<<<<< HEAD
                       <button
                         onClick={() => setFoldersExpanded(!foldersExpanded)}
                         className="flex items-center gap-2 p-2 rounded-md text-sm font-medium text-muted-foreground cursor-pointer hover:text-foreground transition-colors hover:bg-[#F4F4F5]"
-=======
-                      <h2 className="text-sm font-medium text-muted-foreground">
-                        All Categories
-                      </h2>
-                      <button
-                        onClick={() => setFoldersExpanded(!foldersExpanded)}
-                        className="text-muted-foreground hover:text-foreground transition-colors"
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                         aria-label={
                           foldersExpanded
                             ? "Collapse folders"
                             : "Expand folders"
                         }
                       >
-<<<<<<< HEAD
                         All Categories
                         {foldersExpanded ? (
                           <ChevronDown className="size-4" />
                         ) : (
                           <ChevronRight className="size-4" />
-=======
-                        {foldersExpanded ? (
-                          <ChevronUp className="size-4" />
-                        ) : (
-                          <ChevronDown className="size-4" />
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                         )}
                       </button>
                     </div>
@@ -1267,11 +1116,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                   {foldersExpanded && (
                     <>
                       {folderView === "grid" ? (
-<<<<<<< HEAD
                         <div className="grid grid-cols-2 gap-2 sm:gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-=======
-                        <div className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                           {filteredFolders.length > 0 ? (
                             filteredFolders.map((folder) => (
                               <div
@@ -1304,7 +1149,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                           )}
                         </div>
                       ) : (
-<<<<<<< HEAD
                         <div className="rounded-md">
                           <Table>
                             <TableHeader>
@@ -1335,13 +1179,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                     className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary cursor-pointer"
                                   />
                                 </TableHead>
-=======
-                        <div className="rounded-md border dark:border-[#3F3F46]">
-                          <Table>
-                            <TableHeader>
-                              <TableRow className="dark:border-[#3F3F46]">
-                                <TableHead className="w-[30px] sm:w-[40px] px-2 sm:px-4"></TableHead>
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                                 <TableHead className="px-2 sm:px-4">
                                   Name
                                 </TableHead>
@@ -1381,11 +1218,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                         <img
                                           src="/Folder.svg"
                                           alt="Folder"
-<<<<<<< HEAD
                                           className="h-[16px] w-[16px] sm:h-[20px] sm:w-[20px] shrink-0"
-=======
-                                          className="w-12 h-12 shrink-0"
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                                         />
                                         <span className="truncate font-medium text-gray-900 dark:text-white text-xs sm:text-sm">
                                           {folder.name}
@@ -1439,34 +1272,18 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                 >
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-2">
-<<<<<<< HEAD
                       <button
                         onClick={() => setFilesExpanded(!filesExpanded)}
                         className="flex items-center gap-2 p-2 rounded-md text-sm font-medium text-muted-foreground cursor-pointer hover:text-foreground transition-colors hover:bg-[#F4F4F5]"
-=======
-                      <button className="text-sm font-medium text-muted-foreground cursor-pointer hover:text-foreground transition-colors hover:bg-gray-100 bg-gray-50">
-                        All Files
-                      </button>
-                      <button
-                        onClick={() => setFilesExpanded(!filesExpanded)}
-                        className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                         aria-label={
                           filesExpanded ? "Collapse files" : "Expand files"
                         }
                       >
-<<<<<<< HEAD
                         All Files
                         {filesExpanded ? (
                           <ChevronDown className="size-4" />
                         ) : (
                           <ChevronRight className="size-4" />
-=======
-                        {filesExpanded ? (
-                          <ChevronUp className="size-4" />
-                        ) : (
-                          <ChevronDown className="size-4" />
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                         )}
                       </button>
                     </div>
@@ -1503,17 +1320,10 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                       <div className="flex items-center gap-2 bg-white dark:bg-[#09090B] py-3 sm:py-4 overflow-x-auto pb-3 sm:pb-4 scrollbar-hide -mx-2 px-2 sm:mx-0 sm:px-0">
                         <button
                           onClick={() => setActiveFileType(null)}
-<<<<<<< HEAD
                           className={`shrink-0 cursor-pointer rounded-md px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 dark:bg-[#09090B] ${
                             activeFileType === null
                               ? "bg-[#F4F4F5] text-primary dark:border-[#3F3F46] border border-primary/20 shadow-sm dark:bg-[#27272A]"
                               : "text-gray-600 hover:bg-gray-50 border border-gray-200 bg-white hover:border-gray-300 dark:border-[#3F3F46] dark:text-[#A1A1AA] dark:bg-[#09090B]"
-=======
-                          className={`shrink-0 cursor-pointer rounded-md px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
-                            activeFileType === null
-                              ? "bg-primary/10 text-primary border border-primary/20 shadow-sm"
-                              : "text-gray-600 hover:bg-gray-50 border border-gray-200 bg-white hover:border-gray-300 dark:bg-[#09090B] dark:border-[#3F3F46] dark:text-[#A1A1AA]"
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                           }`}
                         >
                           <span>All Files</span>
@@ -1540,11 +1350,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                               }
                               className={`shrink-0 cursor-pointer rounded-md px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 dark:bg-[#09090B] ${
                                 isActive
-<<<<<<< HEAD
                                   ? "bg-[#F4F4F5] text-primary dark:border-[#3F3F46] border border-primary/20 shadow-sm dark:bg-[#27272A]"
-=======
-                                  ? "bg-primary/10 text-primary dark:border-[#3F3F46] border border-primary/20 shadow-sm dark:bg-[#27272A]"
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                                   : "text-gray-600 hover:bg-gray-50 border border-gray-200 bg-white hover:border-gray-300 dark:border-[#3F3F46] dark:text-[#A1A1AA] dark:bg-[#09090B]"
                               }`}
                             >
@@ -1566,11 +1372,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                       {fileView === "grid" ? (
                         <div className="space-y-4">
                           <div
-<<<<<<< HEAD
                             className={`transition-all duration-300 grid grid-cols-2 gap-2 sm:gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 ${
-=======
-                            className={`transition-all duration-300 grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ${
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                               filteredFiles.length === 0
                                 ? "min-h-[200px] flex items-center justify-center"
                                 : ""
@@ -1753,7 +1555,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                           </div>
                         </div>
                       ) : (
-<<<<<<< HEAD
                         <div className="rounded-md">
                           <Table>
                             <TableHeader>
@@ -1781,13 +1582,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                     className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary cursor-pointer"
                                   />
                                 </TableHead>
-=======
-                        <div className="rounded-md border dark:border-[#3F3F46]">
-                          <Table>
-                            <TableHeader>
-                              <TableRow className="dark:border-[#3F3F46]">
-                                <TableHead className="w-[30px] sm:w-[40px] px-2 sm:px-4"></TableHead>
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                                 <TableHead className="px-2 sm:px-4">
                                   Name
                                 </TableHead>
@@ -1865,11 +1659,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                     <TableRow
                                       key={fileId}
                                       onClick={() => handleFileSelect(file)}
-<<<<<<< HEAD
                                       className="cursor-pointer"
-=======
-                                      className="cursor-pointer dark:border-[#3F3F46]"
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                                     >
                                       <TableCell className="px-2 sm:px-4">
                                         <input
@@ -1890,11 +1680,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                           <img
                                             src={getFileIcon()}
                                             alt={file.type}
-<<<<<<< HEAD
                                             className="h-[16px] w-[16px] sm:h-[20px] sm:w-[20px] shrink-0 object-contain"
-=======
-                                            className="w-12 h-12 shrink-0 object-contain"
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                                           />
                                           <span className="truncate font-medium text-gray-900 dark:text-white text-xs sm:text-sm">
                                             {file.name}
@@ -1995,11 +1781,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                             </TableBody>
                           </Table>
                           {filteredFiles.length > itemsPerPage && (
-<<<<<<< HEAD
                             <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-[#09090B]">
-=======
-                            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-[#3F3F46] bg-white dark:bg-[#09090B]">
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                               <div className="text-sm text-gray-500 dark:text-gray-400">
                                 Showing{" "}
                                 {Math.min(
@@ -2021,17 +1803,10 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                     )
                                   }
                                   disabled={filesCurrentPage === 1}
-<<<<<<< HEAD
                                   className={`px-3 py-1 rounded-md text-sm font-medium ${
                                     filesCurrentPage === 1
                                       ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-[#18181B] dark:text-gray-600"
                                       : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:hover:bg-[#18181B]"
-=======
-                                  className={`px-3 py-1 border rounded-md text-sm font-medium ${
-                                    filesCurrentPage === 1
-                                      ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-[#18181B] dark:text-gray-600 dark:border-[#3F3F46]"
-                                      : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:border-[#3F3F46] dark:hover:bg-[#18181B]"
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                                   }`}
                                 >
                                   Previous
@@ -2046,17 +1821,10 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                     )
                                   }
                                   disabled={filesCurrentPage >= totalFilesPages}
-<<<<<<< HEAD
                                   className={`px-3 py-1 rounded-md text-sm font-medium ${
                                     filesCurrentPage >= totalFilesPages
                                       ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-[#18181B] dark:text-gray-600"
                                       : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:hover:bg-[#18181B]"
-=======
-                                  className={`px-3 py-1 border rounded-md text-sm font-medium ${
-                                    filesCurrentPage >= totalFilesPages
-                                      ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-[#18181B] dark:text-gray-600 dark:border-[#3F3F46]"
-                                      : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:border-[#3F3F46] dark:hover:bg-[#18181B]"
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
                                   }`}
                                 >
                                   Next
@@ -2089,11 +1857,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
         <div
           className={`fixed bg-white dark:bg-[#09090B] border-gray-200 dark:border-[#3F3F46] shadow-lg transition-all duration-300 ease-in-out z-40
             ${/* Mobile - from bottom, no X translation */ ""}
-<<<<<<< HEAD
             bottom-0 left-0 right-0 w-full rounded-t-2xl border-t translate-x-0
-=======
-            bottom-0 left-0 right-0 w-full h-[85vh] rounded-t-2xl border-t translate-x-0
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
             ${/* Desktop - from right */ ""}
             sm:top-0 sm:bottom-auto sm:left-auto sm:right-0 sm:h-full sm:w-[400px] sm:rounded-none sm:border-t-0 sm:border-l
             ${/* Mobile Animation - ONLY Y axis */ ""}

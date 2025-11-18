@@ -327,22 +327,14 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
           <MdOutlineFolderCopy
             width={16}
             height={16}
-<<<<<<< HEAD
             className="shrink-0"
-=======
-            className="flex-shrink-0"
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
           />
         ),
         href: "/Dashboard/Library",
       },
       {
         title: "Chats",
-<<<<<<< HEAD
         icon: <MessageCircle className="h-4 w-4 shrink-0" />,
-=======
-        icon: <MessageCircle className="h-4 w-4 flex-shrink-0" />,
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
         href: "/Dashboard/chat",
       },
     ],
@@ -366,11 +358,7 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
             }}
           >
             <span className="flex items-center gap-2 w-full group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:gap-0">
-<<<<<<< HEAD
               <IoIosSearch className="h-6 w-5 shrink-0 text-black dark:text-white" />
-=======
-              <IoIosSearch className="h-6 w-5 flex-shrink-0 text-black dark:text-white" />
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
               <span className="overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:hidden">
                 Search
               </span>
@@ -385,15 +373,9 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
               asChild
               isActive={pathname === item.href}
               className={`w-full justify-start h-8 px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-150 ease-in-out ${
-<<<<<<< HEAD
                 pathname === item.href && !searchDialogOpen
                   ? "bg-[#F4F4F5] dark:bg-[#27272A] dark:text-white"
                   : "hover:bg-gray-100 dark:hover:bg-[#27272A]"
-=======
-                pathname === item.href
-                  ? "bg-[#F4F4F5] dark:bg-[#27272A] dark:text-white"
-                  : ""
->>>>>>> 18d841f1334313896abb287cd4404dc463b8bf8d
               }`}
               tooltip={{
                 children: item.title,
