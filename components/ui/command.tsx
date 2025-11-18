@@ -33,7 +33,7 @@ const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
           {children}
         </Command>
       </DialogContent>
-    </Dialog> 
+    </Dialog>
   );
 };
 
