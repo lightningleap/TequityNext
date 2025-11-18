@@ -97,18 +97,7 @@ export default function LoginPage() {
   if (step === "verification") {
     return (
       <div className="flex h-screen overflow-hidden">
-        {/* Left Side - Background Graphics (Hidden on small/medium, visible on large) */}
-        <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
-          <Image
-            src={Container}
-            alt="Verification Graphic"
-            fill
-            className="object-cover object-center"
-            priority
-          />
-        </div>
-
-        {/* Right Side - Verification Form */}
+        {/* Left Side - Verification Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-16 bg-white overflow-y-auto scrollbar-hide">
           <div className="w-full max-w-sm sm:max-w-md flex items-center justify-center">
             {/* Form Card */}
@@ -148,7 +137,7 @@ export default function LoginPage() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           e.preventDefault();
-                        handleEmailSubmit(e as React.FormEvent);
+                          handleVerificationSubmit(e as React.FormEvent);
                         }
                       }}
                       placeholder="Enter verification code"
@@ -207,24 +196,23 @@ export default function LoginPage() {
             </div>
           </div>
         </div>
+
+        {/* Right Side - Background Graphics (Hidden on small/medium, visible on large) */}
+        <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
+          <Image
+            src={Container}
+            alt="Verification Graphic"
+            fill
+            className="object-cover object-center"
+          />
+        </div>
       </div>
     );
   }
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Left Side - Image (Hidden on small/medium, visible on large) */}
-      <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
-        <Image
-          src={Container}
-          alt="Login Graphic"
-          fill
-          className="object-cover object-center"
-          priority
-        />
-      </div>
-
-      {/* Right Side - Email Form */}
+      {/* Left Side - Email Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-16 bg-white overflow-y-auto scrollbar-hide">
         <div className="w-full max-w-sm sm:max-w-md flex items-center justify-center">
           {/* Form Card */}
@@ -326,6 +314,16 @@ export default function LoginPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Right Side - Image (Hidden on small/medium, visible on large) */}
+      <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
+        <Image
+          src={Container}
+          alt="Login Graphic"
+          fill
+          className="object-cover object-center"
+        />
       </div>
     </div>
   );

@@ -103,9 +103,9 @@ export default function WorkspaceSetupPage() {
         // Simulate API call
         await new Promise((resolve) => setTimeout(resolve, 500));
 
-        // Navigate to Dashboard
-        router.prefetch("/Dashboard/Library");
-        router.push("/Dashboard/Library");
+        // Navigate to Pricing page
+        router.prefetch("/pricing");
+        router.push("/pricing");
       } finally {
         setIsLoading(false);
       }
@@ -114,9 +114,9 @@ export default function WorkspaceSetupPage() {
   );
 
   const handleSkip = useCallback(() => {
-    // Navigate to Dashboard when skipping
-    router.prefetch("/Dashboard/Library");
-    router.push("/Dashboard/Library");
+    // Navigate to Pricing page when skipping
+    router.prefetch("/pricing");
+    router.push("/pricing");
   }, [router]);
 
   const options = [
