@@ -29,7 +29,7 @@ export function SearchBar({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="border-0 px-2 text-sm placeholder:text-muted-foreground focus-visible:ring-0 dark:bg-[#27272A] dark:text-white"
+          className="border-none px-2 text-sm placeholder:text-muted-foreground focus-visible:ring-0 dark:bg-[#27272A] dark:text-white rounded-none shadow-none"
           aria-label="Search files"
           onClick={onClick}
           onFocus={onFocus}

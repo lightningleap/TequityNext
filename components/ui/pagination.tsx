@@ -22,17 +22,11 @@ export function Pagination({
   className,
 }: PaginationProps) {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const startItem = (currentPage - 1) * itemsPerPage + 1;
-  const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
     <div className={cn("flex items-center justify-between px-4 py-3 bg-white dark:bg-[#09090B] border-t border-gray-200 dark:border-[#27272A]", className)}>
       <div className="text-sm text-gray-500 dark:text-gray-400">
-        {selectedCount > 0 ? (
-          <span>{selectedCount} of {totalItems} row(s) selected</span>
-        ) : (
-          <span>Showing {startItem} to {endItem} of {totalItems} entries</span>
-        )}
+        <span>{selectedCount} of {totalItems} row(s) selected</span>
       </div>
       
       <div className="flex items-center space-x-2">
@@ -46,12 +40,8 @@ export function Pagination({
               : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:border-gray-600 dark:hover:bg-[#18181B]"
           )}
         >
-          <ChevronLeft className="h-4 w-4" />
+          Previous
         </button>
-        
-        {/* <div className="text-sm text-gray-700 dark:text-gray-300">
-          {currentPage} of {totalPages}
-        </div> */}
         
         <button
           onClick={() => onPageChange(currentPage + 1)}
@@ -63,7 +53,7 @@ export function Pagination({
               : "bg-white text-gray-700 hover:bg-gray-50 dark:bg-[#09090B] dark:text-white dark:border-gray-600 dark:hover:bg-[#18181B]"
           )}
         >
-          <ChevronRight className="h-4 w-4" />
+          Next
         </button>
       </div>
     </div>

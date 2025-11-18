@@ -1,16 +1,19 @@
 "use client";
 
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Download, Maximize2, Minimize2, ChevronsRight, FileText, Folder } from "lucide-react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { FileItem } from "./filegrid";
 import { useSidebar } from "@/components/ui/sidebar";
 import Image from "next/image";
 
+
 // Set up the worker for react-pdf - only on client side
 if (typeof window !== 'undefined') {
   pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 }
+
 
 interface PDFViewerProps {
   isOpen: boolean;
@@ -20,30 +23,146 @@ interface PDFViewerProps {
   onMaximizeChange?: (isMaximized: boolean) => void;
 }
 
+
 export function PDFViewer({ isOpen, onClose, file, folderName, onMaximizeChange }: PDFViewerProps) {
   const [numPages, setNumPages] = useState<number>(0);
   const [isMaximized, setIsMaximized] = useState<boolean>(false);
+  const [dragPosition, setDragPosition] = useState(90); // Initial height in vh
+  const [isDragging, setIsDragging] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const { state } = useSidebar();
+
+  // Check if mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Drag handlers for mobile PDF viewer
+  const handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
+    setIsDragging(true);
+    e.preventDefault();
+  };
+
+  const handleDragMove = (e: React.TouchEvent | React.MouseEvent) => {
+    if (!isDragging) return;
+    
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const windowHeight = window.innerHeight;
+    const newHeight = ((windowHeight - clientY) / windowHeight) * 100;
+    
+    // Check if dragged to top (less than 10vh from top)
+    if (newHeight > 90) {
+      setIsFullscreen(true);
+      return;
+    }
+    
+    // Check if dragged to bottom (less than 20vh from bottom) - close the viewer
+    if (newHeight < 20 && !isFullscreen) {
+      handleClose();
+      setIsDragging(false);
+      return;
+    }
+    
+    // Exit fullscreen if dragging down from fullscreen
+    if (isFullscreen && newHeight < 85) {
+      setIsFullscreen(false);
+    }
+    
+    // Limit height between 30vh and 95vh when not in fullscreen
+    if (!isFullscreen) {
+      const clampedHeight = Math.max(30, Math.min(95, newHeight));
+      setDragPosition(clampedHeight);
+    }
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    const handleGlobalMove = (e: TouchEvent | MouseEvent) => {
+      if (!isDragging) return;
+      
+      const clientY = 'touches' in e ? (e as TouchEvent).touches[0].clientY : (e as MouseEvent).clientY;
+      const windowHeight = window.innerHeight;
+      const newHeight = ((windowHeight - clientY) / windowHeight) * 100;
+      
+      // Check if dragged to top (less than 10vh from top)
+      if (newHeight > 90) {
+        setIsFullscreen(true);
+        return;
+      }
+      
+      // Check if dragged to bottom (less than 20vh from bottom) - close the viewer
+      if (newHeight < 20 && !isFullscreen) {
+        handleClose();
+        setIsDragging(false);
+        return;
+      }
+      
+      // Exit fullscreen if dragging down from fullscreen
+      if (isFullscreen && newHeight < 85) {
+        setIsFullscreen(false);
+      }
+      
+      // Limit height between 30vh and 95vh when not in fullscreen
+      if (!isFullscreen) {
+        const clampedHeight = Math.max(30, Math.min(95, newHeight));
+        setDragPosition(clampedHeight);
+      }
+    };
+
+    const handleGlobalEnd = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      document.addEventListener('touchmove', handleGlobalMove);
+      document.addEventListener('mousemove', handleGlobalMove);
+      document.addEventListener('touchend', handleGlobalEnd);
+      document.addEventListener('mouseup', handleGlobalEnd);
+    }
+
+    return () => {
+      document.removeEventListener('touchmove', handleGlobalMove);
+      document.removeEventListener('mousemove', handleGlobalMove);
+      document.removeEventListener('touchend', handleGlobalEnd);
+      document.removeEventListener('mouseup', handleGlobalEnd);
+    };
+  }, [isDragging, isFullscreen]);
 
   if (!isOpen || !file) return null;
 
+
   const displayName = folderName || file.name;
+
 
   // Calculate width based on sidebar state
   const sidebarWidth = state === "collapsed" ? "3rem" : "16rem";
   const maxWidth = `calc(100% - ${sidebarWidth})`;
 
+
   console.log("PDFViewer - File data:", file);
   console.log("PDFViewer - File URL:", file.url);
   console.log("PDFViewer - File Type:", file.type);
+
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
   }
 
+
   function onDocumentLoadError(error: Error) {
     console.error("PDF load error:", error);
   }
+
 
   const handleDownload = () => {
     if (file.url) {
@@ -54,6 +173,7 @@ export function PDFViewer({ isOpen, onClose, file, folderName, onMaximizeChange 
     }
   };
 
+
   const handleMaximize = () => {
     const newMaximizedState = !isMaximized;
     setIsMaximized(newMaximizedState);
@@ -62,38 +182,58 @@ export function PDFViewer({ isOpen, onClose, file, folderName, onMaximizeChange 
     }
   };
 
+
   const handleClose = () => {
     setIsMaximized(false);
     if (onMaximizeChange) {
       onMaximizeChange(false);
     }
+    setDragPosition(90); // Reset to default position
+    setIsFullscreen(false); // Reset fullscreen state
     onClose();
   };
+
 
   return (
     <>
       {/* Backdrop/Overlay for mobile */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          className="fixed inset-0 shadow-lg z-40 md:hidden"
           onClick={handleClose}
         />
       )}
 
+
       <div
         className={`fixed bg-white dark:bg-[#09090B] shadow-lg transform transition-all duration-300 ease-in-out z-50
-          ${isOpen ? 'translate-y-0 md:translate-x-0' : 'translate-y-full md:translate-y-0 md:translate-x-full'}
-          ${isMaximized ? '' : 'w-full md:w-[400px]'}
-          bottom-0 md:bottom-auto md:top-0 md:right-0
-          h-[90vh] md:h-full
-          rounded-t-2xl md:rounded-none
-          border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-800`}
-        style={isMaximized ? { width: maxWidth } : undefined}
+          ${/* Mobile - from bottom, no X translation */ ""}
+          bottom-0 left-0 right-0 w-full rounded-t-2xl border-t translate-x-0
+          ${/* Desktop - from right */ ""}
+          md:top-0 md:bottom-auto md:left-auto md:right-0 md:h-full md:w-[400px] md:rounded-none md:border-t-0 md:border-l
+          ${/* Mobile Animation - ONLY Y axis */ ""}
+          ${isOpen ? "translate-y-0" : "translate-y-full"}
+          ${/* Desktop Animation - ONLY X axis, reset Y */ ""}
+          md:translate-y-0 ${
+            isOpen ? "md:translate-x-0" : "md:translate-x-full"
+          }
+          ${isMaximized ? '' : 'md:w-[400px]'}
+        `}
+        style={{ height: isMobile && isOpen && !isFullscreen ? `${dragPosition}vh` : isMobile && isFullscreen ? '100vh' : undefined }}
       >
-        {/* Mobile drag handle bar */}
-        <div className="flex md:hidden justify-center pt-2 pb-1">
-          <div className="w-12 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
+        {/* Draggable handle for mobile - hide in fullscreen */}
+        <div
+          className={`md:hidden flex justify-center py-2 cursor-touch active:cursor-grabbing ${isFullscreen ? 'opacity-0 pointer-events-none' : ''}`}
+          onTouchStart={handleDragStart}
+          onTouchMove={handleDragMove}
+          onTouchEnd={handleDragEnd}
+          onMouseDown={handleDragStart}
+          onMouseMove={handleDragMove}
+          onMouseUp={handleDragEnd}
+        >
+          <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
         </div>
+
 
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#09090B]">
@@ -104,31 +244,33 @@ export function PDFViewer({ isOpen, onClose, file, folderName, onMaximizeChange 
           </h2>
         </div>
 
+
         {/* Right side: Download, Maximize/Minimize, and Close icons */}
         <div className="flex items-center gap-3">
           <button
             onClick={handleDownload}
-            className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors"
+            className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors cursor-pointer"
             aria-label="Download file"
           >
             <Download className="h-5 w-5" />
           </button>
           <button
             onClick={handleMaximize}
-            className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors"
+            className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors cursor-pointer"
             aria-label={isMaximized ? "Minimize viewer" : "Maximize viewer"}
           >
             {isMaximized ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
           </button>
           <button
             onClick={handleClose}
-            className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors hidden md:block"
+            className="p-1 text-gray-500 dark:text-white hover:text-gray-700 transition-colors hidden md:block cursor-pointer"
             aria-label="Close viewer"
           >
             <ChevronsRight className="h-5 w-5" />
           </button>
         </div>
       </div>
+
 
       {/* Content Area */}
       <div className="h-[calc(100%-80px)] md:h-[calc(100%-64px)] overflow-auto scrollbar-hide bg-gray-50 dark:bg-[#09090B]">
@@ -296,3 +438,7 @@ export function PDFViewer({ isOpen, onClose, file, folderName, onMaximizeChange 
     </>
   );
 }
+
+
+
+

@@ -46,6 +46,8 @@ export function ChatInterface({
   const contextMenuRef = useRef<HTMLDivElement>(null);
   const [messageReactions, setMessageReactions] = useState<Record<number, 'like' | 'dislike' | null>>({});
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [feedbackMessage, setFeedbackMessage] = useState<Record<number, string>>({});
+  const [visualFills, setVisualFills] = useState<Record<number, 'like' | 'dislike' | 'copy' | null>>({});
   const [contextSearchValue, setContextSearchValue] = useState("");
 
   // Auto-resize textarea function
@@ -213,21 +215,71 @@ export function ChatInterface({
   const handleCopy = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 2000);
+    setVisualFills(prev => ({ ...prev, [index]: 'copy' }));
+    setFeedbackMessage(prev => ({ ...prev, [index]: 'Copied' }));
+    setTimeout(() => {
+      setCopiedIndex(null);
+      setVisualFills(prev => {
+        const newFills = { ...prev };
+        delete newFills[index];
+        return newFills;
+      });
+      setFeedbackMessage(prev => {
+        const newFeedback = { ...prev };
+        delete newFeedback[index];
+        return newFeedback;
+      });
+    }, 2000);
   };
 
   const handleLike = (index: number) => {
+    const isCurrentlyLiked = messageReactions[index] === 'like';
     setMessageReactions(prev => ({
       ...prev,
-      [index]: prev[index] === 'like' ? null : 'like'
+      [index]: isCurrentlyLiked ? null : 'like'
     }));
+
+    if (!isCurrentlyLiked) {
+      setVisualFills(prev => ({ ...prev, [index]: 'like' }));
+      setFeedbackMessage(prev => ({ ...prev, [index]: 'Liked' }));
+      setTimeout(() => {
+        setVisualFills(prev => {
+          const newFills = { ...prev };
+          delete newFills[index];
+          return newFills;
+        });
+        setFeedbackMessage(prev => {
+          const newFeedback = { ...prev };
+          delete newFeedback[index];
+          return newFeedback;
+        });
+      }, 2000);
+    }
   };
 
   const handleDislike = (index: number) => {
+    const isCurrentlyDisliked = messageReactions[index] === 'dislike';
     setMessageReactions(prev => ({
       ...prev,
-      [index]: prev[index] === 'dislike' ? null : 'dislike'
+      [index]: isCurrentlyDisliked ? null : 'dislike'
     }));
+    
+    if (!isCurrentlyDisliked) {
+      setVisualFills(prev => ({ ...prev, [index]: 'dislike' }));
+      setFeedbackMessage(prev => ({ ...prev, [index]: 'Disliked' }));
+      setTimeout(() => {
+        setVisualFills(prev => {
+          const newFills = { ...prev };
+          delete newFills[index];
+          return newFills;
+        });
+        setFeedbackMessage(prev => {
+          const newFeedback = { ...prev };
+          delete newFeedback[index];
+          return newFeedback;
+        });
+      }, 2000);
+    }
   };
 
   const handleFileSelect = (file: FileItem) => {
@@ -395,40 +447,50 @@ export function ChatInterface({
 
                   {/* Action Buttons - Only for AI messages */}
                   {!message.isUser && (
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleCopy(message.text, index)}
-                        className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors ${
-                          copiedIndex === index
-                            ? 'text-black dark:text-white'
-                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-                        }`}
-                        title="Copy"
-                      >
-                        <Copy className={`h-3 w-3 ${copiedIndex === index ? 'fill-current' : ''}`} />
-                      </button>
-                      <button
+                    <div className="flex flex-col items-start gap-1">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleCopy(message.text, index)}
+                          className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors cursor-pointer ${
+                            copiedIndex === index
+                              ? 'text-black dark:text-white'
+                              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                          }`}
+                          title="Copy"
+                        >
+                          <Copy className={`h-3 w-3 ${visualFills[index] === 'copy' ? 'fill-current text-black dark:text-white' : ''}`} />
+                        </button>
+                        <button
                         onClick={() => handleLike(index)}
-                        className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors ${
+                        className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors cursor-pointer ${
                           messageReactions[index] === 'like'
-                            ? 'text-blue-600 dark:text-blue-400'
+                            ? 'text-black dark:text-white'
                             : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                         }`}
                         title="Like"
                       >
-                        <ThumbsUp className={`h-3 w-3 ${messageReactions[index] === 'like' ? 'fill-current' : ''}`} />
+                        <ThumbsUp className={`h-3 w-3 ${visualFills[index] === 'like' ? 'fill-current text-black dark:text-white' : ''}`} />
                       </button>
-                      <button
-                        onClick={() => handleDislike(index)}
-                        className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors ${
-                          messageReactions[index] === 'dislike'
-                            ? 'text-red-600 dark:text-red-400'
-                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-                        }`}
-                        title="Dislike"
-                      >
-                        <ThumbsDown className={`h-3 w-3 ${messageReactions[index] === 'dislike' ? 'fill-current' : ''}`} />
-                      </button>
+                        <button
+                          onClick={() => handleDislike(index)}
+                          className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors cursor-pointer ${
+                            messageReactions[index] === 'dislike'
+                              ? 'text-black dark:text-white'
+                              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                          }`}
+                          title="Dislike"
+                        >
+                          <ThumbsDown className={`h-3 w-3 ${visualFills[index] === 'dislike' ? 'fill-current text-black dark:text-white' : ''}`} />
+                        </button>
+                      </div>
+                      {feedbackMessage[index] && (
+                        <div className="flex items-center gap-1 text-xs text-black dark:text-white ml-2 animate-pulse">
+                          {feedbackMessage[index] === 'Copied' && <Copy className="h-3 w-3 text-black dark:text-white" />}
+                          {feedbackMessage[index] === 'Liked' && <ThumbsUp className="h-3 w-3 text-black dark:text-white" />}
+                          {feedbackMessage[index] === 'Disliked' && <ThumbsDown className="h-3 w-3 text-black dark:text-white" />}
+                          <span>{feedbackMessage[index]}</span>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -481,7 +543,7 @@ export function ChatInterface({
                         <button
                           type="button"
                           onClick={() => removeContextItem(item.id, item.type)}
-                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors flex-shrink-0"
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors flex-shrink-0 cursor-pointer"
                           aria-label="Remove"
                         >
                           <X className="h-3.5 w-3.5" />
@@ -515,7 +577,7 @@ export function ChatInterface({
                         <button
                           type="button"
                           onClick={() => removeAttachedFile(index)}
-                          className="text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-200 transition-colors flex-shrink-0"
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors flex-shrink-0 cursor-pointer"
                           aria-label="Remove file"
                         >
                           <X className="h-3.5 w-3.5" />
@@ -545,7 +607,7 @@ export function ChatInterface({
               <button
                 type="submit"
                 disabled={!inputValue.trim() && attachedFiles.length === 0 && selectedContextItems.length === 0}
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-[#D91D69] text-white hover:bg-[#D91D69] dark:bg-[#D91D69] dark:text-black dark:border-[#3F3F46] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-[#D91D69] text-white hover:bg-[#D91D69] dark:bg-[#D91D69] dark:text-black dark:border-[#3F3F46] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 aria-label="Send message"
               >
                 <ArrowUp className="h-4 w-4" />
@@ -556,7 +618,7 @@ export function ChatInterface({
                 <button
                   type="button"
                   onClick={handleUploadClick}
-                  className="flex items-center bg-[#FFFFFF] dark:bg-[#09090B] border-gray-200 dark:border-[#3F3F46] border justify-center w-8 h-8 rounded-md text-gray-600 hover:bg-gray-100 transition-colors"
+                  className="flex items-center bg-[#FFFFFF] dark:bg-[#09090B] border-gray-200 dark:border-[#3F3F46] border justify-center w-8 h-8 rounded-md text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
                   aria-label="Upload files"
                   title="Upload files"
                 >
@@ -570,7 +632,7 @@ export function ChatInterface({
                       <button
                         type="button"
                         onClick={() => handleFileUpload("files")}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white transition-colors cursor-pointer"
                       >
                         <File className="h-4 w-4 text-blue-600" />
                         <span>Upload Files</span>
@@ -578,7 +640,7 @@ export function ChatInterface({
                       <button
                         type="button"
                         onClick={() => handleFileUpload("folder")}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white transition-colors cursor-pointer"
                       >
                         <Folder className="h-4 w-4 text-orange-600" />
                         <span>Upload Folder</span>
@@ -586,7 +648,7 @@ export function ChatInterface({
                       <button
                         type="button"
                         onClick={() => handleFileUpload("image")}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white transition-colors cursor-pointer"
                       >
                         <ImageIcon className="h-4 w-4 text-purple-600" />
                         <span>Upload Images</span>
@@ -605,7 +667,7 @@ export function ChatInterface({
                     }
                     setShowContextMenu(!showContextMenu);
                   }}
-                  className="flex bg-[#FFFFFF] dark:text-white dark:bg-[#09090B] border-gray-200 dark:border-[#3F3F46] border items-center gap-1 px-2 h-8 rounded-md text-gray-600 hover:bg-gray-100 transition-colors text-sm"
+                  className="flex bg-[#FFFFFF] dark:text-white dark:bg-[#09090B] border-gray-200 dark:border-[#3F3F46] border items-center gap-1 px-2 h-8 rounded-md text-gray-600 hover:bg-gray-100 transition-colors text-sm cursor-pointer"
                   aria-label="Add context"
                 >
                   <AtSign className="h-3.5 w-3.5" />
@@ -643,7 +705,7 @@ export function ChatInterface({
                                 key={file.id}
                                 type="button"
                                 onClick={() => handleFileSelect(file)}
-                                className="w-full flex items-center gap-2 px-4 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors"
+                                className="w-full flex items-center gap-2 px-4 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
                               >
                                 {getFileIcon(file.type)}
                                 <div className="flex-1 text-left min-w-0">
@@ -681,7 +743,7 @@ export function ChatInterface({
                                 key={idx}
                                 type="button"
                                 onClick={() => handleChatSelect(msg.text, `chat-${idx}-${msg.timestamp.getTime()}`)}
-                                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors"
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
                                 title={msg.text}
                               >
                                 <div className="truncate">

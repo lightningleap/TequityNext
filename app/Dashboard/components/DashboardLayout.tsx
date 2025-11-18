@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState, useEffect } from "react";
+import { ReactNode, useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Sidebar } from "@/components/ui/sidebar";
@@ -16,7 +16,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, Settings, LogOut, Moon, Sun, Star } from "lucide-react";
+import { Plus, Settings, LogOut, Moon, Sun, Star, Menu, AlignJustify } from "lucide-react";
 import { SettingsDialog } from "../Settings/SettingsDialog";
 import { ChevronsLeft, ChevronDown, UploadCloud } from "lucide-react";
 import { MdOutlineFolderCopy } from "react-icons/md";
@@ -47,6 +47,7 @@ export function DashboardLayout({
   const [starredFiles, setStarredFiles] = useState<Array<{ id: string; name: string; type: string }>>([]);
   const chatContext = useChatContextOptional();
   const [dataroomName, setDataroomName] = useState("LLA");
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   // Load dataroom name from localStorage
   useEffect(() => {
@@ -111,8 +112,37 @@ export function DashboardLayout({
     router.push("/login");
   };
 
+  const toggleSidebar = () => {
+    // Try multiple approaches to find and trigger the sidebar toggle
+    const selectors = [
+      'button[data-sidebar="trigger"]',
+      '[data-radix-sidebar-menu-trigger]',
+      'button[aria-label="Toggle Sidebar"]',
+      'button[aria-controls="sidebar"]',
+      '.sidebar-trigger',
+      'button:has([data-lucide="menu"])',
+      'button:has([data-lucide="chevron-left"])',
+    ];
+    
+    for (const selector of selectors) {
+      const trigger = document.querySelector(selector) as HTMLButtonElement;
+      if (trigger) {
+        trigger.click();
+        return;
+      }
+    }
+    
+    // Fallback: try to trigger a keyboard shortcut if supported
+    const event = new KeyboardEvent('keydown', {
+      key: 'b',
+      ctrlKey: true,
+      metaKey: false,
+    });
+    document.dispatchEvent(event);
+  };
+
   return (
-    <SidebarProvider defaultOpen={true}>
+    <SidebarProvider>
       <div className="flex h-screen w-full">
         <Sidebar
           side="left"
@@ -121,7 +151,7 @@ export function DashboardLayout({
           className="flex-shrink-0 group"
         >
           <div className="flex flex-col gap-2 px-2 py-3 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:py-3">
-            <div className="flex items-center gap-2 px-2 py-2 rounded-md h-12 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-300 ease-in-out w-full group/trigger">
+            <div className="flex items-center gap-2 px-2 py-2 rounded-md h-12 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-300 ease-in-out w-full relative">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <div className="flex items-center gap-2 flex-1 cursor-pointer hover:bg-gray-50 rounded-md px-2 py-2 -mx-2 -my-2 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:py-0 group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:my-0 dark:hover:bg-[#27272A] dark:hover:text-white data-[state=open]:bg-[#F4F4F5] dark:data-[state=open]:bg-[#27272A]">
@@ -137,19 +167,6 @@ export function DashboardLayout({
                       <p className="font-sans font-medium text-sm leading-none tracking-[-0.084px] whitespace-nowrap overflow-hidden text-left">
                         {formattedDataroomName}
                       </p>
-                    </div>
-                    <div className="relative">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const trigger = document.querySelector('[data-sidebar="trigger"]') as HTMLButtonElement;
-                          trigger?.click();
-                        }}
-                        className="flex items-center justify-center size-8 -mr-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors group-data-[collapsible=icon]:hidden rounded-md"
-                      >
-                        <ChevronsLeft className="size-4" />
-                      </button>
-                      <div className="absolute inset-0 -z-10 group-data-[state=open]/trigger:bg-[#F4F4F5] dark:group-data-[state=open]/trigger:bg-[#27272A] rounded-md transition-colors" />
                     </div>
                   </div>
                 </DropdownMenuTrigger>
@@ -224,7 +241,16 @@ export function DashboardLayout({
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-
+              
+              {/* Collapse button positioned to appear inside the dropdown area */}
+              <button
+                onClick={() => {
+                  toggleSidebar();
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center size-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors group-data-[collapsible=icon]:hidden rounded-md z-10"
+              >
+                <ChevronsLeft className="size-4" />
+              </button>
             </div>
           </div>
           <SidebarMenuItems />
@@ -244,16 +270,20 @@ export function DashboardLayout({
         <div className="flex-1 flex flex-col overflow-hidden relative">
           {/* Mobile Header */}
           <header className="flex md:hidden h-16 items-center justify-between border-b dark:border-[#A1A1AA] border-gray-200 bg-white dark:bg-[#09090B] px-3">
-            <SidebarTrigger className="size-9 p-2" />
+            {/* Menu Button - Left */}
+            <SidebarTrigger className="size-9 p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors shadow-sm">
+              <Menu className="h-5 w-5 text-gray-700 dark:text-gray-200" />
+            </SidebarTrigger>
 
+            {/* Middle Content */}
             {isChatPage && chatContext && chatContext.chats.length > 0 ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors focus:ring-0 focus:ring-offset-0 focus:outline-none border-0 focus:border-0 focus-visible:border-0">
+                  <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors focus:ring-0 focus:ring-offset-0 focus:outline-none border-0 focus:border-0 focus-visible:border-0">
                     <span className="text-sm text-gray-700 dark:text-gray-200 truncate max-w-[150px]">
                       {chatContext.activeChat?.title || "New Chat"}
                     </span>
-                    <ChevronDown className="h-3 w-3 text-gray-500 flex-shrink-0" />
+                    <ChevronDown className="h-5 w-5 text-gray-500 flex-shrink-0" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56 dark:bg-[#09090B] dark:text-white" align="center">
@@ -270,6 +300,45 @@ export function DashboardLayout({
                       <span className="truncate">{chat.title}</span>
                     </DropdownMenuItem>
                   ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : title === "Library" ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 h-9 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-[#27272A] transition-colors focus:ring-0 focus:ring-offset-0 focus:outline-none border-0 focus:border-0 focus-visible:border-0">
+                    <MdOutlineFolderCopy className="h-4 w-4 text-black dark:text-white" />
+                    <span className="text-sm font-medium text-[#0f172a] dark:text-white">{title}</span>
+                    <ChevronDown className="h-4 w-4 text-gray-500" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 dark:bg-[#09090B] dark:text-white p-0" align="center">
+                  {starredFiles.length > 0 ? (
+                    <>
+                      {starredFiles.map((file) => (
+                        <DropdownMenuItem 
+                          key={file.id}
+                          className="cursor-pointer hover:bg-gray-50 dark:hover:bg-[#27272A] px-4 py-2 flex items-center gap-2"
+                          onClick={() => {
+                            console.log("Starred file clicked:", file);
+                            // Dispatch custom event to open PDF viewer
+                            const fileData = {
+                              id: file.id,
+                              name: file.name,
+                              type: file.type || 'pdf',
+                              size: 0,
+                            };
+                            window.dispatchEvent(new CustomEvent('selectFile', { detail: fileData }));
+                          }}
+                        >
+                          <span className="truncate">{file.name}</span>
+                        </DropdownMenuItem>
+                      ))}
+                    </>
+                  ) : (
+                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-50 dark:hover:bg-[#27272A] px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+                      No starred files
+                    </DropdownMenuItem>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
@@ -317,6 +386,17 @@ export function DashboardLayout({
                           <DropdownMenuItem 
                             key={file.id}
                             className="cursor-pointer hover:bg-gray-50 dark:hover:bg-[#27272A] px-4 py-2 flex items-center gap-2"
+                            onClick={() => {
+                              console.log("Starred file clicked (mobile):", file);
+                              // Dispatch custom event to open PDF viewer
+                              const fileData = {
+                                id: file.id,
+                                name: file.name,
+                                type: file.type || 'pdf',
+                                size: 0,
+                              };
+                              window.dispatchEvent(new CustomEvent('selectFile', { detail: fileData }));
+                            }}
                           >
                             {/* <FileText className="h-4 w-4 text-gray-500 dark:text-gray-400" /> */}
                             <span className="truncate">{file.name}</span>
@@ -333,9 +413,9 @@ export function DashboardLayout({
               ) : isChatPage && chatContext && chatContext.chats.length > 0 ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="flex items-center gap-1 h-9 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-[#27272A] transition-colors focus:ring-0 focus:ring-offset-0 focus:outline-none border-0 focus:border-0 focus-visible:border-0">
-                      <span className="text-sm text-gray-700 dark:text-gray-200">{title}</span>
-                      <ChevronDown className="h-3 w-3 text-gray-500 mt-0.5" />
+                    <button className="flex items-center gap-2 h-9 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-[#27272A] transition-colors focus:ring-0 focus:ring-offset-0 focus:outline-none border-0 focus:border-0 focus-visible:border-0">
+                      <span className="text-sm font-medium text-[#0f172a] dark:text-white">{title}</span>
+                      <ChevronDown className="h-4 w-4 text-gray-500" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56 dark:bg-[#09090B] dark:text-white p-0" align="start">

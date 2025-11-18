@@ -148,6 +148,12 @@ export default function SignupPage() {
                     type="text"
                     value={verificationCode}
                     onChange={(e) => setVerificationCode(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleVerificationSubmit(e as any);
+                      }
+                    }}
                     placeholder="Enter verification code"
                     className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
                       error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
@@ -201,7 +207,7 @@ export default function SignupPage() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
         <div className="w-full max-w-md flex items-center justify-center">
           {/* Form Card */}
-          <div className="w-full max-w-[412px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-6 flex flex-col gap-8">
+          <div className="w-full max-w-[412px] bg-[rgba(0,0,0,0.001)] rounded-[24px] flex flex-col gap-8">
             {/* Logo and Heading */}
             <div className="flex flex-col gap-2.5">
               {/* Company Logo */}
@@ -220,10 +226,10 @@ export default function SignupPage() {
             </div>
 
             {/* Google Sign In Button */}
-            <div className="h-12">
+            <div className="mt-3">
               <button
                 onClick={handleGoogleSignIn}
-                className="w-full h-12 border border-gray-300 rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 cursor-pointer"
+                className="w-full h-11 border border-gray-300 rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 cursor-pointer"
               >
                 <div className="w-5 h-5 relative rounded-sm overflow-hidden">
                   <Image src={GoogleIcon} alt="Google Logo" />
@@ -252,6 +258,12 @@ export default function SignupPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSubmit(e as any);
+                  }
+                }}
                 placeholder="Enter your email address"
                 className={`w-full h-10 px-3 py-2 border ${emailError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors`}
                 required
@@ -267,13 +279,15 @@ export default function SignupPage() {
             )}
 
             {/* Continue Button */}
-            <Button
+            <div className="mt-3">
+              <Button
               onClick={handleSubmit}
               disabled={!email.trim() || isLoading}
               className="w-full h-11 cursor-pointer bg-[#09090B] hover:bg-gray-800 text-white rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? "Sending code..." : "Continue"}
             </Button>
+            </div>
 
             {/* Navigation Options */}
             <div className="text-center">
