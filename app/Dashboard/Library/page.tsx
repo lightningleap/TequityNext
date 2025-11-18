@@ -2,7 +2,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
@@ -12,7 +11,6 @@ import {
   Maximize2,
   Star,
   Download,
-  Edit,
   ArrowLeft,
   ChevronRight,
 } from "lucide-react";
@@ -34,17 +32,16 @@ import {
 import { LuClock } from "react-icons/lu";
 import { IoGridOutline } from "react-icons/io5";
 import { FaListUl } from "react-icons/fa";
-import { ChevronUp, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { FiTrash } from "react-icons/fi";
 import { ChatInterface } from "../components/ChatInterface";
 import { useFiles } from "../context/FilesContext";
 import { DashboardLayout } from "../components/DashboardLayout";
 import { DeleteModal } from "../components/DeleteModal";
 import { useChatContext } from "../context/ChatContext";
-import { useSidebar } from "@/components/ui/sidebar";
+// import { useSidebar } from "@/components/ui/sidebar";
 import Image from "next/image";
 import Logomark from "@/public/Logomark.svg";
-
 
 // Dynamically import PDFViewer to prevent SSR issues with react-pdf
 const PDFViewer = dynamic(
@@ -64,7 +61,6 @@ import {
 } from "@/components/ui/tooltip";
 import { SearchDropdown } from "../components/SearchDropdown";
 
-
 interface LibraryContentProps {
   files: FileItem[];
   setFiles: React.Dispatch<React.SetStateAction<FileItem[]>>;
@@ -74,12 +70,11 @@ interface LibraryContentProps {
   >;
 }
 
-
 function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
   const router = useRouter();
   const { createNewChat, activeChat, activeChatId, chats, selectChat } =
     useChatContext();
-  const { state: sidebarState } = useSidebar();
+  // const { state: sidebarState } = useSidebar();
   const [folderView, setFolderView] = useState<"grid" | "list">("grid");
   const [fileView, setFileView] = useState<"grid" | "list">("grid");
   const [foldersExpanded, setFoldersExpanded] = useState(true);
@@ -95,10 +90,10 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 640);
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   // Reset drag position and fullscreen when AI chat is closed
@@ -111,7 +106,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -123,7 +117,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
       }
     };
 
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -131,7 +124,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
   }, []);
 
   const [isPDFViewerOpen, setIsPDFViewerOpen] = useState(false);
-  const [isPDFMaximized, setIsPDFMaximized] = useState(false);
+  // const [isPDFMaximized, setIsPDFMaximized] = useState(false);
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
   const [activeFileType, setActiveFileType] = useState<string | null>(null);
   const [selectedFolders, setSelectedFolders] = useState<Set<string>>(
@@ -147,25 +140,30 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     fileCount: number;
     files: FileItem[];
   } | null>(null);
-  const [recentlyVisited, setRecentlyVisited] = useState<Array<{
-    id: string;
-    name: string;
-    type: string;
-    isFolder: boolean;
-    visitedAt: Date;
-  }>>(() => {
+  const [recentlyVisited, setRecentlyVisited] = useState<
+    Array<{
+      id: string;
+      name: string;
+      type: string;
+      isFolder: boolean;
+      visitedAt: Date;
+    }>
+  >(() => {
     // Load from localStorage on initial render
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('recentlyVisited');
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("recentlyVisited");
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
           return parsed.map((item: any) => ({
             ...item,
-            visitedAt: new Date(item.visitedAt)
+            visitedAt: new Date(item.visitedAt),
           }));
         } catch (error) {
-          console.error('Error parsing recently visited from localStorage:', error);
+          console.error(
+            "Error parsing recently visited from localStorage:",
+            error
+          );
           return [];
         }
       }
@@ -183,15 +181,17 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
 
   // Save recently visited to localStorage whenever it changes
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       if (recentlyVisited.length > 0) {
-        localStorage.setItem('recentlyVisited', JSON.stringify(recentlyVisited));
+        localStorage.setItem(
+          "recentlyVisited",
+          JSON.stringify(recentlyVisited)
+        );
       } else {
-        localStorage.removeItem('recentlyVisited');
+        localStorage.removeItem("recentlyVisited");
       }
     }
   }, [recentlyVisited]);
-
 
   // Load starred files from localStorage on mount
   useEffect(() => {
@@ -218,29 +218,29 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
 
   const handleDragMove = (e: React.TouchEvent | React.MouseEvent) => {
     if (!isDragging) return;
-    
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+
+    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
     const windowHeight = window.innerHeight;
     const newHeight = ((windowHeight - clientY) / windowHeight) * 100;
-    
+
     // Check if dragged to top (less than 10vh from top)
     if (newHeight > 90) {
       setIsFullscreen(true);
       return;
     }
-    
+
     // Check if dragged to bottom (less than 20vh from bottom) - close the chat
     if (newHeight < 20 && !isFullscreen) {
       closeAIChat();
       setIsDragging(false);
       return;
     }
-    
+
     // Exit fullscreen if dragging down from fullscreen
     if (isFullscreen && newHeight < 85) {
       setIsFullscreen(false);
     }
-    
+
     // Limit height between 30vh and 95vh when not in fullscreen
     if (!isFullscreen) {
       const clampedHeight = Math.max(30, Math.min(95, newHeight));
@@ -255,29 +255,32 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
   useEffect(() => {
     const handleGlobalMove = (e: TouchEvent | MouseEvent) => {
       if (!isDragging) return;
-      
-      const clientY = 'touches' in e ? (e as TouchEvent).touches[0].clientY : (e as MouseEvent).clientY;
+
+      const clientY =
+        "touches" in e
+          ? (e as TouchEvent).touches[0].clientY
+          : (e as MouseEvent).clientY;
       const windowHeight = window.innerHeight;
       const newHeight = ((windowHeight - clientY) / windowHeight) * 100;
-      
+
       // Check if dragged to top (less than 10vh from top)
       if (newHeight > 90) {
         setIsFullscreen(true);
         return;
       }
-      
+
       // Check if dragged to bottom (less than 20vh from bottom) - close the chat
       if (newHeight < 20 && !isFullscreen) {
         closeAIChat();
         setIsDragging(false);
         return;
       }
-      
+
       // Exit fullscreen if dragging down from fullscreen
       if (isFullscreen && newHeight < 85) {
         setIsFullscreen(false);
       }
-      
+
       // Limit height between 30vh and 95vh when not in fullscreen
       if (!isFullscreen) {
         const clampedHeight = Math.max(30, Math.min(95, newHeight));
@@ -290,17 +293,17 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     };
 
     if (isDragging) {
-      document.addEventListener('touchmove', handleGlobalMove);
-      document.addEventListener('mousemove', handleGlobalMove);
-      document.addEventListener('touchend', handleGlobalEnd);
-      document.addEventListener('mouseup', handleGlobalEnd);
+      document.addEventListener("touchmove", handleGlobalMove);
+      document.addEventListener("mousemove", handleGlobalMove);
+      document.addEventListener("touchend", handleGlobalEnd);
+      document.addEventListener("mouseup", handleGlobalEnd);
     }
 
     return () => {
-      document.removeEventListener('touchmove', handleGlobalMove);
-      document.removeEventListener('mousemove', handleGlobalMove);
-      document.removeEventListener('touchend', handleGlobalEnd);
-      document.removeEventListener('mouseup', handleGlobalEnd);
+      document.removeEventListener("touchmove", handleGlobalMove);
+      document.removeEventListener("mousemove", handleGlobalMove);
+      document.removeEventListener("touchend", handleGlobalEnd);
+      document.removeEventListener("mouseup", handleGlobalEnd);
     };
   }, [isDragging, isFullscreen]);
 
@@ -313,7 +316,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     Audio: ["MP3", "WAV", "AAC", "OGG", "WMA"],
     Excel: ["XLSX", "XLS", "CSV"],
   };
-
 
   // Get paginated files
   const paginatedFiles = (fileList: FileItem[], page: number) => {
@@ -329,12 +331,10 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
       ? fileTypeMap[activeFileType]?.includes(fileExt || "")
       : true;
 
-
     // Filter by search query
     const searchMatch = searchQuery
       ? file.name.toLowerCase().includes(searchQuery.toLowerCase())
       : true;
-
 
     return typeMatch && searchMatch;
   });
@@ -348,7 +348,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
       ? folder.name.toLowerCase().includes(searchQuery.toLowerCase())
       : true
   );
-
 
   // Checkbox handlers
   const toggleFolderSelection = (folderId: string, e: React.MouseEvent) => {
@@ -364,7 +363,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     });
   };
 
-
   const toggleFileSelection = (fileId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedFiles((prev) => {
@@ -378,7 +376,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     });
   };
 
-
   // Toggle star status for a file
   const toggleFileStar = (fileId: string, fileName: string) => {
     setStarredFileIds((prev) => {
@@ -388,7 +385,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
       } else {
         newSet.add(fileId);
       }
-
 
       // Save to localStorage with file details
       const starredFilesData = Array.from(newSet).map((id) => {
@@ -400,18 +396,15 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
         };
       });
 
-
       if (typeof window !== "undefined") {
         localStorage.setItem("starredFiles", JSON.stringify(starredFilesData));
         // Dispatch custom event to notify sidebar
         window.dispatchEvent(new Event("starredFilesUpdated"));
       }
 
-
       return newSet;
     });
   };
-
 
   // Format date helper
   const formatDate = (date: Date) => {
@@ -422,7 +415,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     }).format(new Date(date));
   };
 
-
   // Format file size helper
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return "-";
@@ -432,24 +424,23 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     return `${mb.toFixed(2)} MB`;
   };
 
-
   const handleFileSelect = (file: FileItem) => {
     console.log("File selected:", file);
     setSelectedFile(file);
     setIsPDFViewerOpen(true);
-    
+
     // Add to recently visited
-    setRecentlyVisited(prev => {
+    setRecentlyVisited((prev) => {
       const newItem = {
-        id: file.id || file.name || 'unknown',
+        id: file.id || file.name || "unknown",
         name: file.name,
-        type: (file.type || 'pdf').toString(),
+        type: (file.type || "pdf").toString(),
         isFolder: false,
-        visitedAt: new Date()
+        visitedAt: new Date(),
       };
-      
+
       // Remove if already exists and add to beginning
-      const filtered = prev.filter(item => item.id !== newItem.id);
+      const filtered = prev.filter((item) => item.id !== newItem.id);
       return [newItem, ...filtered].slice(0, 8); // Keep only 8 most recent
     });
   };
@@ -460,22 +451,21 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     fileCount: number;
   }) => {
     console.log("Folder selected:", folder);
-    
+
     // Add to recently visited
-    setRecentlyVisited(prev => {
+    setRecentlyVisited((prev) => {
       const newItem = {
         id: folder.id,
         name: folder.name,
-        type: 'folder',
+        type: "folder",
         isFolder: true,
-        visitedAt: new Date()
+        visitedAt: new Date(),
       };
-      
+
       // Remove if already exists and add to beginning
-      const filtered = prev.filter(item => item.id !== folder.id);
+      const filtered = prev.filter((item) => item.id !== folder.id);
       return [newItem, ...filtered].slice(0, 8); // Keep only 8 most recent
     });
-
 
     // Create sample files for the folder
     const sampleFiles: FileItem[] = [
@@ -511,7 +501,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
       },
     ];
 
-
     // Set the folder view state
     setCurrentFolder({
       ...folder,
@@ -525,9 +514,9 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     const handleOpenPDFViewer = (event: CustomEvent) => {
       const fileData = event.detail;
       console.log("Opening PDF viewer from sidebar:", fileData);
-      
+
       // Find the file in the files array
-      const file = files.find(f => f.id === fileData.id);
+      const file = files.find((f) => f.id === fileData.id);
       if (file) {
         handleFileSelect(file);
       } else {
@@ -535,16 +524,22 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
         const fileItem: FileItem = {
           id: fileData.id || fileData.name,
           name: fileData.name,
-          type: fileData.type || 'pdf',
+          type: fileData.type || "pdf",
           size: fileData.size || 0,
         };
         handleFileSelect(fileItem);
       }
     };
 
-    window.addEventListener('openPDFViewer', handleOpenPDFViewer as EventListener);
+    window.addEventListener(
+      "openPDFViewer",
+      handleOpenPDFViewer as EventListener
+    );
     return () => {
-      window.removeEventListener('openPDFViewer', handleOpenPDFViewer as EventListener);
+      window.removeEventListener(
+        "openPDFViewer",
+        handleOpenPDFViewer as EventListener
+      );
     };
   }, [files, handleFileSelect]);
 
@@ -553,9 +548,11 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     const handleSelectFile = (event: CustomEvent) => {
       const fileData = event.detail;
       console.log("Selecting file from SearchDialog:", fileData);
-      
+
       // Find the file in the files array
-      const file = files.find(f => f.id === fileData.id || f.name === fileData.name);
+      const file = files.find(
+        (f) => f.id === fileData.id || f.name === fileData.name
+      );
       if (file) {
         handleFileSelect(file);
       } else {
@@ -563,16 +560,19 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
         const fileItem: FileItem = {
           id: fileData.id || fileData.name,
           name: fileData.name,
-          type: fileData.type || 'pdf',
+          type: fileData.type || "pdf",
           size: fileData.size || 0,
         };
         handleFileSelect(fileItem);
       }
     };
 
-    window.addEventListener('selectFile', handleSelectFile as EventListener);
+    window.addEventListener("selectFile", handleSelectFile as EventListener);
     return () => {
-      window.removeEventListener('selectFile', handleSelectFile as EventListener);
+      window.removeEventListener(
+        "selectFile",
+        handleSelectFile as EventListener
+      );
     };
   }, [files, handleFileSelect]);
 
@@ -581,9 +581,11 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     const handleSelectFolder = (event: CustomEvent) => {
       const folderData = event.detail;
       console.log("Selecting folder from SearchDialog:", folderData);
-      
+
       // Find the folder in the folders array
-      const folder = folders.find(f => f.id === folderData.id || f.name === folderData.name);
+      const folder = folders.find(
+        (f) => f.id === folderData.id || f.name === folderData.name
+      );
       if (folder) {
         handleFolderSelect(folder);
       } else {
@@ -597,14 +599,20 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
       }
     };
 
-    window.addEventListener('selectFolder', handleSelectFolder as EventListener);
+    window.addEventListener(
+      "selectFolder",
+      handleSelectFolder as EventListener
+    );
     return () => {
-      window.removeEventListener('selectFolder', handleSelectFolder as EventListener);
+      window.removeEventListener(
+        "selectFolder",
+        handleSelectFolder as EventListener
+      );
     };
   }, [folders, handleFolderSelect]);
 
   // Calculate sidebar width for PDF maximized state
-  const sidebarWidth = sidebarState === "collapsed" ? "3rem" : "16rem";
+  // const sidebarWidth = sidebarState === "collapsed" ? "3rem" : "16rem";
 
   // Prevent body scroll when chat is open on mobile
   useEffect(() => {
@@ -622,13 +630,11 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     };
   }, [isAIChatOpen]);
 
-
   const handleBackToLibrary = () => {
     setIsViewingFolder(false);
     setCurrentFolder(null);
     setCurrentPage(1); // Reset to first page when going back
   };
-
 
   return (
     <>
@@ -662,7 +668,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                     {currentFolder.files.length} items
                   </p>
                 </div>
-
 
                 {/* Folder Files Section */}
                 <section
@@ -698,7 +703,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                       </button>
                     </div>
                   </div>
-
 
                   {folderContentView === "grid" ? (
                     <div className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -764,11 +768,17 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                             <TableHead className="w-[30px] sm:w-[40px] px-2 sm:px-4">
                               <input
                                 type="checkbox"
-                                checked={currentFolder.files.length > 0 && selectedFiles.size === currentFolder.files.length}
+                                checked={
+                                  currentFolder.files.length > 0 &&
+                                  selectedFiles.size ===
+                                    currentFolder.files.length
+                                }
                                 onChange={(e) => {
                                   if (e.target.checked) {
                                     // Select all files in current folder
-                                    const allFileIds = currentFolder.files.map(file => file.id || file.name);
+                                    const allFileIds = currentFolder.files.map(
+                                      (file) => file.id || file.name
+                                    );
                                     setSelectedFiles(new Set(allFileIds));
                                   } else {
                                     // Deselect all
@@ -811,9 +821,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                 return "/Files/file.svg";
                               };
 
-
                               const fileId = file.id || file.name;
-
 
                               return (
                                 <TableRow
@@ -837,7 +845,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                       <img
                                         src={getFileIcon()}
                                         alt={file.type}
-                                        className="h-[16px] w-[16px] sm:h-[20px] sm:w-[20px] flex-shrink-0 object-contain"
+                                        className="h-[16px] w-[16px] sm:h-[20px] sm:w-[20px] shrink-0 object-contain"
                                       />
                                       <span className="truncate font-medium text-gray-900 dark:text-white text-xs sm:text-sm">
                                         {file.name}
@@ -929,7 +937,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                   )}
                 </section>
 
-
                 {/* Bottom spacer */}
                 <div className="h-8 sm:h-8" aria-hidden="true"></div>
               </>
@@ -957,80 +964,105 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                   </div>
                 </header>
 
-
                 {recentlyVisited.length > 0 && (
-                <section
-                  aria-labelledby="recently-visited"
-                  className="mb-6 sm:mb-10"
-                >
-                  <h2
-                    id="recently-visited"
-                    className="mb-4 sm:mb-6 flex gap-2 text-sm font-medium text-muted-foreground"
+                  <section
+                    aria-labelledby="recently-visited"
+                    className="mb-6 sm:mb-10"
                   >
-                    <LuClock className="size-4 text-muted-foreground" />
-                    Recently visited
-                  </h2>
-                  <div className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 md:grid md:grid-cols-3 lg:grid-cols-4 md:overflow-x-visible">
-                    {recentlyVisited.slice(0, 4).map((item, index) => {
-                      // Determine image source based on type and folder status
-                      let imageSrc = "/noPdfImg.svg"; // default
-                      if (item.isFolder) {
-                        imageSrc = "/BigFolder.svg";
-                      } else if (item.type?.toLowerCase() === 'pdf' || item.type?.toLowerCase() === 'txt' || item.type?.toLowerCase() === 'doc' || item.type?.toLowerCase() === 'docx') {
-                        imageSrc = "/txtPDF.svg";
-                      } else if (item.type?.toLowerCase() === 'mp3' || item.type?.toLowerCase() === 'mp4' || item.type?.toLowerCase() === 'jpg' || item.type?.toLowerCase() === 'png' || item.type?.toLowerCase() === 'gif') {
-                        imageSrc = "/noPdfImg.svg"; // music and images
-                      }
-                      
-                      // Calculate time ago
-                      const now = new Date();
-                      const diffInHours = Math.floor((now.getTime() - item.visitedAt.getTime()) / (1000 * 60 * 60));
-                      let timeAgo = "Just now";
-                      if (diffInHours === 1) timeAgo = "1 hour ago";
-                      else if (diffInHours < 24) timeAgo = `${diffInHours} hours ago`;
-                      else if (diffInHours < 48) timeAgo = "1 day ago";
-                      else timeAgo = `${Math.floor(diffInHours / 24)} days ago`;
-                      
-                      const actionText = item.isFolder ? "Opened" : index === 3 ? "Last updated" : "Opened";
-                      
-                      return (
-                        <div 
-                          key={item.id}
-                          className="flex flex-col items-center w-[180px] h-[170px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center p-[12px] gap-[20px] flex-shrink-0"
-                          onClick={() => {
-                            if (item.isFolder) {
-                              // Find the folder and select it
-                              const folder = folders.find(f => f.id === item.id);
-                              if (folder) handleFolderSelect(folder);
-                            } else {
-                              // Find the file and select it
-                              const file = files.find(f => f.id === item.id);
-                              if (file) handleFileSelect(file);
-                            }
-                          }}
-                        >
-                          <div className="flex items-center justify-center w-[156px] h-[90px] flex-shrink-0">
-                            <img
-                              src={imageSrc}
-                              alt={item.isFolder ? "Folder" : "File"}
-                              className="max-w-full max-h-full object-contain"
-                            />
-                          </div>
-                          <div className="w-[156px] h-[36px] flex flex-col items-center justify-center">
-                            <p className="text-xs sm:text-sm font-medium text-gray-900 truncate dark:text-white lines-clamp-1" title={item.name}>
-                              {item.name}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {actionText} {timeAgo}
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </section>
-                )}
+                    <h2
+                      id="recently-visited"
+                      className="mb-4 sm:mb-6 flex gap-2 text-sm font-medium text-muted-foreground"
+                    >
+                      <LuClock className="size-4 text-muted-foreground" />
+                      Recently visited
+                    </h2>
+                    <div className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 md:grid md:grid-cols-3 lg:grid-cols-4 md:overflow-x-visible">
+                      {recentlyVisited.slice(0, 4).map((item, index) => {
+                        // Determine image source based on type and folder status
+                        let imageSrc = "/noPdfImg.svg"; // default
+                        if (item.isFolder) {
+                          imageSrc = "/BigFolder.svg";
+                        } else if (
+                          item.type?.toLowerCase() === "pdf" ||
+                          item.type?.toLowerCase() === "txt" ||
+                          item.type?.toLowerCase() === "doc" ||
+                          item.type?.toLowerCase() === "docx"
+                        ) {
+                          imageSrc = "/txtPDF.svg";
+                        } else if (
+                          item.type?.toLowerCase() === "mp3" ||
+                          item.type?.toLowerCase() === "mp4" ||
+                          item.type?.toLowerCase() === "jpg" ||
+                          item.type?.toLowerCase() === "png" ||
+                          item.type?.toLowerCase() === "gif"
+                        ) {
+                          imageSrc = "/noPdfImg.svg"; // music and images
+                        }
 
+                        // Calculate time ago
+                        const now = new Date();
+                        const diffInHours = Math.floor(
+                          (now.getTime() - item.visitedAt.getTime()) /
+                            (1000 * 60 * 60)
+                        );
+                        let timeAgo = "Just now";
+                        if (diffInHours === 1) timeAgo = "1 hour ago";
+                        else if (diffInHours < 24)
+                          timeAgo = `${diffInHours} hours ago`;
+                        else if (diffInHours < 48) timeAgo = "1 day ago";
+                        else
+                          timeAgo = `${Math.floor(diffInHours / 24)} days ago`;
+
+                        const actionText = item.isFolder
+                          ? "Opened"
+                          : index === 3
+                          ? "Last updated"
+                          : "Opened";
+
+                        return (
+                          <div
+                            key={item.id}
+                            className="flex flex-col items-center w-[180px] h-[170px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center p-[12px] gap-[20px] shrink-0"
+                            onClick={() => {
+                              if (item.isFolder) {
+                                // Find the folder and select it
+                                const folder = folders.find(
+                                  (f) => f.id === item.id
+                                );
+                                if (folder) handleFolderSelect(folder);
+                              } else {
+                                // Find the file and select it
+                                const file = files.find(
+                                  (f) => f.id === item.id
+                                );
+                                if (file) handleFileSelect(file);
+                              }
+                            }}
+                          >
+                            <div className="flex items-center justify-center w-[156px] h-[90px] shrink-0">
+                              <img
+                                src={imageSrc}
+                                alt={item.isFolder ? "Folder" : "File"}
+                                className="max-w-full max-h-full object-contain"
+                              />
+                            </div>
+                            <div className="w-[156px] h-[36px] flex flex-col items-center justify-center">
+                              <p
+                                className="text-xs sm:text-sm font-medium text-gray-900 truncate dark:text-white lines-clamp-1"
+                                title={item.name}
+                              >
+                                {item.name}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {actionText} {timeAgo}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+                )}
 
                 <section
                   aria-labelledby="all-folders"
@@ -1038,22 +1070,22 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                 >
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setFoldersExpanded(!foldersExpanded)}
-                      className="flex items-center gap-2 p-2 rounded-md text-sm font-medium text-muted-foreground cursor-pointer hover:text-foreground transition-colors hover:bg-[#F4F4F5]"
-                      aria-label={
-                        foldersExpanded
-                          ? "Collapse folders"
-                          : "Expand folders"
-                      }
-                    >
-                      All Categories
-                      {foldersExpanded ? (
-                        <ChevronDown className="size-4" />
-                      ) : (
-                        <ChevronRight className="size-4" />
-                      )}
-                    </button>
+                      <button
+                        onClick={() => setFoldersExpanded(!foldersExpanded)}
+                        className="flex items-center gap-2 p-2 rounded-md text-sm font-medium text-muted-foreground cursor-pointer hover:text-foreground transition-colors hover:bg-[#F4F4F5]"
+                        aria-label={
+                          foldersExpanded
+                            ? "Collapse folders"
+                            : "Expand folders"
+                        }
+                      >
+                        All Categories
+                        {foldersExpanded ? (
+                          <ChevronDown className="size-4" />
+                        ) : (
+                          <ChevronRight className="size-4" />
+                        )}
+                      </button>
                     </div>
                     <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-md dark:bg-[#27272A]">
                       <button
@@ -1080,7 +1112,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                       </button>
                     </div>
                   </div>
-
 
                   {foldersExpanded && (
                     <>
@@ -1125,12 +1156,21 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                 <TableHead className="w-[30px] sm:w-[40px] px-2 sm:px-4">
                                   <input
                                     type="checkbox"
-                                    checked={filteredFolders.length > 0 && selectedFolders.size === filteredFolders.length}
+                                    checked={
+                                      filteredFolders.length > 0 &&
+                                      selectedFolders.size ===
+                                        filteredFolders.length
+                                    }
                                     onChange={(e) => {
                                       if (e.target.checked) {
                                         // Select all folders
-                                        const allFolderIds = filteredFolders.map(folder => folder.id);
-                                        setSelectedFolders(new Set(allFolderIds));
+                                        const allFolderIds =
+                                          filteredFolders.map(
+                                            (folder) => folder.id
+                                          );
+                                        setSelectedFolders(
+                                          new Set(allFolderIds)
+                                        );
                                       } else {
                                         // Deselect all
                                         setSelectedFolders(new Set());
@@ -1178,7 +1218,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                         <img
                                           src="/Folder.svg"
                                           alt="Folder"
-                                          className="h-[16px] w-[16px] sm:h-[20px] sm:w-[20px] flex-shrink-0"
+                                          className="h-[16px] w-[16px] sm:h-[20px] sm:w-[20px] shrink-0"
                                         />
                                         <span className="truncate font-medium text-gray-900 dark:text-white text-xs sm:text-sm">
                                           {folder.name}
@@ -1226,29 +1266,27 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                   )}
                 </section>
 
-
                 <section
                   aria-labelledby="all-files"
                   className="space-y-3 sm:space-y-4"
                 >
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setFilesExpanded(!filesExpanded)}
-                      className="flex items-center gap-2 p-2 rounded-md text-sm font-medium text-muted-foreground cursor-pointer hover:text-foreground transition-colors hover:bg-[#F4F4F5]"
-                      aria-label={
-                        filesExpanded ? "Collapse files" : "Expand files"
-                      }
-                    >
-                      All Files
-                      {filesExpanded ? (
-                        <ChevronDown className="size-4" />
-                      ) : (
-                        <ChevronRight className="size-4" />
-                      )}
-                    </button>
+                      <button
+                        onClick={() => setFilesExpanded(!filesExpanded)}
+                        className="flex items-center gap-2 p-2 rounded-md text-sm font-medium text-muted-foreground cursor-pointer hover:text-foreground transition-colors hover:bg-[#F4F4F5]"
+                        aria-label={
+                          filesExpanded ? "Collapse files" : "Expand files"
+                        }
+                      >
+                        All Files
+                        {filesExpanded ? (
+                          <ChevronDown className="size-4" />
+                        ) : (
+                          <ChevronRight className="size-4" />
+                        )}
+                      </button>
                     </div>
-
 
                     <div className="flex items-center gap-1 bg-gray-100 dark:bg-[#27272A] p-1 rounded-md">
                       <button
@@ -1330,7 +1368,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                           );
                         })}
                       </div>
-
 
                       {fileView === "grid" ? (
                         <div className="space-y-4">
@@ -1525,11 +1562,17 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                 <TableHead className="w-[30px] sm:w-[40px] px-2 sm:px-4">
                                   <input
                                     type="checkbox"
-                                    checked={filteredFiles.length > 0 && selectedFiles.size === filteredFiles.length}
+                                    checked={
+                                      filteredFiles.length > 0 &&
+                                      selectedFiles.size ===
+                                        filteredFiles.length
+                                    }
                                     onChange={(e) => {
                                       if (e.target.checked) {
                                         // Select all files
-                                        const allFileIds = filteredFiles.map(file => file.id || file.name);
+                                        const allFileIds = filteredFiles.map(
+                                          (file) => file.id || file.name
+                                        );
                                         setSelectedFiles(new Set(allFileIds));
                                       } else {
                                         // Deselect all
@@ -1610,9 +1653,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                     return "/Files/file.svg";
                                   };
 
-
                                   const fileId = file.id || file.name;
-
 
                                   return (
                                     <TableRow
@@ -1639,7 +1680,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                                           <img
                                             src={getFileIcon()}
                                             alt={file.type}
-                                            className="h-[16px] w-[16px] sm:h-[20px] sm:w-[20px] flex-shrink-0 object-contain"
+                                            className="h-[16px] w-[16px] sm:h-[20px] sm:w-[20px] shrink-0 object-contain"
                                           />
                                           <span className="truncate font-medium text-gray-900 dark:text-white text-xs sm:text-sm">
                                             {file.name}
@@ -1804,7 +1845,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
           </div>
         </main>
 
-
         {/* Backdrop for mobile when AI chat is open */}
         {isAIChatOpen && (
           <div
@@ -1812,7 +1852,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
             onClick={closeAIChat}
           />
         )}
-
 
         {/* AI Chat Sidebar - Slides from bottom on mobile, from right on desktop */}
         <div
@@ -1828,11 +1867,20 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
               isAIChatOpen ? "sm:translate-x-0" : "sm:translate-x-full"
             }
           `}
-          style={{ height: isMobile && isAIChatOpen && !isFullscreen ? `${dragPosition}vh` : isMobile && isFullscreen ? '100vh' : undefined }}
+          style={{
+            height:
+              isMobile && isAIChatOpen && !isFullscreen
+                ? `${dragPosition}vh`
+                : isMobile && isFullscreen
+                ? "100vh"
+                : undefined,
+          }}
         >
           {/* Draggable handle for mobile - hide in fullscreen */}
           <div
-            className={`sm:hidden flex justify-center py-2 cursor-touch active:cursor-grabbing ${isFullscreen ? 'opacity-0 pointer-events-none' : ''}`}
+            className={`sm:hidden flex justify-center py-2 cursor-touch active:cursor-grabbing ${
+              isFullscreen ? "opacity-0 pointer-events-none" : ""
+            }`}
             onTouchStart={handleDragStart}
             onTouchMove={handleDragMove}
             onTouchEnd={handleDragEnd}
@@ -1851,14 +1899,13 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
               <ChevronsRight className="h-4 w-4" />
             </button>
 
-
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer">
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
                     {activeChat?.title || "New Chat"}
                   </span>
-                  <ChevronDown className="h-4 w-4 font-bold text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                  <ChevronDown className="h-4 w-4 font-bold text-gray-500 dark:text-gray-400 shrink-0" />
                 </button>
               </DropdownMenu.Trigger>
               <DropdownMenu.Portal>
@@ -1892,7 +1939,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
               </DropdownMenu.Portal>
             </DropdownMenu.Root>
 
-
             <button
               onClick={() => {
                 router.push("/Dashboard/chat");
@@ -1914,7 +1960,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
           </div>
         </div>
 
-
         {/* Floating AI Button */}
         {!isAIChatOpen && (
           <TooltipProvider>
@@ -1933,7 +1978,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                     alt="Tequity AI"
                     width={56}
                     height={56}
-                    className="flex-shrink-0"
+                    className="shrink-0"
                   />
                 </button>
               </TooltipTrigger>
@@ -1944,14 +1989,12 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
           </TooltipProvider>
         )}
 
-
         {/* PDF Viewer */}
         <PDFViewer
           isOpen={isPDFViewerOpen}
           onClose={() => setIsPDFViewerOpen(false)}
           file={selectedFile}
         />
-
 
         {/* Delete Confirmation Modal */}
         <DeleteModal
@@ -1960,7 +2003,6 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
           onCancel={() => setFileToDelete(null)}
           onConfirm={() => {
             if (!fileToDelete) return;
-
 
             // Close PDF viewer if the deleted file is currently open
             if (selectedFile?.id === fileToDelete.id) {
@@ -1985,10 +2027,8 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
   );
 }
 
-
 export default function LibraryPage() {
   const { setFiles: setGlobalFiles, setFolders: setGlobalFolders } = useFiles();
-
 
   const [folders, setFolders] = useState([
     { id: "1", name: "Financial Reports", fileCount: 24 },
@@ -1998,7 +2038,6 @@ export default function LibraryPage() {
     { id: "5", name: "Design Assets", fileCount: 234 },
     { id: "6", name: "Legal Documents", fileCount: 12 },
   ]);
-
 
   const [files, setFiles] = useState<FileItem[]>([
     {
@@ -2067,13 +2106,11 @@ export default function LibraryPage() {
     },
   ]);
 
-
   // Update global context whenever files or folders change
   useEffect(() => {
     setGlobalFiles(files);
     setGlobalFolders(folders);
   }, [files, folders, setGlobalFiles, setGlobalFolders]);
-
 
   const handleFileUpload = (
     newFiles: FileItem[],
@@ -2082,17 +2119,14 @@ export default function LibraryPage() {
     console.log("Library received - Files:", newFiles);
     console.log("Library received - Folders:", newFolders);
 
-
     if (newFiles.length > 0) {
       setFiles((prevFiles) => [...prevFiles, ...newFiles]);
     }
-
 
     if (newFolders.length > 0) {
       setFolders((prevFolders) => [...prevFolders, ...newFolders]);
     }
   };
-
 
   return (
     <DashboardLayout
@@ -2108,7 +2142,3 @@ export default function LibraryPage() {
     </DashboardLayout>
   );
 }
-
-
-
-

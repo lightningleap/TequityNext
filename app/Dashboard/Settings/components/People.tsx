@@ -77,7 +77,7 @@ export function People() {
   const indexOfLastUser = currentPage * itemsPerPage;
   const indexOfFirstUser = indexOfLastUser - itemsPerPage;
   const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
-  const totalPages = Math.ceil(users.length / itemsPerPage);
+  // const totalPages = Math.ceil(users.length / itemsPerPage);
   
   // Handlers
   const handlePageChange = (page: number) => {
@@ -114,7 +114,7 @@ export function People() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="px-4 py-2 whitespace-nowrap border border-gray-300 hover:bg-gray-50 dark:hover:bg-[#27272A] rounded-md text-sm hover:bg-gray-50 transition-colors">
+          <button className="px-4 py-2 whitespace-nowrap border border-gray-300 hover:bg-gray-50 dark:hover:bg-[#27272A] rounded-md text-sm  transition-colors">
             Copy link
           </button>
           <button
@@ -177,7 +177,7 @@ export function People() {
                 </TableCell>
                 <TableCell className="py-3 px-2">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex-shrink-0 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-medium dark:bg-blue-900 dark:text-blue-200">
+                    <div className="shrink-0 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-medium dark:bg-blue-900 dark:text-blue-200">
                       {user.initials}
                     </div>
                     <div className="min-w-0">

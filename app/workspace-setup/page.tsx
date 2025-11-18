@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -27,45 +27,55 @@ export default function WorkspaceSetupPage() {
   const router = useRouter();
 
   // Step 1 handlers
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setWorkspaceName(e.target.value);
-  }, []);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setWorkspaceName(e.target.value);
+    },
+    []
+  );
 
-  const handleStep1Submit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
+  const handleStep1Submit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setError("");
+      setIsLoading(true);
 
-    try {
-      // Validate workspace name
-      if (workspaceName.trim().length < 3) {
-        throw new Error("Dataroom name must be at least 3 characters long");
+      try {
+        // Validate workspace name
+        if (workspaceName.trim().length < 3) {
+          throw new Error("Dataroom name must be at least 3 characters long");
+        }
+
+        if (workspaceName.trim().length > 50) {
+          throw new Error("Dataroom name must not exceed 50 characters");
+        }
+
+        // Check for invalid characters
+        const invalidChars = /[<>:"/\\|?*]/;
+        if (invalidChars.test(workspaceName)) {
+          throw new Error("Dataroom name contains invalid characters");
+        }
+
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        // Store dataroom name in localStorage
+        localStorage.setItem("dataroomName", workspaceName.trim());
+
+        // Move to step 2
+        setCurrentStep(2);
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to create dataroom. Please try again."
+        );
+      } finally {
+        setIsLoading(false);
       }
-
-      if (workspaceName.trim().length > 50) {
-        throw new Error("Dataroom name must not exceed 50 characters");
-      }
-
-      // Check for invalid characters
-      const invalidChars = /[<>:"/\\|?*]/;
-      if (invalidChars.test(workspaceName)) {
-        throw new Error("Dataroom name contains invalid characters");
-      }
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // Store dataroom name in localStorage
-      localStorage.setItem('dataroomName', workspaceName.trim());
-
-      // Move to step 2
-      setCurrentStep(2);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create dataroom. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [workspaceName]);
+    },
+    [workspaceName]
+  );
 
   // Step 2 handlers
   const handleStep2Submit = useCallback(async (e: React.FormEvent) => {
@@ -84,21 +94,24 @@ export default function WorkspaceSetupPage() {
   }, []);
 
   // Step 3 handlers
-  const handleStep3Submit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const handleStep3Submit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsLoading(true);
 
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      try {
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Navigate to Dashboard
-      router.prefetch("/Dashboard/Library");
-      router.push("/Dashboard/Library");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [router]);
+        // Navigate to Dashboard
+        router.prefetch("/Dashboard/Library");
+        router.push("/Dashboard/Library");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [router]
+  );
 
   const handleSkip = useCallback(() => {
     // Navigate to Dashboard when skipping
@@ -112,7 +125,7 @@ export default function WorkspaceSetupPage() {
     { value: "investor", label: "Investor Reporting" },
     { value: "board", label: "Board Pack" },
     { value: "diligence", label: "Due Diligence" },
-    { value: "other", label: "Other" }
+    { value: "other", label: "Other" },
   ];
 
   const progressWidth = `${(currentStep / 3) * 100}%`;
@@ -130,218 +143,233 @@ export default function WorkspaceSetupPage() {
         <div className="min-h-[500px]">
           {/* Step 1: Workspace Name */}
           {currentStep === 1 && (
-          <>
-            <div className="space-y-2">
-              <h1 className="text-3xl font-normal text-gray-900">
-                Welcome to Tequity
-              </h1>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Create a secure room for your deal, project, or confidential files.
-              </p>
-            </div>
-
-            <div className="space-y-5">
-              {error && (
-                <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-sm text-red-600">{error}</p>
-                </div>
-              )}
-
+            <>
               <div className="space-y-2">
-                <input
-                  type="text"
-                  value={workspaceName}
-                  onChange={handleInputChange}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleStep1Submit(e as any);
-                    }
-                  }}
-                  placeholder="Dataroom Name"
-                  className={`w-full h-10 px-3 border rounded-lg focus:outline-none focus:ring-2 text-sm transition-colors ${
-                    error
-                      ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                      : 'border-gray-300 focus:ring-pink-500 focus:border-pink-500'
-                  }`}
-                  required
-                />
-                <p className="text-xs text-gray-500">
-                  You can rename this later — no commitments yet.
+                <h1 className="text-3xl font-normal text-gray-900">
+                  Welcome to Tequity
+                </h1>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  Create a secure room for your deal, project, or confidential
+                  files.
                 </p>
               </div>
 
-              <Button
-                onClick={handleStep1Submit}
-                disabled={!workspaceName.trim() || isLoading}
-                className="w-full h-11 cursor-pointer bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? "Setting up..." : "Set up dataroom"}
-              </Button>
+              <div className="space-y-5">
+                {error && (
+                  <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-600">{error}</p>
+                  </div>
+                )}
 
-              <div className="flex items-center justify-center">
-                <div className="w-full max-w-[120px] h-1 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-gray-900 rounded-full transition-all duration-500 ease-out" style={{ width: progressWidth }}></div>
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    value={workspaceName}
+                    onChange={handleInputChange}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleStep1Submit(e as React.FormEvent);
+                      }
+                    }}
+                    placeholder="Dataroom Name"
+                    className={`w-full h-10 px-3 border rounded-lg focus:outline-none focus:ring-2 text-sm transition-colors ${
+                      error
+                        ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                        : "border-gray-300 focus:ring-pink-500 focus:border-pink-500"
+                    }`}
+                    required
+                  />
+                  <p className="text-xs text-gray-500">
+                    You can rename this later — no commitments yet.
+                  </p>
+                </div>
+
+                <Button
+                  onClick={handleStep1Submit}
+                  disabled={!workspaceName.trim() || isLoading}
+                  className="w-full h-11 cursor-pointer bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? "Setting up..." : "Set up dataroom"}
+                </Button>
+
+                <div className="flex items-center justify-center">
+                  <div className="w-full max-w-[120px] h-1 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gray-900 rounded-full transition-all duration-500 ease-out"
+                      style={{ width: progressWidth }}
+                    ></div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </>
-        )}
+            </>
+          )}
 
-        {/* Step 2: Use Case Selection */}
-        {currentStep === 2 && (
-          <>
-            <div className="space-y-2">
-              <h1 className="text-3xl font-normal text-gray-900">
-                What brings you to Tequity?
-              </h1>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Help us tailor your experience with the right tools.
-              </p>
-            </div>
-
-            <div className="space-y-5">
+          {/* Step 2: Use Case Selection */}
+          {currentStep === 2 && (
+            <>
               <div className="space-y-2">
-                <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && selectedOption) {
-                          e.preventDefault();
-                          handleStep2Submit(e as any);
-                        }
-                      }}
-                      className="w-full justify-between h-10 px-3 border border-gray-300 rounded-lg hover:bg-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
-                    >
-                      {selectedOption ?
-                        options.find(opt => opt.value === selectedOption)?.label :
-                        'Select an option'}
-                      <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${isOpen ? 'transform rotate-180' : ''}`} />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] p-1">
-                    {options.map((option) => (
-                      <DropdownMenuItem
-                        key={option.value}
-                        className="flex items-center justify-between px-3 py-2 text-sm rounded-md cursor-pointer hover:bg-gray-100"
-                        onSelect={() => {
-                          setSelectedOption(option.value);
-                          setIsOpen(false);
+                <h1 className="text-3xl font-normal text-gray-900">
+                  What brings you to Tequity?
+                </h1>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  Help us tailor your experience with the right tools.
+                </p>
+              </div>
+
+              <div className="space-y-5">
+                <div className="space-y-2">
+                  <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && selectedOption) {
+                            e.preventDefault();
+                            handleStep2Submit(e as React.FormEvent);
+                          }
                         }}
+                        className="w-full justify-between h-10 px-3 border border-gray-300 rounded-lg hover:bg-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
                       >
-                        <span>{option.label}</span>
-                        {selectedOption === option.value && (
-                          <Check className="h-4 w-4 text-pink-500" />
-                        )}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+                        {selectedOption
+                          ? options.find((opt) => opt.value === selectedOption)
+                              ?.label
+                          : "Select an option"}
+                        <ChevronDown
+                          className={`ml-2 h-4 w-4 transition-transform ${
+                            isOpen ? "transform rotate-180" : ""
+                          }`}
+                        />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width) p-1">
+                      {options.map((option) => (
+                        <DropdownMenuItem
+                          key={option.value}
+                          className="flex items-center justify-between px-3 py-2 text-sm rounded-md cursor-pointer hover:bg-gray-100"
+                          onSelect={() => {
+                            setSelectedOption(option.value);
+                            setIsOpen(false);
+                          }}
+                        >
+                          <span>{option.label}</span>
+                          {selectedOption === option.value && (
+                            <Check className="h-4 w-4 text-pink-500" />
+                          )}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
 
-              <Button
-                onClick={handleStep2Submit}
-                disabled={!selectedOption || isLoading}
-                className="w-full h-11 cursor-pointer bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? "Setting up..." : "Continue"}
-              </Button>
+                <Button
+                  onClick={handleStep2Submit}
+                  disabled={!selectedOption || isLoading}
+                  className="w-full h-11 cursor-pointer bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? "Setting up..." : "Continue"}
+                </Button>
 
-              <div className="flex items-center justify-center">
-                <div className="w-full max-w-[120px] h-1 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-gray-900 rounded-full transition-all duration-500 ease-out" style={{ width: progressWidth }}></div>
+                <div className="flex items-center justify-center">
+                  <div className="w-full max-w-[120px] h-1 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gray-900 rounded-full transition-all duration-500 ease-out"
+                      style={{ width: progressWidth }}
+                    ></div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </>
-        )}
+            </>
+          )}
 
-        {/* Step 3: Team Invitations */}
-        {currentStep === 3 && (
-          <>
-            <div className="space-y-2">
-              <h1 className="text-3xl font-normal text-gray-900">
-                Invite Your Team
-              </h1>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Add team members to collaborate in your dataroom.
-              </p>
-            </div>
-
-            <div className="space-y-5">
-              <div className="space-y-4">
-                <input
-                  type="email"
-                  value={email1}
-                  onChange={(e) => setEmail1(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      if (email1.trim()) {
-                        handleStep3Submit(e as any);
-                      }
-                    }
-                  }}
-                  placeholder="email@example.com"
-                  className="w-full h-10 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
-                />
-                <input
-                  type="email"
-                  value={email2}
-                  onChange={(e) => setEmail2(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      if (email2.trim()) {
-                        handleStep3Submit(e as any);
-                      }
-                    }
-                  }}
-                  placeholder="email@example.com"
-                  className="w-full h-10 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
-                />
-                <input
-                  type="email"
-                  value={email3}
-                  onChange={(e) => setEmail3(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      if (email3.trim()) {
-                        handleStep3Submit(e as any);
-                      }
-                    }
-                  }}
-                  placeholder="email@example.com"
-                  className="w-full h-10 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
-                />
+          {/* Step 3: Team Invitations */}
+          {currentStep === 3 && (
+            <>
+              <div className="space-y-2">
+                <h1 className="text-3xl font-normal text-gray-900">
+                  Invite Your Team
+                </h1>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  Add team members to collaborate in your dataroom.
+                </p>
               </div>
 
-              <Button
-                onClick={handleStep3Submit}
-                disabled={isLoading}
-                className="w-full h-11 cursor-pointer bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? "Sending invitations..." : "Send Invites"}
-              </Button>
+              <div className="space-y-5">
+                <div className="space-y-4">
+                  <input
+                    type="email"
+                    value={email1}
+                    onChange={(e) => setEmail1(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (email1.trim()) {
+                          handleStep3Submit(e as React.FormEvent);
+                        }
+                      }
+                    }}
+                    placeholder="email@example.com"
+                    className="w-full h-10 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
+                  />
+                  <input
+                    type="email"
+                    value={email2}
+                    onChange={(e) => setEmail2(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (email2.trim()) {
+                          handleStep3Submit(e as React.FormEvent);
+                        }
+                      }
+                    }}
+                    placeholder="email@example.com"
+                    className="w-full h-10 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
+                  />
+                  <input
+                    type="email"
+                    value={email3}
+                    onChange={(e) => setEmail3(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (email3.trim()) {
+                          handleStep3Submit(e as React.FormEvent);
+                        }
+                      }
+                    }}
+                    placeholder="email@example.com"
+                    className="w-full h-10 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm transition-colors"
+                  />
+                </div>
 
-              <Button
-                onClick={handleSkip}
-                variant="link"
-                className="w-full h-11 border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors duration-200 cursor-pointer"
-              >
-                Skip for now, I &apos;ll invite later
-              </Button>
+                <Button
+                  onClick={handleStep3Submit}
+                  disabled={isLoading}
+                  className="w-full h-11 cursor-pointer bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? "Sending invitations..." : "Send Invites"}
+                </Button>
 
-              <div className="flex items-center justify-center">
-                <div className="w-full max-w-[120px] h-1 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-gray-900 rounded-full transition-all duration-500 ease-out" style={{ width: progressWidth }}></div>
+                <Button
+                  onClick={handleSkip}
+                  variant="link"
+                  className="w-full h-11 border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors duration-200 cursor-pointer"
+                >
+                  Skip for now, I &apos;ll invite later
+                </Button>
+
+                <div className="flex items-center justify-center">
+                  <div className="w-full max-w-[120px] h-1 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gray-900 rounded-full transition-all duration-500 ease-out"
+                      style={{ width: progressWidth }}
+                    ></div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </>
-        )}
+            </>
+          )}
         </div>
       </div>
     </div>

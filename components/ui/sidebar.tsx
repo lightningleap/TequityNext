@@ -29,7 +29,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { CiSearch } from "react-icons/ci";
+// import { CiSearch } from "react-icons/ci";
 import { MdOutlineFolderCopy } from "react-icons/md";
 import { SearchDialog } from "@/app/Dashboard/components/SearchDialog";
 import { useFilesOptional } from "@/app/Dashboard/context/FilesContext";
@@ -327,14 +327,14 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
           <MdOutlineFolderCopy
             width={16}
             height={16}
-            className="flex-shrink-0"
+            className="shrink-0"
           />
         ),
         href: "/Dashboard/Library",
       },
       {
         title: "Chats",
-        icon: <MessageCircle className="h-4 w-4 flex-shrink-0" />,
+        icon: <MessageCircle className="h-4 w-4 shrink-0" />,
         href: "/Dashboard/chat",
       },
     ],
@@ -358,7 +358,7 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
             }}
           >
             <span className="flex items-center gap-2 w-full group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:gap-0">
-              <IoIosSearch className="h-6 w-5 flex-shrink-0 text-black dark:text-white" />
+              <IoIosSearch className="h-6 w-5 shrink-0 text-black dark:text-white" />
               <span className="overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:hidden">
                 Search
               </span>
@@ -422,7 +422,7 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
                   window.dispatchEvent(event);
                 }}
               >
-                <FileText className="h-4 w-4 flex-shrink-0 text-[#3f3f46] dark:text-[#A1A1AA]" />
+                <FileText className="h-4 w-4 shrink-0 text-[#3f3f46] dark:text-[#A1A1AA]" />
                 <span className="text-sm font-normal text-[#3f3f46] dark:text-[#F4F4F5] overflow-ellipsis overflow-hidden whitespace-nowrap leading-5">
                   {file.name}
                 </span>

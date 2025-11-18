@@ -24,10 +24,8 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
   const { state } = useSidebar();
   const { chats, deleteChat, selectChat, updateChatTitle } = useChatContext();
   const [editingChatId, setEditingChatId] = useState<string | null>(null);
-  const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<string>("");
   const editInputRef = useRef<HTMLInputElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
 
   // Focus input when editing starts
   useEffect(() => {
@@ -43,7 +41,11 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
     deleteChat(chatId);
   };
 
-  const handleEdit = (chatId: string, currentTitle: string, e: React.MouseEvent) => {
+  const handleEdit = (
+    chatId: string,
+    currentTitle: string,
+    e: React.MouseEvent
+  ) => {
     e.stopPropagation();
     setEditingChatId(chatId);
     setEditValue(currentTitle);
@@ -54,7 +56,10 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
       e.stopPropagation();
       e.preventDefault();
     }
-    if (editValue.trim() !== "" && editValue.trim() !== chats.find(c => c.id === chatId)?.title) {
+    if (
+      editValue.trim() !== "" &&
+      editValue.trim() !== chats.find((c) => c.id === chatId)?.title
+    ) {
       updateChatTitle(chatId, editValue.trim());
     }
     setEditingChatId(null);
@@ -77,15 +82,10 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
   };
 
   const handleChatClick = (chatId: string) => {
-    if (editingChatId !== chatId && menuOpenId !== chatId) {
+    if (editingChatId !== chatId) {
       selectChat(chatId);
       onChatSelect?.(chatId);
     }
-  };
-
-  const toggleMenu = (chatId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setMenuOpenId(menuOpenId === chatId ? null : chatId);
   };
 
   // Don't render if sidebar is collapsed
@@ -104,11 +104,16 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
             key={chat.id}
             onClick={() => handleChatClick(chat.id)}
             className={`group relative flex items-center justify-between text-sm text-[#3F3F46] hover:bg-[#F4F4F5] dark:hover:bg-[#27272A]  rounded-md px-3 py-1 cursor-pointer transition-colors ${
-              activeChatId === chat.id ? "dark:text-[#3F3F46]" : "text-[#3F3F46]"
+              activeChatId === chat.id
+                ? "dark:text-[#3F3F46]"
+                : "text-[#3F3F46]"
             }`}
           >
             {editingChatId === chat.id ? (
-              <div className="flex items-center gap-2 w-full text-[#3F3F46]" onClick={(e) => e.stopPropagation()}>
+              <div
+                className="flex items-center gap-2 w-full text-[#3F3F46]"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <input
                   ref={editInputRef}
                   type="text"
@@ -122,7 +127,7 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
                 <button
                   type="button"
                   onClick={(e) => handleSaveEdit(chat.id, e)}
-                  className="p-1 hover:bg-gray-200 rounded flex-shrink-0"
+                  className="p-1 hover:bg-gray-200 rounded shrink-0"
                   aria-label="Save"
                 >
                   <Check className="h-3 w-3 text-green-600" />
@@ -133,7 +138,7 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
                     e.stopPropagation();
                     handleCancelEdit(e);
                   }}
-                  className="p-1 hover:bg-gray-200 rounded flex-shrink-0"
+                  className="p-1 hover:bg-gray-200 rounded shrink-0"
                   aria-label="Cancel"
                 >
                   <X className="h-3 w-3 text-red-600" />
@@ -153,12 +158,12 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
                       <HiOutlineDotsHorizontal className="h-5 w-5 text-gray-500 dark:text-white" />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent 
-                    align="start" 
+                  <DropdownMenuContent
+                    align="start"
                     className="w-32 dark:bg-[#09090B] dark:border-[#27272A]"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={(e) => {
                         handleEdit(chat.id, chat.title, e);
                       }}
@@ -168,7 +173,7 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
                       <span>Rename</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="dark:bg-[#27272A]" />
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={(e) => {
                         handleDelete(chat.id, e);
                       }}
