@@ -107,18 +107,7 @@ export default function SignupPage() {
   if (step === "verification") {
     return (
       <div className="flex h-screen overflow-hidden">
-        {/* Left Side - Background Graphics (Hidden on small/medium, visible on large) */}
-        <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
-          <Image
-            src={Container}
-            alt="Verification Graphic"
-            fill
-            className="object-cover object-center"
-            priority
-          />
-        </div>
-
-        {/* Right Side - Verification Form */}
+        {/* Left Side - Verification Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-2 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
           <div className="w-full max-w-md flex items-center justify-center">
             {/* Form Card */}
@@ -135,7 +124,7 @@ export default function SignupPage() {
                 </h1>
 
                 <p className="text-sm text-gray-500">
-                  We sent a temporary login code to {email} <br />
+                  We sent a temporary login code to {email} <br />
                   Not you?
                 </p>
               </div>
@@ -198,6 +187,16 @@ export default function SignupPage() {
             </div>
           </div>
         </div>
+
+        {/* Right Side - Background Graphics (Hidden on small/medium, visible on large) */}
+        <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
+          <Image
+            src={Container}
+            alt="Verification Graphic"
+            fill
+            className="object-cover object-center"
+          />
+        </div>
       </div>
     );
   }
@@ -205,18 +204,7 @@ export default function SignupPage() {
   // Email Step UI
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Left Side - Image (Hidden on small/medium, visible on large) */}
-      <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
-        <Image
-          src={Container}
-          alt="Signup Graphic"
-          fill
-          className="object-cover object-center"
-          priority
-        />
-      </div>
-
-      {/* Right Side - Form */}
+      {/* Left Side - Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
         <div className="w-full max-w-md flex items-center justify-center">
           {/* Form Card */}
@@ -264,7 +252,7 @@ export default function SignupPage() {
             </div>
 
             {/* Form Fields */}
-            <div className="w-[364px] space-y-5">
+            <div className="w-full space-y-5">
               {/* Email Input */}
               <div className="space-y-1.5">
                 <input
@@ -316,6 +304,16 @@ export default function SignupPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Right Side - Image (Hidden on small/medium, visible on large) */}
+      <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
+        <Image
+          src={Container}
+          alt="Signup Graphic"
+          fill
+          className="object-cover object-center"
+        />
       </div>
     </div>
   );
