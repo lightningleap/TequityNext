@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import {
@@ -424,7 +424,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
     return `${mb.toFixed(2)} MB`;
   };
 
-  const handleFileSelect = (file: FileItem) => {
+  const handleFileSelect = useCallback((file: FileItem) => {
     console.log("File selected:", file);
     setSelectedFile(file);
     setIsPDFViewerOpen(true);
@@ -443,9 +443,9 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
       const filtered = prev.filter((item) => item.id !== newItem.id);
       return [newItem, ...filtered].slice(0, 8); // Keep only 8 most recent
     });
-  };
+  }, []);
 
-  const handleFolderSelect = (folder: {
+  const handleFolderSelect = useCallback((folder: {
     id: string;
     name: string;
     fileCount: number;
@@ -507,7 +507,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
       files: sampleFiles,
     });
     setIsViewingFolder(true);
-  };
+  }, []);
 
   // Listen for custom event to open PDF viewer from sidebar
   useEffect(() => {
