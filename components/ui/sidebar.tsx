@@ -8,11 +8,7 @@ import { usePathname } from "next/navigation";
 import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps, cva } from "class-variance-authority";
 import { IoIosSearch } from "react-icons/io";
-import {
-  FileText,
-  PanelLeftIcon,
-  MessageCircle,
-} from "lucide-react";
+import { FileText, PanelLeftIcon, MessageCircle } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -33,7 +29,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { CiSearch } from "react-icons/ci";
+// import { CiSearch } from "react-icons/ci";
 import { MdOutlineFolderCopy } from "react-icons/md";
 import { SearchDialog } from "@/app/Dashboard/components/SearchDialog";
 import { useFilesOptional } from "@/app/Dashboard/context/FilesContext";
@@ -175,7 +171,8 @@ function Sidebar({
   variant?: "sidebar" | "floating" | "inset";
   collapsible?: "offcanvas" | "icon" | "none";
 }) {
-  const { isMobile, state, openMobile, setOpenMobile, toggleSidebar } = useSidebar();
+  const { isMobile, state, openMobile, setOpenMobile, toggleSidebar } =
+    useSidebar();
 
   if (collapsible === "none") {
     return (
@@ -257,7 +254,7 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
           className="bg-white dark:bg-[#09090B] group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm transition-all duration-300 ease-in-out will-change-auto group-data-[collapsible=icon]:cursor-pointer group-data-[collapsible=icon]:hover:bg-gray-50 dark:group-data-[collapsible=icon]:hover:bg-gray-900"
-          style={{ contain: 'layout style' }}
+          style={{ contain: "layout style" }}
           onClick={() => {
             if (state === "collapsed") {
               toggleSidebar();
@@ -274,7 +271,9 @@ function Sidebar({
 const SidebarMenuItems = React.memo(function SidebarMenuItems() {
   const pathname = usePathname();
   const [searchDialogOpen, setSearchDialogOpen] = React.useState(false);
-  const [starredFiles, setStarredFiles] = React.useState<Array<{ id: string; name: string; type: string }>>([]);
+  const [starredFiles, setStarredFiles] = React.useState<
+    Array<{ id: string; name: string; type: string }>
+  >([]);
   const filesContext = useFilesOptional();
 
   const handleSearchOpen = React.useCallback(() => {
@@ -320,18 +319,27 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
     };
   }, []);
 
-  const navItems = React.useMemo(() => [
-    {
-      title: "Library",
-      icon: <MdOutlineFolderCopy width={16} height={16} className="flex-shrink-0" />,
-      href: "/Dashboard/Library",
-    },
-    {
-      title: "Chats",
-      icon: <MessageCircle className="h-4 w-4 flex-shrink-0" />,
-      href: "/Dashboard/chat",
-    },
-  ], []);
+  const navItems = React.useMemo(
+    () => [
+      {
+        title: "Library",
+        icon: (
+          <MdOutlineFolderCopy
+            width={16}
+            height={16}
+            className="shrink-0"
+          />
+        ),
+        href: "/Dashboard/Library",
+      },
+      {
+        title: "Chats",
+        icon: <MessageCircle className="h-4 w-4 shrink-0" />,
+        href: "/Dashboard/chat",
+      },
+    ],
+    []
+  );
 
   return (
     <>
@@ -340,7 +348,9 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
         <SidebarMenuItem>
           <SidebarMenuButton
             className={`w-full justify-start h-8 px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-150 ease-in-out cursor-pointer ${
-              searchDialogOpen ? 'bg-[#F4F4F5] dark:bg-[#27272A] dark:text-white' : 'bg-transparent hover:bg-gray-100 dark:hover:bg-[#27272A]'
+              searchDialogOpen
+                ? "bg-[#F4F4F5] dark:bg-[#27272A] dark:text-white"
+                : "bg-transparent hover:bg-gray-100 dark:hover:bg-[#27272A]"
             }`}
             onClick={handleSearchOpen}
             tooltip={{
@@ -348,37 +358,43 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
             }}
           >
             <span className="flex items-center gap-2 w-full group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:gap-0">
-              <IoIosSearch className="h-6 w-5 flex-shrink-0 text-black dark:text-white" />
-              <span className="overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:hidden">Search</span>
+              <IoIosSearch className="h-6 w-5 shrink-0 text-black dark:text-white" />
+              <span className="overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:hidden">
+                Search
+              </span>
             </span>
           </SidebarMenuButton>
         </SidebarMenuItem>
 
-      {/* Regular Navigation Items */}
-      {navItems.map((item) => (
-        <SidebarMenuItem key={item.href}>
-          <SidebarMenuButton
-            asChild
-            isActive={pathname === item.href}
-            className={`w-full justify-start h-8 px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-150 ease-in-out ${
-              pathname === item.href && !searchDialogOpen ? 'bg-[#F4F4F5] dark:bg-[#27272A] dark:text-white' : 'hover:bg-gray-100 dark:hover:bg-[#27272A]'
-            }`}
-            tooltip={{
-              children: item.title,
-            }}
-          >
-            <Link
-              href={item.href}
-              className="flex items-center gap-2 w-full group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:justify-center"
-              prefetch={true}
+        {/* Regular Navigation Items */}
+        {navItems.map((item) => (
+          <SidebarMenuItem key={item.href}>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname === item.href}
+              className={`w-full justify-start h-8 px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-150 ease-in-out ${
+                pathname === item.href && !searchDialogOpen
+                  ? "bg-[#F4F4F5] dark:bg-[#27272A] dark:text-white"
+                  : "hover:bg-gray-100 dark:hover:bg-[#27272A]"
+              }`}
+              tooltip={{
+                children: item.title,
+              }}
             >
-              {item.icon}
-              <span className="overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:hidden">{item.title}</span>
-            </Link>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      ))}
-    </SidebarMenu>
+              <Link
+                href={item.href}
+                className="flex items-center gap-2 w-full group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:justify-center"
+                prefetch={true}
+              >
+                {item.icon}
+                <span className="overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:hidden">
+                  {item.title}
+                </span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        ))}
+      </SidebarMenu>
 
       {/* Starred Section - Only visible on Library page */}
       {pathname === "/Dashboard/Library" && starredFiles.length > 0 && (
@@ -395,18 +411,18 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
                 className="flex gap-2 h-8 items-center px-2 w-full rounded-md hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
                 onClick={() => {
                   // Dispatch custom event to open PDF viewer
-                  const event = new CustomEvent('openPDFViewer', { 
-                    detail: { 
-                      id: file.id, 
-                      name: file.name, 
+                  const event = new CustomEvent("openPDFViewer", {
+                    detail: {
+                      id: file.id,
+                      name: file.name,
                       type: file.type,
                       url: `/files/${file.id}`, // Construct URL based on file ID
-                    } 
+                    },
                   });
                   window.dispatchEvent(event);
                 }}
               >
-                <FileText className="h-4 w-4 flex-shrink-0 text-[#3f3f46] dark:text-[#A1A1AA]" />
+                <FileText className="h-4 w-4 shrink-0 text-[#3f3f46] dark:text-[#A1A1AA]" />
                 <span className="text-sm font-normal text-[#3f3f46] dark:text-[#F4F4F5] overflow-ellipsis overflow-hidden whitespace-nowrap leading-5">
                   {file.name}
                 </span>
@@ -630,7 +646,10 @@ function SidebarMenu({ className, ...props }: React.ComponentProps<"ul">) {
     <ul
       data-slot="sidebar-menu"
       data-sidebar="menu"
-      className={cn("flex w-full min-w-0 flex-col gap-1 px-4 group-data-[collapsible=icon]:px-2", className)}
+      className={cn(
+        "flex w-full min-w-0 flex-col gap-1 px-4 group-data-[collapsible=icon]:px-2",
+        className
+      )}
       {...props}
     />
   );

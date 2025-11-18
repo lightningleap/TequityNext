@@ -12,7 +12,7 @@ import Image from "next/image";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
-  const [step, setStep] = useState<'email' | 'verification'>('email');
+  const [step, setStep] = useState<"email" | "verification">("email");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -40,9 +40,13 @@ export default function LoginPage() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Switch to verification step
-      setStep('verification');
+      setStep("verification");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send verification code. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to send verification code. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -72,7 +76,11 @@ export default function LoginPage() {
       // Navigate directly to dashboard after verification
       router.push("/Dashboard/Library");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Verification failed. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Verification failed. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +94,7 @@ export default function LoginPage() {
     console.log("Google sign-in clicked");
   };
 
-  if (step === 'verification') {
+  if (step === "verification") {
     return (
       <div className="flex h-screen overflow-hidden">
         {/* Left Side - Background Graphics (Hidden on small/medium, visible on large) */}
@@ -138,20 +146,26 @@ export default function LoginPage() {
                       value={verificationCode}
                       onChange={(e) => setVerificationCode(e.target.value)}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
+                        if (e.key === "Enter") {
                           e.preventDefault();
-                          handleVerificationSubmit(e as any);
+                        handleEmailSubmit(e as React.FormEvent);
                         }
                       }}
                       placeholder="Enter verification code"
                       className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                        error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                        error
+                          ? "border-red-300 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-blue-500"
                       }`}
                     />
                     {/* Error Message - Positioned absolutely to prevent layout shift */}
-                    <div className={`absolute left-0 right-0 transition-all duration-200 ${
-                      error ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
-                    }`}>
+                    <div
+                      className={`absolute left-0 right-0 transition-all duration-200 ${
+                        error
+                          ? "opacity-100 translate-y-0"
+                          : "opacity-0 -translate-y-2 pointer-events-none"
+                      }`}
+                    >
                       {error && (
                         <p className="text-sm text-red-600 py-2">{error}</p>
                       )}
@@ -182,7 +196,10 @@ export default function LoginPage() {
                 <div className="text-center">
                   <Link href="/signup">
                     <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                      Don&apos;t have an account? <span className="text-gray-900 font-medium">Create Account</span>
+                      Don&apos;t have an account?{" "}
+                      <span className="text-gray-900 font-medium">
+                        Create Account
+                      </span>
                     </span>
                   </Link>
                 </div>
@@ -258,21 +275,27 @@ export default function LoginPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
+                    onKeyDown={(e: React.KeyboardEvent) => {
+                      if (e.key === "Enter") {
                         e.preventDefault();
-                        handleEmailSubmit(e as any);
+                        handleEmailSubmit(e as React.FormEvent);
                       }
                     }}
                     placeholder="Enter your email address"
                     className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                      error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                      error
+                        ? "border-red-300 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-blue-500"
                     }`}
                   />
                   {/* Error Message - Positioned absolutely to prevent layout shift */}
-                  <div className={`absolute left-0 right-0 transition-all duration-200 ${
-                    error ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
-                  }`}>
+                  <div
+                    className={`absolute left-0 right-0 transition-all duration-200 ${
+                      error
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 -translate-y-2 pointer-events-none"
+                    }`}
+                  >
                     {error && (
                       <p className="text-sm text-red-600 py-2">{error}</p>
                     )}
@@ -293,7 +316,10 @@ export default function LoginPage() {
               <div className="text-center">
                 <Link href="/signup">
                   <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                    Don&apos;t have an account? <span className="text-gray-900 font-medium">Create Account</span>
+                    Don&apos;t have an account?{" "}
+                    <span className="text-gray-900 font-medium">
+                      Create Account
+                    </span>
                   </span>
                 </Link>
               </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState, useEffect, useRef } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Sidebar } from "@/components/ui/sidebar";
@@ -16,7 +16,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, Settings, LogOut, Moon, Sun, Star, Menu, AlignJustify } from "lucide-react";
+import { Plus, Settings, LogOut, Moon, Sun, Menu } from "lucide-react";
 import { SettingsDialog } from "../Settings/SettingsDialog";
 import { ChevronsLeft, ChevronDown, UploadCloud } from "lucide-react";
 import { MdOutlineFolderCopy } from "react-icons/md";
@@ -44,33 +44,33 @@ export function DashboardLayout({
   const isChatPage = pathname === "/Dashboard/chat";
   const { theme, setTheme } = useTheme();
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [starredFiles, setStarredFiles] = useState<Array<{ id: string; name: string; type: string }>>([]);
+  const [starredFiles, setStarredFiles] = useState<
+    Array<{ id: string; name: string; type: string }>
+  >([]);
   const chatContext = useChatContextOptional();
   const [dataroomName, setDataroomName] = useState("LLA");
-  const sidebarRef = useRef<HTMLDivElement>(null);
 
   // Load dataroom name from localStorage
   useEffect(() => {
-    const savedName = localStorage.getItem('dataroomName');
+    const savedName = localStorage.getItem("dataroomName");
     if (savedName) {
       setDataroomName(savedName);
     }
 
     // Listen for storage changes to update in real-time
     const handleStorageChange = () => {
-      const updatedName = localStorage.getItem('dataroomName');
+      const updatedName = localStorage.getItem("dataroomName");
       if (updatedName) {
         setDataroomName(updatedName);
       }
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   // Format dataroom name with suffix
   const formattedDataroomName = `${dataroomName}'s Dataroom`;
-
 
   // Load starred files from localStorage
   useEffect(() => {
@@ -116,14 +116,14 @@ export function DashboardLayout({
     // Try multiple approaches to find and trigger the sidebar toggle
     const selectors = [
       'button[data-sidebar="trigger"]',
-      '[data-radix-sidebar-menu-trigger]',
+      "[data-radix-sidebar-menu-trigger]",
       'button[aria-label="Toggle Sidebar"]',
       'button[aria-controls="sidebar"]',
-      '.sidebar-trigger',
+      ".sidebar-trigger",
       'button:has([data-lucide="menu"])',
       'button:has([data-lucide="chevron-left"])',
     ];
-    
+
     for (const selector of selectors) {
       const trigger = document.querySelector(selector) as HTMLButtonElement;
       if (trigger) {
@@ -131,10 +131,10 @@ export function DashboardLayout({
         return;
       }
     }
-    
+
     // Fallback: try to trigger a keyboard shortcut if supported
-    const event = new KeyboardEvent('keydown', {
-      key: 'b',
+    const event = new KeyboardEvent("keydown", {
+      key: "b",
       ctrlKey: true,
       metaKey: false,
     });
@@ -148,7 +148,7 @@ export function DashboardLayout({
           side="left"
           variant="sidebar"
           collapsible="icon"
-          className="flex-shrink-0 group"
+          className="shrink-0 group"
         >
           <div className="flex flex-col gap-2 px-2 py-3 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:py-3">
             <div className="flex items-center gap-2 px-2 py-2 rounded-md h-12 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-300 ease-in-out w-full relative">
@@ -161,7 +161,7 @@ export function DashboardLayout({
                       width={32}
                       height={32}
                       priority
-                      className="flex-shrink-0"
+                      className="shrink-0"
                     />
                     <div className="flex items-center gap-2 flex-1 overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">
                       <p className="font-sans font-medium text-sm leading-none tracking-[-0.084px] whitespace-nowrap overflow-hidden text-left">
@@ -170,7 +170,10 @@ export function DashboardLayout({
                     </div>
                   </div>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-59 -ml-1 space-y-1.5 dark:bg-[#09090B] dark:text-white" align="start">
+                <DropdownMenuContent
+                  className="w-59 -ml-1 space-y-1.5 dark:bg-[#09090B] dark:text-white"
+                  align="start"
+                >
                   {/* Header */}
                   <DropdownMenuLabel className="text-xs text-gray-500 font-normal dark:text-[#F4F4F5] px-3">
                     Your Dataroom&apos;s
@@ -183,10 +186,9 @@ export function DashboardLayout({
                       alt="Logo"
                       width={20}
                       height={20}
-                      className="flex-shrink-0"
+                      className="shrink-0"
                     />
                     <span className="font-medium">LLA&apos;s DATAROOM</span>
-
                   </DropdownMenuItem>
 
                   {/* Add Dataroom */}
@@ -200,20 +202,22 @@ export function DashboardLayout({
                   <div className="flex items-center rounded-lg dark:bg-[#27272A] bg-gray-100 dark:text-white gap-1 px-1 py-1">
                     <button
                       onClick={() => setTheme("light")}
-                      className={`flex cursor-pointer items-center gap-2 px-3 py-2 rounded-md flex-1 transition-colors ${theme === "light"
+                      className={`flex cursor-pointer items-center gap-2 px-3 py-2 rounded-md flex-1 transition-colors ${
+                        theme === "light"
                           ? "bg-white shadow-sm"
                           : "bg-gray-100 hover:bg-gray-200 dark:bg-[#27272A] dark:text-white"
-                        }`}
+                      }`}
                     >
                       <Sun className="h-4 w-4" />
                       <span className="text-sm">Light</span>
                     </button>
                     <button
                       onClick={() => setTheme("dark")}
-                      className={`flex cursor-pointer items-center gap-2 px-3 py-2 rounded-md flex-1 transition-colors ${theme === "dark"
+                      className={`flex cursor-pointer items-center gap-2 px-3 py-2 rounded-md flex-1 transition-colors ${
+                        theme === "dark"
                           ? "bg-white shadow-sm dark:bg-[#09090B] dark:text-white"
                           : "bg-gray-100 hover:bg-gray-200 dark:bg-[#09090B] dark:text-white"
-                        }`}
+                      }`}
                     >
                       <Moon className="h-4 w-4" />
                       <span className="text-sm">Dark</span>
@@ -241,7 +245,7 @@ export function DashboardLayout({
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              
+
               {/* Collapse button positioned to appear inside the dropdown area */}
               <button
                 onClick={() => {
@@ -254,7 +258,9 @@ export function DashboardLayout({
             </div>
           </div>
           <SidebarMenuItems />
-          {isChatPage && <hr className="my-4 transition-opacity duration-300 group-data-[collapsible=icon]:hidden" />}
+          {isChatPage && (
+            <hr className="my-4 transition-opacity duration-300 group-data-[collapsible=icon]:hidden" />
+          )}
 
           {/* Chat History - Only visible on Tequity AI page and when sidebar is expanded */}
           {isChatPage && (
@@ -283,10 +289,13 @@ export function DashboardLayout({
                     <span className="text-sm text-gray-700 dark:text-gray-200 truncate max-w-[150px]">
                       {chatContext.activeChat?.title || "New Chat"}
                     </span>
-                    <ChevronDown className="h-5 w-5 text-gray-500 flex-shrink-0" />
+                    <ChevronDown className="h-5 w-5 text-gray-500 shrink-0" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 dark:bg-[#09090B] dark:text-white" align="center">
+                <DropdownMenuContent
+                  className="w-56 dark:bg-[#09090B] dark:text-white"
+                  align="center"
+                >
                   {chatContext.chats.slice(0, 5).map((chat) => (
                     <DropdownMenuItem
                       key={chat.id}
@@ -294,8 +303,11 @@ export function DashboardLayout({
                         chatContext.selectChat(chat.id);
                         onChatSelect?.(chat.id);
                       }}
-                      className={`cursor-pointer ${chatContext.activeChatId === chat.id ? 'bg-gray-100 dark:bg-[#27272A]' : ''
-                        }`}
+                      className={`cursor-pointer ${
+                        chatContext.activeChatId === chat.id
+                          ? "bg-gray-100 dark:bg-[#27272A]"
+                          : ""
+                      }`}
                     >
                       <span className="truncate">{chat.title}</span>
                     </DropdownMenuItem>
@@ -307,15 +319,20 @@ export function DashboardLayout({
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 h-9 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-[#27272A] transition-colors focus:ring-0 focus:ring-offset-0 focus:outline-none border-0 focus:border-0 focus-visible:border-0">
                     <MdOutlineFolderCopy className="h-4 w-4 text-black dark:text-white" />
-                    <span className="text-sm font-medium text-[#0f172a] dark:text-white">{title}</span>
+                    <span className="text-sm font-medium text-[#0f172a] dark:text-white">
+                      {title}
+                    </span>
                     <ChevronDown className="h-4 w-4 text-gray-500" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 dark:bg-[#09090B] dark:text-white p-0" align="center">
+                <DropdownMenuContent
+                  className="w-56 dark:bg-[#09090B] dark:text-white p-0"
+                  align="center"
+                >
                   {starredFiles.length > 0 ? (
                     <>
                       {starredFiles.map((file) => (
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           key={file.id}
                           className="cursor-pointer hover:bg-gray-50 dark:hover:bg-[#27272A] px-4 py-2 flex items-center gap-2"
                           onClick={() => {
@@ -324,10 +341,14 @@ export function DashboardLayout({
                             const fileData = {
                               id: file.id,
                               name: file.name,
-                              type: file.type || 'pdf',
+                              type: file.type || "pdf",
                               size: 0,
                             };
-                            window.dispatchEvent(new CustomEvent('selectFile', { detail: fileData }));
+                            window.dispatchEvent(
+                              new CustomEvent("selectFile", {
+                                detail: fileData,
+                              })
+                            );
                           }}
                         >
                           <span className="truncate">{file.name}</span>
@@ -349,9 +370,11 @@ export function DashboardLayout({
                   width={20}
                   height={20}
                   priority
-                  className="flex-shrink-0"
+                  className="shrink-0"
                 />
-                <span className="text-sm font-semibold text-[#3f3f46] dark:text-white">{formattedDataroomName}</span>
+                <span className="text-sm font-semibold text-[#3f3f46] dark:text-white">
+                  {formattedDataroomName}
+                </span>
               </div>
             )}
 
@@ -372,30 +395,42 @@ export function DashboardLayout({
                   <DropdownMenuTrigger asChild>
                     <button className="flex items-center gap-2 h-9 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-[#27272A] transition-colors focus:ring-0 focus:ring-offset-0 focus:outline-none border-0 focus:border-0 focus-visible:border-0">
                       <MdOutlineFolderCopy className="h-4 w-4 text-black dark:text-white" />
-                      <span className="text-sm font-medium text-[#0f172a] dark:text-white">{title}</span>
+                      <span className="text-sm font-medium text-[#0f172a] dark:text-white">
+                        {title}
+                      </span>
                       <ChevronDown className="h-4 w-4 text-gray-500" />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56 dark:bg-[#09090B] dark:text-white p-0" align="start">
+                  <DropdownMenuContent
+                    className="w-56 dark:bg-[#09090B] dark:text-white p-0"
+                    align="start"
+                  >
                     {starredFiles.length > 0 ? (
                       <>
                         {/* <div className="px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400">
                           Starred Files
                         </div> */}
                         {starredFiles.map((file) => (
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             key={file.id}
                             className="cursor-pointer hover:bg-gray-50 dark:hover:bg-[#27272A] px-4 py-2 flex items-center gap-2"
                             onClick={() => {
-                              console.log("Starred file clicked (mobile):", file);
+                              console.log(
+                                "Starred file clicked (mobile):",
+                                file
+                              );
                               // Dispatch custom event to open PDF viewer
                               const fileData = {
                                 id: file.id,
                                 name: file.name,
-                                type: file.type || 'pdf',
+                                type: file.type || "pdf",
                                 size: 0,
                               };
-                              window.dispatchEvent(new CustomEvent('selectFile', { detail: fileData }));
+                              window.dispatchEvent(
+                                new CustomEvent("selectFile", {
+                                  detail: fileData,
+                                })
+                              );
                             }}
                           >
                             {/* <FileText className="h-4 w-4 text-gray-500 dark:text-gray-400" /> */}
@@ -414,11 +449,16 @@ export function DashboardLayout({
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="flex items-center gap-2 h-9 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-[#27272A] transition-colors focus:ring-0 focus:ring-offset-0 focus:outline-none border-0 focus:border-0 focus-visible:border-0">
-                      <span className="text-sm font-medium text-[#0f172a] dark:text-white">{title}</span>
+                      <span className="text-sm font-medium text-[#0f172a] dark:text-white">
+                        {title}
+                      </span>
                       <ChevronDown className="h-4 w-4 text-gray-500" />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56 dark:bg-[#09090B] dark:text-white p-0" align="start">
+                  <DropdownMenuContent
+                    className="w-56 dark:bg-[#09090B] dark:text-white p-0"
+                    align="start"
+                  >
                     {/* <DropdownMenuLabel className="text-xs text-gray-500 dark:text-gray-400 font-normal">
                       Recent Chats
                     </DropdownMenuLabel> */}
@@ -429,7 +469,11 @@ export function DashboardLayout({
                           chatContext.selectChat(chat.id);
                           onChatSelect?.(chat.id);
                         }}
-                        className={`cursor-pointer ${chatContext.activeChatId === chat.id ? 'bg-gray-100 dark:bg-[#27272A] rounded-none' : ''}`}
+                        className={`cursor-pointer ${
+                          chatContext.activeChatId === chat.id
+                            ? "bg-gray-100 dark:bg-[#27272A] rounded-none"
+                            : ""
+                        }`}
                       >
                         <span className="truncate">{chat.title}</span>
                       </DropdownMenuItem>
@@ -437,7 +481,9 @@ export function DashboardLayout({
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <h1 className="text-lg font-semibold text-black dark:text-white">{title}</h1>
+                <h1 className="text-lg font-semibold text-black dark:text-white">
+                  {title}
+                </h1>
               )}
             </div>
             {headerActions && (

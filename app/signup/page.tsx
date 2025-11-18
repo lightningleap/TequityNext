@@ -12,7 +12,7 @@ import Container from "../../public/Container.svg";
 export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
-  const [step, setStep] = useState<'email' | 'verification'>('email');
+  const [step, setStep] = useState<"email" | "verification">("email");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -30,12 +30,12 @@ export default function SignupPage() {
 
     // Basic validation
     if (!email.trim()) {
-      setEmailError('Email is required');
+      setEmailError("Email is required");
       return;
     }
 
     if (!validateEmail(email)) {
-      setEmailError('Please enter a valid email address');
+      setEmailError("Please enter a valid email address");
       return;
     }
 
@@ -53,9 +53,13 @@ export default function SignupPage() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Switch to verification step
-      setStep('verification');
+      setStep("verification");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send verification code. Please try again.');
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to send verification code. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +89,11 @@ export default function SignupPage() {
       // Navigate to workspace setup after verification
       router.push("/workspace-setup");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Verification failed. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Verification failed. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -95,9 +103,8 @@ export default function SignupPage() {
     console.log("Google sign-in clicked");
   };
 
-
   // Verification Step UI
-  if (step === 'verification') {
+  if (step === "verification") {
     return (
       <div className="flex h-screen overflow-hidden">
         {/* Left Side - Background Graphics (Hidden on small/medium, visible on large) */}
@@ -124,17 +131,20 @@ export default function SignupPage() {
                 </div>
 
                 <h1 className="text-3xl font-normal text-[#09090B]">
-                   Get Started Now
+                  Get Started Now
                 </h1>
 
                 <p className="text-sm text-gray-500">
-                 We sent a temporary login code to {email} <br />
-                 Not you?
+                  We sent a temporary login code to {email} <br />
+                  Not you?
                 </p>
               </div>
 
               {/* Form Fields */}
-              <form onSubmit={handleVerificationSubmit} className="flex flex-col gap-5 w-[364px]">
+              <form
+                onSubmit={handleVerificationSubmit}
+                className="flex flex-col gap-5 w-[364px]"
+              >
                 {/* Error Message */}
                 {error && (
                   <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -149,14 +159,16 @@ export default function SignupPage() {
                     value={verificationCode}
                     onChange={(e) => setVerificationCode(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === "Enter") {
                         e.preventDefault();
-                        handleVerificationSubmit(e as any);
+                        handleVerificationSubmit(e as React.FormEvent);
                       }
                     }}
                     placeholder="Enter verification code"
                     className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                      error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                      error
+                        ? "border-red-300 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-blue-500"
                     }`}
                     disabled={isLoading}
                   />
@@ -177,7 +189,8 @@ export default function SignupPage() {
                 <div className="text-center">
                   <Link href="/login">
                     <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                      Already have an account? <span className="text-gray-900 font-medium">Log in</span>
+                      Already have an account?{" "}
+                      <span className="text-gray-900 font-medium">Log in</span>
                     </span>
                   </Link>
                 </div>
@@ -252,51 +265,54 @@ export default function SignupPage() {
 
             {/* Form Fields */}
             <div className="w-[364px] space-y-5">
-            {/* Email Input */}
-            <div className="space-y-1.5">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleSubmit(e as any);
-                  }
-                }}
-                placeholder="Enter your email address"
-                className={`w-full h-10 px-3 py-2 border ${emailError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors`}
-                required
-                disabled={isLoading}
-              />
-            </div>
-
-            {/* Error Message */}
-            {(error || emailError) && (
-              <div className="p-3 text-sm text-red-600 bg-red-50 rounded-lg">
-                {error || emailError}
+              {/* Email Input */}
+              <div className="space-y-1.5">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleSubmit(e as React.FormEvent);
+                    }
+                  }}
+                  placeholder="Enter your email address"
+                  className={`w-full h-10 px-3 py-2 border ${
+                    emailError ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors`}
+                  required
+                  disabled={isLoading}
+                />
               </div>
-            )}
 
-            {/* Continue Button */}
-            <div className="mt-3">
-              <Button
-              onClick={handleSubmit}
-              disabled={!email.trim() || isLoading}
-              className="w-full h-11 cursor-pointer bg-[#09090B] hover:bg-gray-800 text-white rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? "Sending code..." : "Continue"}
-            </Button>
-            </div>
+              {/* Error Message */}
+              {(error || emailError) && (
+                <div className="p-3 text-sm text-red-600 bg-red-50 rounded-lg">
+                  {error || emailError}
+                </div>
+              )}
 
-            {/* Navigation Options */}
-            <div className="text-center">
-              <Link href="/login">
-                <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                  Already have an account? <span className="text-gray-900 font-medium">Log in</span>
-                </span>
-              </Link>
-            </div>
+              {/* Continue Button */}
+              <div className="mt-3">
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!email.trim() || isLoading}
+                  className="w-full h-11 cursor-pointer bg-[#09090B] hover:bg-gray-800 text-white rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? "Sending code..." : "Continue"}
+                </Button>
+              </div>
+
+              {/* Navigation Options */}
+              <div className="text-center">
+                <Link href="/login">
+                  <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
+                    Already have an account?{" "}
+                    <span className="text-gray-900 font-medium">Log in</span>
+                  </span>
+                </Link>
+              </div>
             </div>
           </div>
         </div>

@@ -7,19 +7,19 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { FiSearch } from "react-icons/fi";
+// import { FiSearch } from "react-icons/fi";
 import Image from "next/image";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command";
 
 // Command actions type
-type CommandAction = {
-  id: string;
-  name: string;
-  icon: React.ReactNode;
-  shortcut?: string;
-  group: string;
-  action: () => void;
-};
+// type CommandAction = {
+//   id: string;
+//   name: string;
+//   icon: React.ReactNode;
+//   shortcut?: string;
+//   group: string;
+//   action: () => void;
+// };
 
 interface SearchDialogProps {
   open: boolean;
@@ -93,18 +93,18 @@ export function SearchDialog({ open, onOpenChange, folders = [], files = [], onF
     ];
 
   // Command actions
-  const commandActions: CommandAction[] = [
+  // const commandActions: CommandAction[] = [
     // No command actions needed
-  ];
+  // ];
 
   // Group commands by their group
-  const commandGroups = commandActions.reduce<Record<string, CommandAction[]>>((groups, action) => {
-    if (!groups[action.group]) {
-      groups[action.group] = [];
-    }
-    groups[action.group].push(action);
-    return groups;
-  }, {});
+  // const commandGroups = commandActions.reduce<Record<string, CommandAction[]>>((groups, action) => {
+  //   if (!groups[action.group]) {
+  //     groups[action.group] = [];
+  //   }
+  //   groups[action.group].push(action);
+  //   return groups;
+  // }, {});
 
 
   // Helper function to format file size
@@ -217,9 +217,9 @@ export function SearchDialog({ open, onOpenChange, folders = [], files = [], onF
                         alt={category.name}
                         width={16}
                         height={16}
-                        className="flex-shrink-0"
+                        className="shrink-0"
                       />
-                      <span className="!text-black dark:!text-white">{category.name}</span>
+                      <span className="text-black dark:text-white">{category.name}</span>
                     </CommandItem>
                   ))}
                 </CommandGroup>
@@ -273,12 +273,12 @@ export function SearchDialog({ open, onOpenChange, folders = [], files = [], onF
                         alt={file.type}
                         width={16}
                         height={16}
-                        className="flex-shrink-0"
+                        className="shrink-0"
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="truncate !text-black dark:!text-white">{file.name}</p>
+                        <p className="truncate text-black dark:text-white">{file.name}</p>
                       </div>
-                      <span className="text-xs !text-gray-500 dark:!text-gray-400">{file.size}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{file.size}</span>
                     </CommandItem>
                   ))}
                 </CommandGroup>
