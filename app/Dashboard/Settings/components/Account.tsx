@@ -2,6 +2,7 @@
 
 import { FiUser } from "react-icons/fi";
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { ChangePasswordDialog } from "../dialogbox/ChangePasswordDialog";
 import { LogoutDialog } from "../dialogbox/LogoutDialog";
 import { DisableAccountDialog } from "../dialogbox/DisableAccountDialog";
@@ -28,9 +29,11 @@ export function Account() {
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center shrink-0 overflow-hidden">
             {profilePicture ? (
-              <img
+              <Image
                 src={profilePicture}
                 alt="Profile"
+                width={64}
+                height={64}
                 className="w-full h-full object-cover"
               />
             ) : (
