@@ -1,7 +1,7 @@
 "use client";
 
 import { FiUser } from "react-icons/fi";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ChangePasswordDialog } from "../dialogbox/ChangePasswordDialog";
 import { LogoutDialog } from "../dialogbox/LogoutDialog";
 import { DisableAccountDialog } from "../dialogbox/DisableAccountDialog";
@@ -11,6 +11,9 @@ export function Account() {
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [disableAccountOpen, setDisableAccountOpen] = useState(false);
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   return (
     <div className="space-y-6 dark:bg-[#09090B]">
       <div className="flex items-center gap-3 dark:text-white">
@@ -23,8 +26,16 @@ export function Account() {
       {/* Profile Picture and Name */}
       <div className="space-y-3 dark:text-white">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
-            <FiUser className="h-8 w-8 text-gray-500 dark:text-white" />
+          <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center shrink-0 overflow-hidden">
+            {profilePicture ? (
+              <img
+                src={profilePicture}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <FiUser className="h-8 w-8 text-gray-500 dark:text-white" />
+            )}
           </div>
           <div className="flex-1 space-y-1">
             <p className="text-xs font-medium" style={{ color: "#64748B" }}>
@@ -32,7 +43,7 @@ export function Account() {
             </p>
             <input
               type="text"
-              className="w-50% px-3 py-2 border border-gray-300 rounded-md "
+              className="w-50% px-3 py-2 border border-gray-300 rounded-md"
               placeholder="Your name"
               defaultValue="John Doe"
             />
@@ -40,10 +51,51 @@ export function Account() {
         </div>
         <p className="text-xs text-gray-500">
           {" "}
-          <span className="text-blue-500 cursor-pointer">
-            Add photo
-          </span> or{" "}
-          <span className="text-red-500 cursor-pointer">Remove photo</span>
+          {!profilePicture ? (
+            <span
+              className="text-blue-500 cursor-pointer hover:text-blue-600"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Add photo
+            </span>
+          ) : (
+            <span
+              className="text-blue-500 cursor-pointer hover:text-blue-600"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Change photo
+            </span>
+          )}{" "}
+          or{" "}
+          {profilePicture && (
+            <span
+              className="text-red-500 cursor-pointer hover:text-red-600"
+              onClick={() => {
+                setProfilePicture(null);
+                if (fileInputRef.current) {
+                  fileInputRef.current.value = "";
+                }
+              }}
+            >
+              Remove photo
+            </span>
+          )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  setProfilePicture(reader.result as string);
+                };
+                reader.readAsDataURL(file);
+              }
+            }}
+          />
         </p>
       </div>
 

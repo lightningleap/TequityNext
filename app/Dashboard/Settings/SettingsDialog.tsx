@@ -57,7 +57,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[368px] md:w-[720px] max-w-[368px] md:max-w-[720px] h-[500px] md:h-[500px] p-0 gap-0 [&>button:first-of-type]:hidden mt-20 md:mt-0 sm:mt-0 rounded-tl-lg rounded-tr-lg bg-white dark:!bg-[#09090B]">
+      <DialogContent className="w-[368px] md:w-[720px] max-w-[368px] md:max-w-[720px] h-[500px] md:h-[500px] p-0 gap-0 [&>button:first-of-type]:hidden mt-20 md:mt-0 sm:mt-0 rounded-tl-lg rounded-tr-lg bg-white dark:!bg-[#09090B] dark:border-[#3F3F46] dark:border shadow-[0px_25px_50px_-12px_#00000040]">
         <DialogHeader className="sr-only">
           <DialogTitle>Settings</DialogTitle>
         </DialogHeader>

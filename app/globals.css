@@ -218,3 +218,26 @@
 html {
   scroll-behavior: smooth;
 }
+
+.tequity-toast {
+  border-radius: 12px !important;
+  font-weight: 500;
+}
+
+.tequity-toast[data-type="success"] {
+  border: 1px solid #008A2E !important;
+  color: #008A2E !important;
+}
+
+.tequity-toast[data-type="success"] svg {
+  color: #008A2E !important;
+}
+
+.tequity-toast[data-type="error"] {
+  border: 1px solid #FF0033 !important;
+  color: #FF0033 !important;
+}
+
+.tequity-toast[data-type="error"] svg {
+  color: #FF0033 !important;
+}

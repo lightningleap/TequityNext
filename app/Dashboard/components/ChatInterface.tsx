@@ -16,6 +16,8 @@ import {
   ThumbsDown,
   Search,
 } from "lucide-react";
+import { GoodResponse } from "./Feedback/goodResponse";
+import { BadResponse } from "./Feedback/badResponse";
 import { useChatContext } from "../context/ChatContext";
 import Image from "next/image";
 import Logomark from "@/public/Logomark.svg";
@@ -56,9 +58,36 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
   const [showContextMenu, setShowContextMenu] = useState(false);
   const uploadMenuRef = useRef<HTMLDivElement>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
+  const feedbackPanelRef = useRef<HTMLDivElement | null>(null);
 
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [contextSearchValue, setContextSearchValue] = useState("");
+  const [activeFeedback, setActiveFeedback] = useState<
+    | {
+        type: "good" | "bad";
+        messageIndex: number;
+      }
+    | null
+  >(null);
+
+  useEffect(() => {
+    if (activeFeedback && feedbackPanelRef.current) {
+      feedbackPanelRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }
+  }, [activeFeedback]);
+
+  const handleFeedbackToggle = (type: "good" | "bad", index: number) => {
+    setActiveFeedback((prev) => {
+      if (prev && prev.type === type && prev.messageIndex === index) {
+        feedbackPanelRef.current = null;
+        return null;
+      }
+      return { type, messageIndex: index };
+    });
+  };
 
   // Auto-resize textarea function
   const adjustTextareaHeight = () => {
@@ -457,10 +486,14 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
                 }`}
               >
                 {/* Message Content */}
-                <div className="flex flex-col gap-1 max-w-[80%]">
+                <div
+                  className={`flex w-full max-w-[600px] flex-col gap-1 ${
+                    message.isUser ? "items-end self-end" : "items-start self-start"
+                  }`}
+                >
                   {/* Message Bubble */}
                   <div
-                    className={`rounded-lg px-2 py-2 ${
+                    className={`w-fit max-w-full rounded-lg px-2 py-2 ${
                       message.isUser
                         ? "bg-[#F4F4F5] dark:bg-[#3F3F46] text-black dark:text-white"
                         : "text-black dark:text-white"
@@ -500,36 +533,74 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
 
                   {/* Action Buttons - Only for AI messages */}
                   {!message.isUser && (
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleCopy(message.text, index)}
-                        className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors ${
-                          copiedIndex === index
-                            ? "text-black dark:text-white"
-                            : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                        }`}
-                        title="Copy"
-                      >
-                        {copiedIndex === index ? (
-                          <span className="text-xs">Copied to clipboard</span>
-                        ) : (
-                          <Copy
-                            className={`h-3 w-3 ${
-                              copiedIndex === index ? "fill-current" : ""
-                            }`}
-                          />
+                    <div className="flex items-center gap-4">
+                      <div className="relative flex h-6 w-6 items-center justify-center">
+                        <button
+                          onClick={() => handleCopy(message.text, index)}
+                          className={`flex h-6 w-6 items-center justify-center transition-colors ${
+                            copiedIndex === index
+                              ? "border-[#D91D69] text-[#D91D69]"
+                              : "border-[#E4E4E7] text-gray-500 hover:text-gray-700 dark:border-[#3F3F46] dark:text-gray-400 dark:hover:text-gray-200"
+                          }`}
+                          title="Copy"
+                          aria-label={copiedIndex === index ? "Copied" : "Copy"}
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                        </button>
+                        {copiedIndex === index && (
+                          <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-medium text-[#D91D69]">
+                            Copied
+                          </span>
                         )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleFeedbackToggle("good", index)}
+                        className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors ${
+                          activeFeedback?.type === "good" &&
+                          activeFeedback?.messageIndex === index
+                            ? "text-[#D91D69]"
+                            : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        }`}
+                        aria-label="Provide positive feedback"
+                      >
+                        <ThumbsUp className="h-3 w-3" />
                       </button>
                       <button
-                        className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors ${"text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}
+                        type="button"
+                        onClick={() => handleFeedbackToggle("bad", index)}
+                        className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors ${
+                          activeFeedback?.type === "bad" &&
+                          activeFeedback?.messageIndex === index
+                            ? "text-[#D91D69]"
+                            : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        }`}
+                        aria-label="Provide negative feedback"
                       >
-                        <ThumbsUp className={`h-3 w-3 `} />
+                        <ThumbsDown className="h-3 w-3" />
                       </button>
-                      <button
-                        className={`flex items-center gap-1 px-2 py-1 text-xs transition-colors ${"text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}
-                      >
-                        <ThumbsDown className={`h-3 w-3 `} />
-                      </button>
+                    </div>
+                  )}
+                  {!message.isUser && activeFeedback?.messageIndex === index && (
+                    <div
+                      ref={feedbackPanelRef}
+                      className="mt-3 flex justify-start"
+                    >
+                      {activeFeedback.type === "good" ? (
+                        <GoodResponse
+                          onClose={() => {
+                            setActiveFeedback(null);
+                            feedbackPanelRef.current = null;
+                          }}
+                        />
+                      ) : (
+                        <BadResponse
+                          onClose={() => {
+                            setActiveFeedback(null);
+                            feedbackPanelRef.current = null;
+                          }}
+                        />
+                      )}
                     </div>
                   )}
                 </div>
@@ -663,7 +734,7 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
                   <button
                     type="button"
                     onClick={handleUploadClick}
-                    className="flex items-center bg-white dark:bg-[#09090B] border border-gray-200 dark:border-[#3F3F46] justify-center rounded-md text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
+                    className="flex items-center bg-white dark:bg-[#09090B] border border-gray-200 dark:border-[#3F3F46] justify-center rounded-md text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer dark:hover:bg-[#27272A]"
                     style={{
                       width: "30px",
                       height: "30px",
@@ -728,7 +799,7 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
                       }
                       setShowContextMenu(!showContextMenu);
                     }}
-                    className="flex bg-white dark:bg-[#09090B] border border-gray-200 dark:border-[#3F3F46] items-center gap-2 px-4 h-8 rounded-md text-gray-600 hover:bg-gray-100 transition-colors text-sm cursor-pointer"
+                    className="flex bg-white dark:bg-[#09090B] border border-gray-200 dark:border-[#3F3F46] items-center gap-2 px-4 h-8 rounded-md text-gray-600 hover:bg-gray-100 transition-colors text-sm cursor-pointer dark:text-white dark:hover:bg-[#27272A]"
                     style={{
                       width: "137.33px",
                       height: "30px",
@@ -753,7 +824,7 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
                       <div className="">
                         {/* Search Bar */}
                         <div className="">
-                          <div className="flex items-center gap-2 px-2 py-2 dark:bg-[#18181B] rounded-t-md">
+                          <div className="flex items-center gap-2 px-2 py-2 dark:bg-[#09090B] rounded-t-md">
                             <Search className="h-4 w-4 text-gray-400" />
                             <input
                               type="text"

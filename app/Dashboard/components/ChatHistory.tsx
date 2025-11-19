@@ -5,6 +5,7 @@ import { Check, X } from "lucide-react";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { MdOutlineDelete } from "react-icons/md";
 import { LuPencil } from "react-icons/lu";
+import { toast } from "sonner";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useChatContext } from "../context/ChatContext";
 import {
@@ -37,8 +38,15 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
 
   const handleDelete = (chatId: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    const chatToDelete = chats.find((c) => c.id === chatId);
     console.log("Deleting chat:", chatId);
-    deleteChat(chatId);
+    
+    try {
+      deleteChat(chatId);
+      toast.success(`Chat "${chatToDelete?.title || 'Untitled'}" deleted successfully`);
+    } catch (error) {
+      toast.error("Failed to delete chat");
+    }
   };
 
   const handleEdit = (
@@ -54,13 +62,17 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
   const handleSaveEdit = (chatId: string, e?: React.MouseEvent) => {
     if (e) {
       e.stopPropagation();
-      e.preventDefault();
     }
     if (
       editValue.trim() !== "" &&
       editValue.trim() !== chats.find((c) => c.id === chatId)?.title
     ) {
-      updateChatTitle(chatId, editValue.trim());
+      try {
+        updateChatTitle(chatId, editValue.trim());
+        toast.success(`Chat renamed to "${editValue.trim()}" successfully`);
+      } catch (error) {
+        toast.error("Failed to rename chat");
+      }
     }
     setEditingChatId(null);
     setEditValue("");

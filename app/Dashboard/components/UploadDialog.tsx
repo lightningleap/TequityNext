@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { UploadGraphic } from "./UploadGraphic";
+import { toast } from "sonner";
 
 function getFileIcon(fileName: string) {
   const extension = fileName.split(".").pop()?.toLowerCase();
@@ -102,6 +103,22 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
       // Automatically start uploading new files
       setTimeout(() => startUpload(newFiles, files.length), 100);
     }
+  };
+
+  const retryUpload = (fileIndex: number) => {
+    const fileToRetry = files[fileIndex];
+    if (!fileToRetry) return;
+
+    setUploadProgress((prev) => ({
+      ...prev,
+      [fileIndex]: 0,
+    }));
+    setUploadStatus((prev) => ({
+      ...prev,
+      [fileIndex]: "pending",
+    }));
+
+    startUpload([fileToRetry], fileIndex);
   };
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -246,11 +263,10 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
     if (onUpload) {
       onUpload(fileItems, folderItems);
     }
-    // Always call onUpload with both parameters
     console.log("Upload mode:", uploadMode);
     console.log("File items:", fileItems);
     console.log("Folder items:", folderItems);
-    onUpload(fileItems, folderItems);
+    toast.success("Files uploaded successfully");
 
     // Reset and close only if all uploads were successful
     setFiles([]);
@@ -281,12 +297,12 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
           <span className="hidden md:inline text-xs font-medium dark:text-white">Upload</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[calc(100vw-32px)] max-w-[352px] h-[400px] sm:w-[560px] sm:max-w-[560px] p-[16px] border border-[#E2E8F0] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)] flex flex-col">
+      <DialogContent className="w-[calc(100vw-32px)] max-w-[352px] h-[400px] sm:w-[560px] sm:max-w-[560px] p-[16px] border border-[#E2E8F0] dark:border-[#27272A] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)] flex flex-col">
         <DialogTitle className="sr-only">Upload Files</DialogTitle>
         <div className="flex flex-col items-center w-full h-full">
           {/* Header */}
           <div className="flex flex-row items-center gap-3 w-full h-9 mb-0 flex-shrink-0">
-            <h2 className="flex-1 font-['Inter'] font-medium text-[20px] leading-[28px] tracking-[-0.12px] text-[#020617]">
+            <h2 className="flex-1 font-['Inter'] font-medium text-[20px] leading-[28px] tracking-[-0.12px] text-[#020617] dark:text-white">
               Upload
             </h2>
             <DialogDescription className="sr-only">
@@ -314,10 +330,10 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
 
               {/* Text */}
               <div className="flex flex-col justify-center items-center gap-1.5 w-full">
-                <p className="font-['Inter'] font-medium text-2xl leading-8 tracking-[-0.006em] text-[#09090B]">
+                <p className="font-['Inter'] font-medium text-2xl leading-8 tracking-[-0.006em] text-[#09090B] dark:text-white">
                   {isDragging ? "Drop files here" : <><span className="sm:hidden">Select or Paste</span><span className="hidden sm:inline">Drop or Select</span></>}
                 </p>
-                <p className="font-['Inter'] font-normal text-sm leading-5 text-center text-[#71717A] w-full">
+                <p className="font-['Inter'] font-normal text-sm leading-5 text-center text-[#71717A] w-full dark:text-white">
                   {isDragging
                     ? "Release to upload"
                     : "Files, Folders, or .zip Archives"}
@@ -353,14 +369,14 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                   return (
                     <div
                       key={index}
-                      className={`flex flex-col items-start p-[12px] gap-[8px] bg-white border border-[#E2E8F0] rounded-xl relative h-[126px] ${
+                      className={`flex flex-col items-start p-[12px] gap-[8px] bg-white border border-[#E2E8F0] rounded-xl relative h-[126px] dark:bg-[#18181B] dark:border-[#3F3F46] transition-colors duration-200 hover:bg-[#F8FAFC] hover:border-[#CBD5F6] dark:hover:bg-[#27272A] dark:hover:border-[#52525B] ${
                         status === "uploading" ? "overflow-hidden" : ""
                       }`}
                     >
                       {/* Progress bar background for uploading state */}
                       {status === "uploading" && (
                         <div
-                          className="absolute left-0 top-0 bottom-0 bg-[#F4F4F5] transition-all duration-300"
+                          className="absolute left-0 top-0 bottom-0 bg-[#F4F4F5] transition-all duration-300 dark:bg-[#3F3F46]/40"
                           style={{ width: `${progress}%` }}
                         />
                       )}
@@ -375,47 +391,58 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                           {status === "pending" && (
                             <button
                               type="button"
-                              className="flex items-center justify-center w-[40px] h-[36px] rounded-md hover:bg-gray-100"
+                              className="flex items-center justify-center w-[40px] h-[36px] rounded-md hover:bg-gray-100 dark:hover:bg-[#27272A]"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 removeFile(index);
                               }}
                             >
-                              <X className="h-4 w-4 text-[#020617]" />
+                              <X className="h-4 w-4 text-[#020617] dark:text-white" />
                             </button>
                           )}
                           {status === "success" && (
                             <button
                               type="button"
-                              className="flex items-center justify-center w-[40px] h-[36px] rounded-md hover:bg-gray-100"
+                              className="flex items-center justify-center w-[40px] h-[36px] rounded-md hover:bg-gray-100 dark:hover:bg-[#27272A]"
                               onClick={() => removeFile(index)}
                             >
-                              <CheckCircle className="h-4 w-4 text-[#008A2E]" />
+                              <CheckCircle className="h-4 w-4 text-[#008A2E] dark:text-[#4ADE80]" />
                             </button>
                           )}
                           {status === "error" && (
                             <button
                               type="button"
-                              className="flex items-center justify-center w-[40px] h-[36px] rounded-md hover:bg-gray-100"
+                              className="flex items-center justify-center w-[40px] h-[36px] rounded-md hover:bg-gray-100 dark:hover:bg-[#27272A]"
                               onClick={() => removeFile(index)}
                             >
-                              <RefreshCw className="h-4 w-4 text-[#020617]" />
+                              <RefreshCw className="h-4 w-4 text-[#020617] dark:text-white" />
                             </button>
                           )}
                         </div>
 
                         {/* File info */}
                         <div className="flex flex-col items-start gap-[4px] w-full">
-                          <p className="font-['Inter'] font-medium text-[12px] leading-[20px] text-[#020617] line-clamp-2 w-full overflow-ellipsis overflow-hidden">
+                          <p className="font-['Inter'] font-medium text-[12px] leading-[20px] text-[#020617] dark:text-white line-clamp-2 w-full overflow-ellipsis overflow-hidden">
                             {file.name}
                           </p>
                           <p className={`font-['Inter'] font-normal text-[10px] leading-[14px] w-full ${
-                            status === "error" ? "text-[#E60000]" : "text-[#64748B]"
+                            status === "error"
+                              ? "text-[#E60000] dark:text-[#FF6B6B]"
+                              : "text-[#64748B] dark:text-[#A1A1AA]"
                           }`}>
                             {status === "error"
                               ? "Upload failed try again"
                               : `${(file.size / (1024 * 1024)).toFixed(1)}MB`}
                           </p>
+                          {status === "error" && (
+                            <button
+                              type="button"
+                              onClick={() => retryUpload(index)}
+                              className="text-[11px] font-semibold text-[#E60000] dark:text-[#FF6B6B] underline-offset-2 hover:underline"
+                            >
+                              Upload failed try again
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -427,10 +454,10 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                   <button
                     type="button"
                     onClick={() => handleButtonClick("files")}
-                    className="flex flex-col justify-center items-center p-[12px] gap-[8px] bg-[#FAFAFA] rounded-xl hover:bg-gray-200 transition-colors h-[126px] cursor-pointer"
+                    className="flex flex-col justify-center items-center p-[12px] gap-[8px] bg-[#FAFAFA] rounded-xl hover:bg-gray-200 transition-colors h-[126px] cursor-pointer border border-[#E2E8F0] dark:bg-[#18181B] dark:border-[#3F3F46] dark:hover:bg-[#3F3F46]/60 hover:border-[#CBD5F6] dark:hover:border-[#52525B]"
                   >
                     <Image src={PlusIcon} alt="Add files" className="w-10 h-10" />
-                    <p className="font-['Inter'] font-normal text-[14px] leading-[20px] text-[#020617]">
+                    <p className="font-['Inter'] font-normal text-[14px] leading-[20px] text-[#020617] dark:text-white">
                       Add files
                     </p>
                   </button>
@@ -443,7 +470,7 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
           {files.length > 0 && (
             <div className="flex-shrink-0 mt-auto pt-4 w-full">
               <Button
-                className="w-full h-10 bg-zinc-900 text-white rounded-lg font-['Inter'] font-medium text-[14px] leading-[20px] tracking-[-0.084px] hover:bg-zinc-800"
+                className="w-full h-10 cursor-pointer bg-zinc-900 text-white rounded-lg font-['Inter'] font-medium text-[14px] leading-[20px] tracking-[-0.084px] hover:bg-zinc-800"
                 onClick={handleUpload}
                 disabled={files.some((_, index) => uploadStatus[index] === "uploading" || uploadStatus[index] === "error")}
               >
