@@ -1015,6 +1015,10 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                             imageSrc = "/noPdfImg.svg"; // music and images
                           }
 
+                          // Use dark mode image if needed
+                          const isDarkMode = document.documentElement.classList.contains('dark');
+                          const finalImageSrc = imageSrc === "/noPdfImg.svg" && isDarkMode ? "/darkNoPdf.svg" : imageSrc;
+
                           // Calculate time ago
                           const now = new Date();
                           const diffInHours = Math.floor(
@@ -1038,7 +1042,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                           return (
                             <div
                               key={item.id}
-                              className="flex flex-col items-center w-[180px] h-[170px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:bg-[#27272A] hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer transition-colors text-center p-[12px] gap-[20px] shrink-0"
+                              className="flex flex-col items-center w-[180px] h-[170px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:hover:bg-[#27272A] hover:bg-gray-50 dark:bg-[#18181B] cursor-pointer transition-colors text-center p-[12px] gap-[20px] shrink-0"
                               onClick={() => {
                                 if (item.isFolder) {
                                   // Find the folder and select it
@@ -1057,7 +1061,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                             >
                               <div className="flex items-center justify-center w-[156px] h-[90px] shrink-0">
                                 <img
-                                  src={imageSrc}
+                                  src={finalImageSrc}
                                   alt={item.isFolder ? "Folder" : "File"}
                                   className="max-w-full max-h-full object-contain"
                                 />
@@ -1089,7 +1093,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setFoldersExpanded(!foldersExpanded)}
-                        className="flex items-center gap-2 p-2 rounded-md text-sm font-medium text-muted-foreground cursor-pointer hover:text-foreground transition-colors hover:bg-[#F4F4F5]"
+                        className="flex items-center gap-2 p-2 rounded-md text-sm font-medium text-muted-foreground cursor-pointer hover:text-foreground transition-colors hover:bg-[#F4F4F5] dark:hover:bg-[#27272A]"
                         aria-label={
                           foldersExpanded
                             ? "Collapse folders"
@@ -1291,7 +1295,7 @@ function LibraryContent({ files, setFiles, folders }: LibraryContentProps) {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setFilesExpanded(!filesExpanded)}
-                        className="flex items-center gap-2 p-2 rounded-md text-sm font-medium text-muted-foreground cursor-pointer hover:text-foreground transition-colors hover:bg-[#F4F4F5]"
+                        className="flex items-center gap-2 p-2 rounded-md text-sm font-medium text-muted-foreground cursor-pointer hover:text-foreground transition-colors hover:bg-[#F4F4F5] dark:hover:bg-[#27272A]"
                         aria-label={
                           filesExpanded ? "Collapse files" : "Expand files"
                         }

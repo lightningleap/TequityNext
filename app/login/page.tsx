@@ -8,6 +8,7 @@ import SignupLogo from "../../public/SignupLogo.svg";
 import GoogleIcon from "../../public/GoogleIcon.svg";
 import Container from "../../public/Container.svg";
 import Image from "next/image";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -41,8 +42,14 @@ export default function LoginPage() {
 
       // Switch to verification step
       setStep("verification");
+      toast.success("Verification code sent");
     } catch (err) {
       setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to send verification code. Please try again."
+      );
+      toast.error(
         err instanceof Error
           ? err.message
           : "Failed to send verification code. Please try again."
@@ -73,10 +80,15 @@ export default function LoginPage() {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Navigate directly to dashboard after verification
+      toast.success("Verification successful");
       router.push("/Dashboard/Library");
     } catch (err) {
       setError(
+        err instanceof Error
+          ? err.message
+          : "Verification failed. Please try again."
+      );
+      toast.error(
         err instanceof Error
           ? err.message
           : "Verification failed. Please try again."

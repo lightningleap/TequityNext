@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import {
   Dialog,
   DialogContent,
@@ -148,13 +149,15 @@ export function SearchDialog({ open, onOpenChange, folders = [], files = [], onF
   const hasResults = filteredCategories.length > 0 || filteredFiles.length > 0;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] sm:w-[600px] md:w-[600px] lg:w-[600px] h-[368px] max-w-[95vw] p-0 overflow-hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 [&>button]:top-3 [&>button]:right-3 sm:[&>button]:top-4 sm:[&>button]:right-4 rounded-lg dark:bg-[#09090B] dark:border-[#3F3F46] dark:border dark:text-white text-black">
+    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-transparent" />
+        <DialogPrimitive.Content className="w-[95vw] sm:w-[600px] md:w-[600px] lg:w-[600px] h-[368px] max-w-[95vw] p-0 overflow-hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 grid gap-4 rounded-lg border bg-white dark:bg-[#09090B] shadow-[0px_25px_50px_-12px_#00000040] dark:border-[var(--tokens-border,#3F3F46)] dark:border dark:text-white text-black [&_[cmdk-item]]:dark:hover:bg-[#27272A]">
         <DialogTitle className="sr-only">Search</DialogTitle>
         <DialogDescription className="sr-only">Search for files, folders, and commands</DialogDescription>
 
         <div className="h-full flex flex-col overflow-hidden">
-          <Command className="">
+          <Command className="dark:bg-[#09090B]">
             <div className="px-3">
               <CommandInput
                 placeholder="Search..."
@@ -196,13 +199,28 @@ export function SearchDialog({ open, onOpenChange, folders = [], files = [], onF
                       }}
                       className="flex items-center gap-2 px-4 py-2 text-sm cursor-pointer text-black dark:text-white"
                     >
-                      <Image
-                        src={category.icon}
-                        alt={category.name}
-                        width={16}
-                        height={16}
-                        className="shrink-0"
-                      />
+                      <div className="w-4 h-4 relative">
+                        {/* Light mode icon */}
+                        <div className="dark:hidden">
+                          <Image
+                            src="/white-folder.svg"
+                            alt={category.name}
+                            fill
+                            className="object-contain"
+                            style={{ filter: 'brightness(0) invert(0)' }}
+                          />
+                        </div>
+                        {/* Dark mode icon */}
+                        <div className="hidden dark:block">
+                          <Image
+                            src="/white-folder.svg"
+                            alt={category.name}
+                            fill
+                            className="object-contain"
+                            style={{ filter: 'brightness(0) invert(1)' }}
+                          />
+                        </div>
+                      </div>
                       <span className="text-black dark:text-white">{category.name}</span>
                     </CommandItem>
                   ))}
@@ -256,7 +274,8 @@ export function SearchDialog({ open, onOpenChange, folders = [], files = [], onF
             </CommandList>
           </Command>
         </div>
-      </DialogContent>
-    </Dialog>
-  );
+      </DialogPrimitive.Content>
+    </DialogPrimitive.Portal>
+  </DialogPrimitive.Root>
+);
 }
