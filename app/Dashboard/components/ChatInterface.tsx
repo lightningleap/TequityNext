@@ -491,6 +491,39 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
                     message.isUser ? "items-end self-end" : "items-start self-start"
                   }`}
                 >
+                  {/* File Attachments - Show separately above message */}
+                  {message.files && message.files.length > 0 && (
+                    <div className={`space-y-2 mb-2 ${
+                      message.isUser ? "items-end" : "items-start"
+                    }`}>
+                      {message.files.map((file, fileIndex) => (
+                        <div
+                          key={fileIndex}
+                          className={`flex items-center gap-3 p-3 rounded-lg border max-w-fit ${
+                            message.isUser
+                              ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+                              : "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                          }`}
+                        >
+                          <div className="flex-shrink-0">
+                            {getFileIcon(file.type)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                              {file.name}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {formatFileSize(file.size)}
+                            </p>
+                          </div>
+                          <div className="flex-shrink-0">
+                            <FileText className="h-4 w-4 text-gray-400" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   {/* Message Bubble */}
                   <div
                     className={`w-fit max-w-full rounded-lg px-2 py-2 ${
@@ -500,35 +533,6 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
                     }`}
                   >
                     <p className="text-sm">{message.text}</p>
-                    {message.files && message.files.length > 0 && (
-                      <div className="mt-3 space-y-2">
-                        {message.files.map((file, fileIndex) => (
-                          <div
-                            key={fileIndex}
-                            className={`flex items-center gap-3 p-3 rounded-lg border ${
-                              message.isUser
-                                ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
-                                : "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-                            }`}
-                          >
-                            <div className="flex-shrink-0">
-                              {getFileIcon(file.type)}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                {file.name}
-                              </p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {formatFileSize(file.size)}
-                              </p>
-                            </div>
-                            <div className="flex-shrink-0">
-                              <FileText className="h-4 w-4 text-gray-400" />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
 
                   {/* Action Buttons - Only for AI messages */}
