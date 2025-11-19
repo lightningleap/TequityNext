@@ -8,11 +8,12 @@ import Image from "next/image";
 import GoogleIcon from "../../public/GoogleIcon.svg";
 import SignupLogo from "../../public/SignupLogo.svg";
 import Container from "../../public/Container.svg";
+import { toast } from "sonner";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
-  const [step, setStep] = useState<'email' | 'verification'>('email');
+  const [step, setStep] = useState<"email" | "verification">("email");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -30,12 +31,12 @@ export default function SignupPage() {
 
     // Basic validation
     if (!email.trim()) {
-      setEmailError('Email is required');
+      setEmailError("Email is required");
       return;
     }
 
     if (!validateEmail(email)) {
-      setEmailError('Please enter a valid email address');
+      setEmailError("Please enter a valid email address");
       return;
     }
 
@@ -52,10 +53,19 @@ export default function SignupPage() {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Switch to verification step
-      setStep('verification');
+      setStep("verification");
+      toast.success("Verification code sent");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send verification code. Please try again.');
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to send verification code. Please try again."
+      );
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Failed to send verification code. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -82,10 +92,19 @@ export default function SignupPage() {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Navigate to workspace setup after verification
+      toast.success("Signup verified");
       router.push("/workspace-setup");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Verification failed. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Verification failed. Please try again."
+      );
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Verification failed. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -95,23 +114,11 @@ export default function SignupPage() {
     console.log("Google sign-in clicked");
   };
 
-
   // Verification Step UI
-  if (step === 'verification') {
+  if (step === "verification") {
     return (
       <div className="flex h-screen overflow-hidden">
-        {/* Left Side - Background Graphics (Hidden on small/medium, visible on large) */}
-        <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
-          <Image
-            src={Container}
-            alt="Verification Graphic"
-            fill
-            className="object-cover object-center"
-            priority
-          />
-        </div>
-
-        {/* Right Side - Verification Form */}
+        {/* Left Side - Verification Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-2 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
           <div className="w-full max-w-md flex items-center justify-center">
             {/* Form Card */}
@@ -124,17 +131,20 @@ export default function SignupPage() {
                 </div>
 
                 <h1 className="text-3xl font-normal text-[#09090B]">
-                   Get Started Now
+                  Get Started Now
                 </h1>
 
                 <p className="text-sm text-gray-500">
-                 We sent a temporary login code to {email} <br />
-                 Not you?
+                  We sent a temporary login code to {email} <br />
+                  Not you?
                 </p>
               </div>
 
               {/* Form Fields */}
-              <form onSubmit={handleVerificationSubmit} className="flex flex-col gap-5 w-[364px]">
+              <form
+                onSubmit={handleVerificationSubmit}
+                className="flex flex-col gap-5 w-[364px]"
+              >
                 {/* Error Message */}
                 {error && (
                   <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -148,9 +158,17 @@ export default function SignupPage() {
                     type="text"
                     value={verificationCode}
                     onChange={(e) => setVerificationCode(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleVerificationSubmit(e as React.FormEvent);
+                      }
+                    }}
                     placeholder="Enter verification code"
                     className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                      error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                      error
+                        ? "border-red-300 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-blue-500"
                     }`}
                     disabled={isLoading}
                   />
@@ -171,13 +189,24 @@ export default function SignupPage() {
                 <div className="text-center">
                   <Link href="/login">
                     <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                      Already have an account? <span className="text-gray-900 font-medium">Log in</span>
+                      Already have an account?{" "}
+                      <span className="text-gray-900 font-medium">Log in</span>
                     </span>
                   </Link>
                 </div>
               </form>
             </div>
           </div>
+        </div>
+
+        {/* Right Side - Background Graphics (Hidden on small/medium, visible on large) */}
+        <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
+          <Image
+            src={Container}
+            alt="Verification Graphic"
+            fill
+            className="object-cover object-center"
+          />
         </div>
       </div>
     );
@@ -186,22 +215,11 @@ export default function SignupPage() {
   // Email Step UI
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Left Side - Image (Hidden on small/medium, visible on large) */}
-      <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
-        <Image
-          src={Container}
-          alt="Signup Graphic"
-          fill
-          className="object-cover object-center"
-          priority
-        />
-      </div>
-
-      {/* Right Side - Form */}
+      {/* Left Side - Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
         <div className="w-full max-w-md flex items-center justify-center">
           {/* Form Card */}
-          <div className="w-full max-w-[412px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-6 flex flex-col gap-8">
+          <div className="w-full max-w-[412px] bg-[rgba(0,0,0,0.001)] rounded-[24px] flex flex-col gap-8">
             {/* Logo and Heading */}
             <div className="flex flex-col gap-2.5">
               {/* Company Logo */}
@@ -220,10 +238,10 @@ export default function SignupPage() {
             </div>
 
             {/* Google Sign In Button */}
-            <div className="h-12">
+            <div className="mt-3">
               <button
                 onClick={handleGoogleSignIn}
-                className="w-full h-12 border border-gray-300 rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 cursor-pointer"
+                className="w-full h-11 border border-gray-300 rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 cursor-pointer"
               >
                 <div className="w-5 h-5 relative rounded-sm overflow-hidden">
                   <Image src={GoogleIcon} alt="Google Logo" />
@@ -245,47 +263,68 @@ export default function SignupPage() {
             </div>
 
             {/* Form Fields */}
-            <div className="w-[364px] space-y-5">
-            {/* Email Input */}
-            <div className="space-y-1.5">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className={`w-full h-10 px-3 py-2 border ${emailError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors`}
-                required
-                disabled={isLoading}
-              />
-            </div>
-
-            {/* Error Message */}
-            {(error || emailError) && (
-              <div className="p-3 text-sm text-red-600 bg-red-50 rounded-lg">
-                {error || emailError}
+            <div className="w-full space-y-5">
+              {/* Email Input */}
+              <div className="space-y-1.5">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleSubmit(e as React.FormEvent);
+                    }
+                  }}
+                  placeholder="Enter your email address"
+                  className={`w-full h-10 px-3 py-2 border ${
+                    emailError ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors`}
+                  required
+                  disabled={isLoading}
+                />
               </div>
-            )}
 
-            {/* Continue Button */}
-            <Button
-              onClick={handleSubmit}
-              disabled={!email.trim() || isLoading}
-              className="w-full h-11 cursor-pointer bg-[#09090B] hover:bg-gray-800 text-white rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? "Sending code..." : "Continue"}
-            </Button>
+              {/* Error Message */}
+              {(error || emailError) && (
+                <div className="p-3 text-sm text-red-600 bg-red-50 rounded-lg">
+                  {error || emailError}
+                </div>
+              )}
 
-            {/* Navigation Options */}
-            <div className="text-center">
-              <Link href="/login">
-                <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                  Already have an account? <span className="text-gray-900 font-medium">Log in</span>
-                </span>
-              </Link>
-            </div>
+              {/* Continue Button */}
+              <div className="mt-3">
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!email.trim() || isLoading}
+                  className="w-full h-11 cursor-pointer bg-[#09090B] hover:bg-gray-800 text-white rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? "Sending code..." : "Continue"}
+                </Button>
+              </div>
+
+              {/* Navigation Options */}
+              <div className="text-center">
+                <Link href="/login">
+                  <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
+                    Already have an account?{" "}
+                    <span className="text-gray-900 font-medium">Log in</span>
+                  </span>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Right Side - Image (Hidden on small/medium, visible on large) */}
+      <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
+        <Image
+          src={Container}
+          alt="Signup Graphic"
+          fill
+          className="object-cover object-center"
+        />
       </div>
     </div>
   );

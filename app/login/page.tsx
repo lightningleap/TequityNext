@@ -8,11 +8,12 @@ import SignupLogo from "../../public/SignupLogo.svg";
 import GoogleIcon from "../../public/GoogleIcon.svg";
 import Container from "../../public/Container.svg";
 import Image from "next/image";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
-  const [step, setStep] = useState<'email' | 'verification'>('email');
+  const [step, setStep] = useState<"email" | "verification">("email");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -40,9 +41,19 @@ export default function LoginPage() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Switch to verification step
-      setStep('verification');
+      setStep("verification");
+      toast.success("Verification code sent");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send verification code. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to send verification code. Please try again."
+      );
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Failed to send verification code. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -69,10 +80,19 @@ export default function LoginPage() {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Navigate directly to dashboard after verification
+      toast.success("Verification successful");
       router.push("/Dashboard/Library");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Verification failed. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Verification failed. Please try again."
+      );
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Verification failed. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -86,25 +106,14 @@ export default function LoginPage() {
     console.log("Google sign-in clicked");
   };
 
-  if (step === 'verification') {
+  if (step === "verification") {
     return (
       <div className="flex h-screen overflow-hidden">
-        {/* Left Side - Background Graphics (Hidden on small/medium, visible on large) */}
-        <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
-          <Image
-            src={Container}
-            alt="Verification Graphic"
-            fill
-            className="object-cover object-center"
-            priority
-          />
-        </div>
-
-        {/* Right Side - Verification Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
-          <div className="w-full max-w-md flex items-center justify-center">
+        {/* Left Side - Verification Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-16 bg-white overflow-y-auto scrollbar-hide">
+          <div className="w-full max-w-sm sm:max-w-md flex items-center justify-center">
             {/* Form Card */}
-            <div className="w-[412px] h-[430px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-6 flex flex-col gap-8">
+            <div className="w-full max-w-[412px] min-h-[430px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-4 sm:p-6 flex flex-col gap-6 sm:gap-8">
               {/* Logo and Heading */}
               <div className="flex flex-col gap-2.5">
                 {/* Company Logo */}
@@ -112,17 +121,17 @@ export default function LoginPage() {
                   <Image src={SignupLogo} alt="Signup Logo" />
                 </div>
 
-                <h1 className="text-3xl font-normal text-[#09090B] w-[364px] h-10">
+                <h1 className="text-2xl sm:text-3xl font-normal text-[#09090B] w-full">
                   Welcome Back
                 </h1>
 
-                <p className="text-sm text-gray-500 w-[364px] h-10">
+                <p className="text-sm text-gray-500 w-full">
                   We sent a temporary login code to {email}. Not you?
                 </p>
               </div>
 
               {/* Form Fields */}
-              <div className="flex flex-col gap-5 w-[364px]">
+              <div className="flex flex-col gap-5 w-full">
                 {/* Error Message */}
                 {error && (
                   <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -131,21 +140,33 @@ export default function LoginPage() {
                 )}
 
                 {/* Verification Code Input with Error Handling */}
-                <div className="space-y-1.5 w-[364px]">
+                <div className="space-y-1.5 w-full">
                   <div className="relative">
                     <input
                       type="text"
                       value={verificationCode}
                       onChange={(e) => setVerificationCode(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleVerificationSubmit(e as React.FormEvent);
+                        }
+                      }}
                       placeholder="Enter verification code"
                       className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                        error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                        error
+                          ? "border-red-300 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-blue-500"
                       }`}
                     />
                     {/* Error Message - Positioned absolutely to prevent layout shift */}
-                    <div className={`absolute left-0 right-0 transition-all duration-200 ${
-                      error ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
-                    }`}>
+                    <div
+                      className={`absolute left-0 right-0 transition-all duration-200 ${
+                        error
+                          ? "opacity-100 translate-y-0"
+                          : "opacity-0 -translate-y-2 pointer-events-none"
+                      }`}
+                    >
                       {error && (
                         <p className="text-sm text-red-600 py-2">{error}</p>
                       )}
@@ -176,7 +197,10 @@ export default function LoginPage() {
                 <div className="text-center">
                   <Link href="/signup">
                     <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                      Don&apos;t have an account? <span className="text-gray-900 font-medium">Create Account</span>
+                      Don&apos;t have an account?{" "}
+                      <span className="text-gray-900 font-medium">
+                        Create Account
+                      </span>
                     </span>
                   </Link>
                 </div>
@@ -184,28 +208,27 @@ export default function LoginPage() {
             </div>
           </div>
         </div>
+
+        {/* Right Side - Background Graphics (Hidden on small/medium, visible on large) */}
+        <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
+          <Image
+            src={Container}
+            alt="Verification Graphic"
+            fill
+            className="object-cover object-center"
+          />
+        </div>
       </div>
     );
   }
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Left Side - Image (Hidden on small/medium, visible on large) */}
-      <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
-        <Image
-          src={Container}
-          alt="Login Graphic"
-          fill
-          className="object-cover object-center"
-          priority
-        />
-      </div>
-
-      {/* Right Side - Email Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
-        <div className="w-full max-w-md flex items-center justify-center">
+      {/* Left Side - Email Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-16 bg-white overflow-y-auto scrollbar-hide">
+        <div className="w-full max-w-sm sm:max-w-md flex items-center justify-center">
           {/* Form Card */}
-          <div className="w-[412px] h-[484px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-6 flex flex-col gap-8">
+          <div className="w-full max-w-[412px] min-h-[484px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-4 sm:p-6 flex flex-col gap-6 sm:gap-8">
             {/* Logo and Heading */}
             <div className="flex flex-col gap-2.5">
               {/* Company Logo */}
@@ -213,7 +236,7 @@ export default function LoginPage() {
                 <Image src={SignupLogo} alt="Signup Logo" />
               </div>
 
-              <h1 className="text-3xl font-normal text-[#09090B] w-[364px] h-10">
+              <h1 className="text-2xl sm:text-3xl font-normal text-[#09090B] w-full">
                 Welcome Back
               </h1>
             </div>
@@ -244,7 +267,7 @@ export default function LoginPage() {
             </div>
 
             {/* Form Fields */}
-            <div className="w-[364px] space-y-5">
+            <div className="w-full space-y-5">
               {/* Email Input with Error Message */}
               <div className="space-y-1.5">
                 <div className="relative">
@@ -252,15 +275,27 @@ export default function LoginPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    onKeyDown={(e: React.KeyboardEvent) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleEmailSubmit(e as React.FormEvent);
+                      }
+                    }}
                     placeholder="Enter your email address"
                     className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                      error ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                      error
+                        ? "border-red-300 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-blue-500"
                     }`}
                   />
                   {/* Error Message - Positioned absolutely to prevent layout shift */}
-                  <div className={`absolute left-0 right-0 transition-all duration-200 ${
-                    error ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
-                  }`}>
+                  <div
+                    className={`absolute left-0 right-0 transition-all duration-200 ${
+                      error
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 -translate-y-2 pointer-events-none"
+                    }`}
+                  >
                     {error && (
                       <p className="text-sm text-red-600 py-2">{error}</p>
                     )}
@@ -281,13 +316,26 @@ export default function LoginPage() {
               <div className="text-center">
                 <Link href="/signup">
                   <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                    Don&apos;t have an account? <span className="text-gray-900 font-medium">Create Account</span>
+                    Don&apos;t have an account?{" "}
+                    <span className="text-gray-900 font-medium">
+                      Create Account
+                    </span>
                   </span>
                 </Link>
               </div>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Right Side - Image (Hidden on small/medium, visible on large) */}
+      <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
+        <Image
+          src={Container}
+          alt="Login Graphic"
+          fill
+          className="object-cover object-center"
+        />
       </div>
     </div>
   );
