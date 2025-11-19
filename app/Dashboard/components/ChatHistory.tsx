@@ -44,7 +44,7 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
     try {
       deleteChat(chatId);
       toast.success(`Chat "${chatToDelete?.title || 'Untitled'}" deleted successfully`);
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete chat");
     }
   };
@@ -70,7 +70,7 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
       try {
         updateChatTitle(chatId, editValue.trim());
         toast.success(`Chat renamed to "${editValue.trim()}" successfully`);
-      } catch (error) {
+      } catch {
         toast.error("Failed to rename chat");
       }
     }
