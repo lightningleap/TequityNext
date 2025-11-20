@@ -158,6 +158,7 @@ function LibraryContent({ files, setFiles, folders, handleDownload }: LibraryCon
   } | null>(null);
   const [recentlyVisited, setRecentlyVisited] = useState<
     Array<{
+      hasText: any;
       id: string;
       name: string;
       type: string;
@@ -463,6 +464,7 @@ function LibraryContent({ files, setFiles, folders, handleDownload }: LibraryCon
         type: (file.type || "pdf").toString(),
         isFolder: false,
         visitedAt: new Date(),
+        hasText: file.hasText || false, // Add hasText property with default to false
       };
 
       // Remove if already exists and add to beginning
@@ -486,6 +488,7 @@ function LibraryContent({ files, setFiles, folders, handleDownload }: LibraryCon
         type: "folder",
         isFolder: true,
         visitedAt: new Date(),
+        hasText: false, // Folders don't have text content, so set to false
       };
 
       // Remove if already exists and add to beginning
@@ -1010,7 +1013,8 @@ function LibraryContent({ files, setFiles, folders, handleDownload }: LibraryCon
                           if (item.isFolder) {
                             imageSrc = "/BigFolder.svg";
                           } else if (item.type?.toLowerCase() === "pdf") {
-                            imageSrc = "/RecentFiles/rPDF.svg";
+                            // Use txtPDF.svg for PDFs that contain text, otherwise use the regular PDF icon
+                            imageSrc = item.hasText ? "/txtPDF.svg" : "/RecentFiles/rPDF.svg";
                           } else if (item.type?.toLowerCase() === "txt") {
                             imageSrc = "/RecentFiles/rTXT.svg";
                           } else if (

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import SignupLogo from "../../public/SignupLogo.svg";
 import GoogleIcon from "../../public/GoogleIcon.svg";
-import Container from "../../public/Container.svg";
+import Container from "../../public/Container.png";
 import Image from "next/image";
 import { toast } from "sonner";
 
@@ -110,7 +110,7 @@ export default function LoginPage() {
     return (
       <div className="flex h-screen overflow-hidden">
         {/* Left Side - Verification Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-16 bg-white overflow-y-auto scrollbar-hide">
+        <div className="w-full lg:w-[70%] flex items-center justify-center p-4 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
           <div className="w-full max-w-sm sm:max-w-md flex items-center justify-center">
             {/* Form Card */}
             <div className="w-full max-w-[412px] min-h-[430px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-4 sm:p-6 flex flex-col gap-6 sm:gap-8">
@@ -126,7 +126,7 @@ export default function LoginPage() {
                 </h1>
 
                 <p className="text-sm text-gray-500 w-full">
-                  We sent a temporary login code to {email}. Not you?
+                  We sent a temporary login code to {email}
                 </p>
               </div>
 
@@ -188,7 +188,7 @@ export default function LoginPage() {
                 {/* Back to Signup */}
                 <button
                   onClick={handleBackToSignup}
-                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors text-left"
+                  className="text-sm cursor-pointer text-gray-500 hover:text-gray-700 transition-colors text-left"
                 >
                   Not you? Use a different email
                 </button>
@@ -196,9 +196,9 @@ export default function LoginPage() {
                 {/* Link to Signup */}
                 <div className="text-center">
                   <Link href="/signup">
-                    <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
+                    <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors">
                       Don&apos;t have an account?{" "}
-                      <span className="text-gray-900 font-medium">
+                      <span className="text-gray-900 cursor-pointer font-medium">
                         Create Account
                       </span>
                     </span>
@@ -210,13 +210,18 @@ export default function LoginPage() {
         </div>
 
         {/* Right Side - Background Graphics (Hidden on small/medium, visible on large) */}
-        <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
-          <Image
-            src={Container}
-            alt="Verification Graphic"
-            fill
-            className="object-cover object-center"
-          />
+        <div className="hidden lg:flex lg:w-[50%] relative overflow-hidden p-2">
+          <div className="relative w-full h-full flex items-center justify-center">
+            <div className="relative w-full h-full max-w-[100%] max-h-[100vh] rounded-md overflow-hidden">
+              <Image
+                src={Container}
+                alt="Verification Graphic"
+                fill
+                style={{ objectFit: 'cover', objectPosition: 'left' }}
+                priority
+              />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -225,7 +230,7 @@ export default function LoginPage() {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Side - Email Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-16 bg-white overflow-y-auto scrollbar-hide">
+      <div className="w-full lg:w-[70%] flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-16 bg-white overflow-y-auto scrollbar-hide">
         <div className="w-full max-w-sm sm:max-w-md flex items-center justify-center">
           {/* Form Card */}
           <div className="w-full max-w-[412px] min-h-[484px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-4 sm:p-6 flex flex-col gap-6 sm:gap-8">
@@ -329,13 +334,18 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side - Image (Hidden on small/medium, visible on large) */}
-      <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
-        <Image
-          src={Container}
-          alt="Login Graphic"
-          fill
-          className="object-cover object-center"
-        />
+      <div className="hidden lg:flex lg:w-[50%] relative overflow-hidden p-2">
+        <div className="relative w-full h-full flex items-center justify-center">
+          <div className="relative w-full h-full max-w-[100%] max-h-[100vh] rounded-md overflow-hidden">
+            <Image
+              src={Container}
+              alt="Login Graphic"
+              fill
+              style={{ objectFit: 'cover', objectPosition: 'left' }}
+              priority
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
