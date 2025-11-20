@@ -12,9 +12,16 @@ import {
 import { Button } from "../../../components/ui/button";
 import { FiUploadCloud } from "react-icons/fi";
 import { FileItem } from "./filegrid";
-import PdfIcon from "../../../public/uploadModal/File Type Icon.svg";
-import XlsIcon from "../../../public/uploadModal/File Type Icon-2.svg";
-import FolderIcon from "../../../public/uploadModal/File Type Icon-1.svg";
+import PdfIcon from "../../../public/Files/PDF-icon.svg";
+import XlsIcon from "../../../public/Files/XLS-icon.svg";
+import PptIcon from "../../../public/Files/PPT-icon.svg";
+import PngIcon from "../../../public/Files/PNG-icon.svg";
+import JpgIcon from "../../../public/Files/JPG-icon.svg";
+import DocsIcon from "../../../public/Files/Docs-icon.svg";
+import Mp3Icon from "../../../public/Files/MP3-icon.svg";
+import TxtIcon from "../../../public/Files/TXT-icon.svg";
+import SvgIcon from "../../../public/Files/SVG-icon.svg";
+import ZipIcon from "../../../public/Files/ZIP-icon.svg";
 import PlusIcon from "../../../public/uploadModal/Icon.svg";
 import {
   X,
@@ -30,30 +37,34 @@ function getFileIcon(fileName: string) {
 
   switch (extension) {
     case "pdf":
-      return <Image src={PdfIcon} alt="PDF" className="w-8 h-8" />;
+      return <Image src={PdfIcon} alt="PDF" className="w-12 h-12" />;
     case "docx":
     case "doc":
-      return <Image src={FolderIcon} alt="Document" className="w-8 h-8" />;
+      return <Image src={DocsIcon} alt="Document" className="w-12 h-12" />;
     case "xlsx":
     case "xls":
     case "csv":
-      return <Image src={XlsIcon} alt="Spreadsheet" className="w-8 h-8" />;
+      return <Image src={XlsIcon} alt="Spreadsheet" className="w-12 h-12" />;
     case "pptx":
     case "ppt":
-      return <Image src={FolderIcon} alt="Presentation" className="w-8 h-8" />;
+      return <Image src={PptIcon} alt="Presentation" className="w-12 h-12" />;
     case "png":
+      return <Image src={PngIcon} alt="PNG Image" className="w-12 h-12" />;
     case "jpg":
     case "jpeg":
-      return <Image src={FolderIcon} alt="Image" className="w-8 h-8" />;
+      return <Image src={JpgIcon} alt="JPEG Image" className="w-12 h-12" />;
+    case "svg":
+      return <Image src={SvgIcon} alt="SVG" className="w-12 h-12" />;
     case "mp4":
     case "mov":
-      return <Image src={FolderIcon} alt="Video" className="w-8 h-8" />;
+    case "mp3":
+      return <Image src={Mp3Icon} alt="Media" className="w-12 h-12" />;
     case "txt":
-      return <Image src={FolderIcon} alt="Text" className="w-8 h-8" />;
+      return <Image src={TxtIcon} alt="Text" className="w-12 h-12" />;
     case "zip":
-      return <Image src={FolderIcon} alt="Archive" className="w-8 h-8" />;
+      return <Image src={ZipIcon} alt="Archive" className="w-12 h-12" />;
     default:
-      return <Image src={FolderIcon} alt="File" className="w-8 h-8" />;
+      return <Image src={DocsIcon} alt="File" className="w-12 h-12" />;
   }
 }
 
@@ -347,7 +358,7 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
             multiple
             onChange={handleFileChange}
             className="hidden"
-            accept=".pdf,.docx,.xlsx,.pptx,.png,.mp4,.csv,.txt"
+            accept=".pdf,.docx,.doc,.xlsx,.xls,.csv,.pptx,.ppt,.png,.jpg,.jpeg,.svg,.mp4,.mov,.mp3,.txt,.zip"
           />
           <input
             ref={folderInputRef}
@@ -369,7 +380,7 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                   return (
                     <div
                       key={index}
-                      className={`flex flex-col items-start p-[12px] gap-[8px] bg-white border border-[#E2E8F0] rounded-xl relative h-[126px] dark:bg-[#18181B] dark:border-[#3F3F46] transition-colors duration-200 hover:bg-[#F8FAFC] hover:border-[#CBD5F6] dark:hover:bg-[#27272A] dark:hover:border-[#52525B] ${
+                      className={`flex flex-col items-start p-[12px] gap-[8px] bg-white border border-[#E2E8F0] rounded-xl relative h-[140px] dark:bg-[#18181B] dark:border-[#3F3F46] transition-colors duration-200 hover:bg-[#F8FAFC] hover:border-[#CBD5F6] dark:hover:bg-[#27272A] dark:hover:border-[#52525B] ${
                         status === "uploading" ? "overflow-hidden" : ""
                       }`}
                     >
@@ -384,7 +395,7 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                       <div className="flex flex-col justify-center items-start gap-[12px] w-full relative z-10">
                         {/* File icon and action button */}
                         <div className="flex flex-row justify-between items-center w-full">
-                          <div className="w-8 h-8 flex-shrink-0">
+                          <div className="w-12 h-12 flex-shrink-0">
                             {getFileIcon(file.name)}
                           </div>
 
@@ -454,7 +465,7 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                   <button
                     type="button"
                     onClick={() => handleButtonClick("files")}
-                    className="flex flex-col justify-center items-center p-[12px] gap-[8px] bg-[#FAFAFA] rounded-xl hover:bg-gray-200 transition-colors h-[126px] cursor-pointer border border-[#E2E8F0] dark:bg-[#18181B] dark:border-[#3F3F46] dark:hover:bg-[#3F3F46]/60 hover:border-[#CBD5F6] dark:hover:border-[#52525B]"
+                    className="flex flex-col justify-center items-center p-[12px] gap-[8px] bg-[#FAFAFA] rounded-xl hover:bg-gray-200 transition-colors h-[140px] cursor-pointer border border-[#E2E8F0] dark:bg-[#18181B] dark:border-[#3F3F46] dark:hover:bg-[#3F3F46]/60 hover:border-[#CBD5F6] dark:hover:border-[#52525B]"
                   >
                     <Image src={PlusIcon} alt="Add files" className="w-10 h-10" />
                     <p className="font-['Inter'] font-normal text-[14px] leading-[20px] text-[#020617] dark:text-white">
