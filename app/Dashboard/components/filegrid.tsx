@@ -23,6 +23,7 @@ export type FileItem = {
   uploadedAt?: Date;
   id?: string;
   url?: string;
+  hasText?: boolean; // Indicates if the file contains text content
   files?: FileItem[]; // For folders containing files
 };
 

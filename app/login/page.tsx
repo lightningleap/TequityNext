@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import SignupLogo from "../../public/SignupLogo.svg";
 import GoogleIcon from "../../public/GoogleIcon.svg";
-import Container from "../../public/Container.svg";
+import Container from "../../public/Container.png";
 import Image from "next/image";
 import { toast } from "sonner";
 
@@ -126,7 +126,7 @@ export default function LoginPage() {
                 </h1>
 
                 <p className="text-sm text-gray-500 w-full">
-                  We sent a temporary login code to {email}. Not you?
+                  We sent a temporary login code to {email}
                 </p>
               </div>
 
@@ -188,7 +188,7 @@ export default function LoginPage() {
                 {/* Back to Signup */}
                 <button
                   onClick={handleBackToSignup}
-                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors text-left"
+                  className="text-sm cursor-pointer text-gray-500 hover:text-gray-700 transition-colors text-left"
                 >
                   Not you? Use a different email
                 </button>
@@ -196,9 +196,9 @@ export default function LoginPage() {
                 {/* Link to Signup */}
                 <div className="text-center">
                   <Link href="/signup">
-                    <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
+                    <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors">
                       Don&apos;t have an account?{" "}
-                      <span className="text-gray-900 font-medium">
+                      <span className="text-gray-900 cursor-pointer font-medium">
                         Create Account
                       </span>
                     </span>

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import GoogleIcon from "../../public/GoogleIcon.svg";
 import SignupLogo from "../../public/SignupLogo.svg";
-import Container from "../../public/Container.svg";
+import Container from "../../public/Container.png";
 import { toast } from "sonner";
 
 export default function SignupPage() {
