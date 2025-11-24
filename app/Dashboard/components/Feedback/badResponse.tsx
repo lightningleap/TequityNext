@@ -87,7 +87,7 @@ export function BadResponse({ onClose }: BadResponseProps) {
                 type="button"
                 onClick={() => toggleTag(tag)}
                 aria-pressed={isSelected}
-                className={`flex h-8 items-center justify-center rounded-md border px-4 text-xs font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+                className={`flex h-8 items-center justify-center rounded-md border px-4 text-xs font-medium transition cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 ${
                   isSelected
                     ? "border-[#D91D69] text-[#D91D69]"
                     : "border-[#E4E4E7] text-gray-700 dark:border-[#3F3F46] dark:bg-[#09090B] dark:text-gray-100"
@@ -104,7 +104,7 @@ export function BadResponse({ onClose }: BadResponseProps) {
         <div className="mt-4 flex flex-col gap-3 max-w-[600px] w-full">
           <div className="relative w-full">
             <textarea
-              className="h-[72px] w-full resize-none rounded-lg border border-[#E4E4E7] bg-transparent px-4 py-3 pr-12 text-sm text-gray-900 placeholder:text-gray-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D91D69] dark:border-[#3F3F46] dark:text-white"
+              className="h-[72px] w-full resize-none rounded-lg border border-[#E4E4E7] bg-transparent px-4 py-3 pr-12 text-sm text-gray-900 placeholder:text-gray-400  focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D91D69] dark:border-[#3F3F46] dark:text-white"
               placeholder="Tell us more (optional)"
               value={notes}
               onChange={(event) => setNotes(event.target.value)}

@@ -185,14 +185,6 @@ export default function LoginPage() {
                   </Button>
                 </div>
 
-                {/* Back to Signup */}
-                <button
-                  onClick={handleBackToSignup}
-                  className="text-sm cursor-pointer text-gray-500 hover:text-gray-700 transition-colors text-left"
-                >
-                  Not you? Use a different email
-                </button>
-
                 {/* Link to Signup */}
                 <div className="text-center">
                   <Link href="/signup">
@@ -217,7 +209,7 @@ export default function LoginPage() {
                 src={Container}
                 alt="Verification Graphic"
                 fill
-                style={{ objectFit: 'cover', objectPosition: 'left' }}
+                style={{ objectFit: "cover", objectPosition: "left" }}
                 priority
               />
             </div>
@@ -341,7 +333,7 @@ export default function LoginPage() {
               src={Container}
               alt="Login Graphic"
               fill
-              style={{ objectFit: 'cover', objectPosition: 'left' }}
+              style={{ objectFit: "cover", objectPosition: "left" }}
               priority
             />
           </div>
