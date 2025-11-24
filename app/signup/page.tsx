@@ -119,8 +119,8 @@ export default function SignupPage() {
     return (
       <div className="flex h-screen overflow-hidden">
         {/* Left Side - Verification Form */}
-        <div className="w-full lg:w-[50%] flex items-center justify-center p-4 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
-          <div className="w-full max-w-md flex items-center justify-center">
+        <div className="w-full lg:flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-16 bg-white overflow-y-auto scrollbar-hide">
+          <div className="w-full max-w-sm sm:max-w-md flex items-center justify-center">
             {/* Form Card */}
             <div className="w-full max-w-[412px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-6 flex flex-col gap-8">
               {/* Logo and Heading */}
@@ -165,11 +165,10 @@ export default function SignupPage() {
                       }
                     }}
                     placeholder="Enter verification code"
-                    className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                      error
+                    className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${error
                         ? "border-red-300 focus:ring-red-500"
                         : "border-gray-300 focus:ring-blue-500"
-                    }`}
+                      }`}
                     disabled={isLoading}
                   />
                 </div>
@@ -199,18 +198,22 @@ export default function SignupPage() {
           </div>
         </div>
 
-        {/* Right Side - Background Graphics (Hidden on small/medium, visible on large) */}
-        <div className="hidden lg:flex lg:w-[50%] relative overflow-hidden p-2">
-          <div className="relative w-full h-full flex items-center justify-center">
-            <div className="relative w-full h-full rounded-md overflow-hidden">
-              <Image
-                src={Container}
-                alt="Verification Graphic"
-                fill
-                style={{ objectFit: 'cover', objectPosition: 'center' }}
-                priority
-              />
-            </div>
+        {/* Right Side - Background Graphics - 40% width */}
+        <div className="hidden lg:flex w-2/5 relative p-1.5">
+          <div className="relative w-full h-full">
+            <Image
+              src={Container}
+              alt="Login Graphic"
+              fill
+              className=""
+              priority
+              sizes="50vw"
+              style={{
+                objectPosition: 'center center',
+                width: '100%',
+                height: '100%',
+              }}
+            />
           </div>
         </div>
       </div>
@@ -220,8 +223,8 @@ export default function SignupPage() {
   // Email Step UI
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Left Side - Form */}
-      <div className="w-full lg:w-[50%] flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
+      {/* Left Side - Form - Takes remaining width */}
+      <div className="w-full lg:flex-1 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
         <div className="w-full max-w-md flex items-center justify-center">
           {/* Form Card */}
           <div className="w-full max-w-[412px] bg-[rgba(0,0,0,0.001)] rounded-[24px] flex flex-col gap-8">
@@ -282,9 +285,8 @@ export default function SignupPage() {
                     }
                   }}
                   placeholder="Enter your email address"
-                  className={`w-full h-10 px-3 py-2 border ${
-                    emailError ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors`}
+                  className={`w-full h-10 px-3 py-2 border ${emailError ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors`}
                   required
                   disabled={isLoading}
                 />
@@ -322,18 +324,17 @@ export default function SignupPage() {
         </div>
       </div>
 
-      {/* Right Side - Image (Hidden on small/medium, visible on large) */}
-      <div className="hidden lg:flex lg:w-[50%] relative overflow-hidden p-2">
-        <div className="relative w-full h-full flex items-center justify-center">
-          <div className="relative w-full h-full max-w-[100vw] h-screen rounded-md overflow-hidden">
-            <Image
-              src={Container}
-              alt="Signup Graphic"
-              fill
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
-              priority
-            />
-          </div>
+      {/* Right Side - Image - 40% width */}
+      <div className="hidden lg:flex w-2/5 relative p-1.5">
+        <div className="relative w-full h-full">
+          <Image
+            src={Container}
+            alt="Signup Graphic"
+            fill
+            className="object-contain"
+            priority
+            sizes="40vw"
+          />
         </div>
       </div>
     </div>

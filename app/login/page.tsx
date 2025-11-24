@@ -109,8 +109,8 @@ export default function LoginPage() {
   if (step === "verification") {
     return (
       <div className="flex h-screen overflow-hidden">
-        {/* Left Side - Verification Form */}
-        <div className="w-full lg:w-[50%] flex items-center justify-center p-4 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
+        {/* Left Side - Verification Form - Takes remaining width */}
+        <div className="w-full lg:flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-16 bg-white overflow-y-auto scrollbar-hide">
           <div className="w-full max-w-sm sm:max-w-md flex items-center justify-center">
             {/* Form Card */}
             <div className="w-full max-w-[412px] min-h-[430px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-4 sm:p-6 flex flex-col gap-6 sm:gap-8">
@@ -153,19 +153,17 @@ export default function LoginPage() {
                         }
                       }}
                       placeholder="Enter verification code"
-                      className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                        error
+                      className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${error
                           ? "border-red-300 focus:ring-red-500"
                           : "border-gray-300 focus:ring-blue-500"
-                      }`}
+                        }`}
                     />
                     {/* Error Message - Positioned absolutely to prevent layout shift */}
                     <div
-                      className={`absolute left-0 right-0 transition-all duration-200 ${
-                        error
+                      className={`absolute left-0 right-0 transition-all duration-200 ${error
                           ? "opacity-100 translate-y-0"
                           : "opacity-0 -translate-y-2 pointer-events-none"
-                      }`}
+                        }`}
                     >
                       {error && (
                         <p className="text-sm text-red-600 py-2">{error}</p>
@@ -201,18 +199,22 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Right Side - Background Graphics (Hidden on small/medium, visible on large) */}
-        <div className="hidden lg:flex lg:w-[50%] relative overflow-hidden p-2">
-          <div className="relative w-full h-full flex items-center justify-center">
-            <div className="relative w-full h-full max-w-[100%] max-h-[100vh] rounded-md overflow-hidden">
-              <Image
-                src={Container}
-                alt="Verification Graphic"
-                fill
-                style={{ objectFit: "cover", objectPosition: "left" }}
-                priority
-              />
-            </div>
+        {/* Right Side - Background Graphics - 40% width */}
+        <div className="hidden lg:flex w-2/5 relative p-1.5">
+          <div className="relative w-full h-full">
+            <Image
+              src={Container}
+              alt="Login Graphic"
+              fill
+              className=""
+              priority
+              sizes="50vw"
+              style={{
+                objectPosition: 'center center',
+                width: '100%',
+                height: '100%',
+              }}
+            />
           </div>
         </div>
       </div>
@@ -221,8 +223,8 @@ export default function LoginPage() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Left Side - Email Form */}
-      <div className="w-full lg:w-[50%] flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-16 bg-white overflow-y-auto scrollbar-hide">
+      {/* Left Side - Form - Takes remaining width */}
+      <div className="w-full lg:flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-16 bg-white overflow-y-auto scrollbar-hide">
         <div className="w-full max-w-sm sm:max-w-md flex items-center justify-center">
           {/* Form Card */}
           <div className="w-full max-w-[412px] min-h-[484px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-4 sm:p-6 flex flex-col gap-6 sm:gap-8">
@@ -279,19 +281,17 @@ export default function LoginPage() {
                       }
                     }}
                     placeholder="Enter your email address"
-                    className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                      error
+                    className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${error
                         ? "border-red-300 focus:ring-red-500"
                         : "border-gray-300 focus:ring-blue-500"
-                    }`}
+                      }`}
                   />
                   {/* Error Message - Positioned absolutely to prevent layout shift */}
                   <div
-                    className={`absolute left-0 right-0 transition-all duration-200 ${
-                      error
+                    className={`absolute left-0 right-0 transition-all duration-200 ${error
                         ? "opacity-100 translate-y-0"
                         : "opacity-0 -translate-y-2 pointer-events-none"
-                    }`}
+                      }`}
                   >
                     {error && (
                       <p className="text-sm text-red-600 py-2">{error}</p>
@@ -325,18 +325,22 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Side - Image (Hidden on small/medium, visible on large) */}
-      <div className="hidden lg:flex lg:w-[50%] relative overflow-hidden p-2">
-        <div className="relative w-full h-full flex items-center justify-center">
-          <div className="relative w-full h-full max-w-[100%] max-h-[100vh] rounded-md overflow-hidden">
-            <Image
-              src={Container}
-              alt="Login Graphic"
-              fill
-              style={{ objectFit: "cover", objectPosition: "left" }}
-              priority
-            />
-          </div>
+      {/* Right Side - Image - Fixed 640px width */}
+      <div className="hidden lg:flex w-2/5 relative p-1.5">
+        <div className="relative w-full h-full">
+          <Image
+            src={Container}
+            alt="Login Graphic"
+            fill
+            className=""
+            priority
+            sizes="50vw"
+            style={{
+              objectPosition: 'center center',
+              width: '100%',
+              height: '100%',
+            }}
+          />
         </div>
       </div>
     </div>

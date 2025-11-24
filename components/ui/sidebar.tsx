@@ -9,7 +9,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps, cva } from "class-variance-authority";
 import { IoIosSearch } from "react-icons/io";
 import { FileText, PanelLeftIcon, MessageCircle } from "lucide-react";
-
+import { Menu } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -444,7 +444,7 @@ function SidebarTrigger({
   onClick,
   ...props
 }: React.ComponentProps<typeof Button>) {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, isMobile } = useSidebar();
 
   return (
     <Button
@@ -459,11 +459,13 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      <PanelLeftIcon />
+      {/* Show hamburger (Menu) icon on mobile, otherwise original PanelLeftIcon */}
+      {isMobile ? <Menu /> : <PanelLeftIcon />}
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );
 }
+
 
 function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
   const { toggleSidebar } = useSidebar();
