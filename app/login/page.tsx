@@ -231,6 +231,11 @@ export default function LoginPage() {
               <h1 className="text-[32px] leading-[40px] font-normal text-[#09090B]">
                 Welcome Back
               </h1>
+
+              <p className="text-[14px] leading-[20px] text-[#71717a] tracking-[0.15px]">
+                Secure your workspace, streamline due diligence, and join a
+                trusted network of dealmakers.
+              </p>
             </div>
 
             {/* Form Fields */}
