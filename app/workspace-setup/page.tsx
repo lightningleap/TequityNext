@@ -13,6 +13,7 @@ import {
 import { ChevronDown, Check } from "lucide-react";
 import CompanyLogo from "@/public/SignupLogo.svg";
 import Image from "next/image";
+import { Input } from "@/components/ui/input";
 
 export default function WorkspaceSetupPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -120,12 +121,8 @@ export default function WorkspaceSetupPage() {
   }, [router]);
 
   const options = [
-    { value: "m&a", label: "M&A Deal" },
-    { value: "fundraising", label: "Fundraising" },
-    { value: "investor", label: "Investor Reporting" },
-    { value: "board", label: "Board Pack" },
-    { value: "diligence", label: "Due Diligence" },
-    { value: "other", label: "Other" },
+    { value: "investor", label: "Investor" },
+    { value: "single-firm", label: "Single Firm " },
   ];
 
   const progressWidth = `${(currentStep / 3) * 100}%`;
@@ -144,7 +141,7 @@ export default function WorkspaceSetupPage() {
           {/* Step 1: Workspace Name */}
           {currentStep === 1 && (
             <>
-              <div className="space-y-2">
+              <div className="space-y-2 mb-6">
                 <h1 className="text-3xl font-normal text-gray-900">
                   Welcome to Tequity
                 </h1>
@@ -162,7 +159,7 @@ export default function WorkspaceSetupPage() {
                 )}
 
                 <div className="space-y-2">
-                  <input
+                  <Input
                     type="text"
                     value={workspaceName}
                     onChange={handleInputChange}
@@ -208,7 +205,7 @@ export default function WorkspaceSetupPage() {
           {/* Step 2: Use Case Selection */}
           {currentStep === 2 && (
             <>
-              <div className="space-y-2">
+              <div className="space-y-2 mb-6">
                 <h1 className="text-3xl font-normal text-gray-900">
                   What brings you to Tequity?
                 </h1>
@@ -233,8 +230,8 @@ export default function WorkspaceSetupPage() {
                       >
                         {selectedOption
                           ? options.find((opt) => opt.value === selectedOption)
-                              ?.label
-                          : "Select an option"}
+                              ?.label 
+                          : "Select" }
                         <ChevronDown
                           className={`ml-2 h-4 w-4 transition-transform ${
                             isOpen ? "transform rotate-180" : ""
@@ -285,7 +282,7 @@ export default function WorkspaceSetupPage() {
           {/* Step 3: Team Invitations */}
           {currentStep === 3 && (
             <>
-              <div className="space-y-2">
+              <div className="space-y-2 mb-6">
                 <h1 className="text-3xl font-normal text-gray-900">
                   Invite Your Team
                 </h1>

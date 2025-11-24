@@ -62,13 +62,10 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
 
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [contextSearchValue, setContextSearchValue] = useState("");
-  const [activeFeedback, setActiveFeedback] = useState<
-    | {
-        type: "good" | "bad";
-        messageIndex: number;
-      }
-    | null
-  >(null);
+  const [activeFeedback, setActiveFeedback] = useState<{
+    type: "good" | "bad";
+    messageIndex: number;
+  } | null>(null);
 
   useEffect(() => {
     if (activeFeedback && feedbackPanelRef.current) {
@@ -396,7 +393,7 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
         alt="file icon"
         width={32}
         height={32}
-        className="flex-shrink-0"
+        className="shrink-0"
       />
     );
   };
@@ -448,7 +445,7 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
                   alt="Tequity AI"
                   width={48}
                   height={48}
-                  className="flex-shrink-0"
+                  className="shrink-0"
                 />
               </div>
               <h3
@@ -488,36 +485,40 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
                 {/* Message Content */}
                 <div
                   className={`flex w-full max-w-[600px] flex-col gap-1 ${
-                    message.isUser ? "items-end self-end" : "items-start self-start"
+                    message.isUser
+                      ? "items-end self-end"
+                      : "items-start self-start"
                   }`}
                 >
                   {/* File Attachments - Show separately above message */}
                   {message.files && message.files.length > 0 && (
-                    <div className={`space-y-2 mb-2 ${
-                      message.isUser ? "items-end" : "items-start"
-                    }`}>
+                    <div
+                      className={`grid grid-cols-2 gap-2 mb-2 w-full max-w-[800px] ${
+                        message.isUser
+                          ? "justify-items-end"
+                          : "justify-items-start"
+                      }`}
+                    >
                       {message.files.map((file, fileIndex) => (
                         <div
                           key={fileIndex}
-                          className={`flex items-center gap-3 p-3 rounded-lg border max-w-fit ${
+                          className={`flex items-center gap-3 p-3 rounded-lg border w-full max-w-[300px] bg-[#f4f4f5] dark:bg-[#27272A] ${
                             message.isUser
-                              ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
-                              : "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                              ? "border-[#E4E4E7] dark:border-[#3F3F46] "
+                              : "border-[#E4E4E7] dark:border-[#3F3F46]"
                           }`}
                         >
-                          <div className="flex-shrink-0">
+                          <div className="shrink-0 bg-[#F4F4F5] dark:bg-[#27272A] p-2 rounded flex items-center justify-center w-8 h-8">
                             {getFileIcon(file.type)}
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          <div className="flex-1 min-w-0 overflow-hidden">
+                            <p className="text-sm font-medium text-[#18181B] dark:text-white truncate w-full">
                               {file.name}
                             </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {formatFileSize(file.size)}
+                            <p className="text-xs text-[#71717A] dark:text-[#A1A1AA] mt-0.5">
+                              {formatFileSize(file.size)} •{" "}
+                              {file.type.toUpperCase()}
                             </p>
-                          </div>
-                          <div className="flex-shrink-0">
-                            <FileText className="h-4 w-4 text-gray-400" />
                           </div>
                         </div>
                       ))}
@@ -537,7 +538,7 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
 
                   {/* Action Buttons - Only for AI messages */}
                   {!message.isUser && (
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1">
                       <div className="relative flex h-6 w-6 items-center justify-center">
                         <button
                           onClick={() => handleCopy(message.text, index)}
@@ -549,7 +550,7 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
                           title="Copy"
                           aria-label={copiedIndex === index ? "Copied" : "Copy"}
                         >
-                          <Copy className="h-3.5 w-3.5" />
+                          <Copy className="h-3.5 w-3.5 cursor-pointer" />
                         </button>
                         {copiedIndex === index && (
                           <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-medium text-[#D91D69]">
@@ -568,7 +569,7 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
                         }`}
                         aria-label="Provide positive feedback"
                       >
-                        <ThumbsUp className="h-3 w-3" />
+                        <ThumbsUp className="h-3 w-3 cursor-pointer" />
                       </button>
                       <button
                         type="button"
@@ -581,32 +582,33 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
                         }`}
                         aria-label="Provide negative feedback"
                       >
-                        <ThumbsDown className="h-3 w-3" />
+                        <ThumbsDown className="h-3 w-3 cursor-pointer" />
                       </button>
                     </div>
                   )}
-                  {!message.isUser && activeFeedback?.messageIndex === index && (
-                    <div
-                      ref={feedbackPanelRef}
-                      className="mt-3 flex justify-start"
-                    >
-                      {activeFeedback.type === "good" ? (
-                        <GoodResponse
-                          onClose={() => {
-                            setActiveFeedback(null);
-                            feedbackPanelRef.current = null;
-                          }}
-                        />
-                      ) : (
-                        <BadResponse
-                          onClose={() => {
-                            setActiveFeedback(null);
-                            feedbackPanelRef.current = null;
-                          }}
-                        />
-                      )}
-                    </div>
-                  )}
+                  {!message.isUser &&
+                    activeFeedback?.messageIndex === index && (
+                      <div
+                        ref={feedbackPanelRef}
+                        className="mt-3 flex justify-start"
+                      >
+                        {activeFeedback.type === "good" ? (
+                          <GoodResponse
+                            onClose={() => {
+                              setActiveFeedback(null);
+                              feedbackPanelRef.current = null;
+                            }}
+                          />
+                        ) : (
+                          <BadResponse
+                            onClose={() => {
+                              setActiveFeedback(null);
+                              feedbackPanelRef.current = null;
+                            }}
+                          />
+                        )}
+                      </div>
+                    )}
                 </div>
               </div>
             ))}
@@ -710,7 +712,7 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
                   value={inputValue}
                   onChange={handleInputChange}
                   placeholder="Need quick insights..."
-                  className="flex-1 outline-none text-sm resize-none overflow-hidden"
+                  className="flex-1 outline-none text-sm resize-none overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent"
                   rows={1}
                   style={{ minHeight: "24px", maxHeight: "120px" }}
                   onKeyDown={(e) => {

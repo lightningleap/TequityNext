@@ -86,7 +86,12 @@ interface LibraryContentProps {
   handleDownload: (file: FileItem) => void;
 }
 
-function LibraryContent({ files, setFiles, folders, handleDownload }: LibraryContentProps) {
+function LibraryContent({
+  files,
+  setFiles,
+  folders,
+  handleDownload,
+}: LibraryContentProps) {
   const router = useRouter();
   const { createNewChat, activeChat, activeChatId, chats, selectChat } =
     useChatContext();
@@ -473,70 +478,69 @@ function LibraryContent({ files, setFiles, folders, handleDownload }: LibraryCon
     });
   }, []);
 
-  const handleFolderSelect = useCallback((folder: {
-    id: string;
-    name: string;
-    fileCount: number;
-  }) => {
-    console.log("Folder selected:", folder);
+  const handleFolderSelect = useCallback(
+    (folder: { id: string; name: string; fileCount: number }) => {
+      console.log("Folder selected:", folder);
 
-    // Add to recently visited
-    setRecentlyVisited((prev) => {
-      const newItem = {
-        id: folder.id,
-        name: folder.name,
-        type: "folder",
-        isFolder: true,
-        visitedAt: new Date(),
-        hasText: false, // Folders don't have text content, so set to false
-      };
+      // Add to recently visited
+      setRecentlyVisited((prev) => {
+        const newItem = {
+          id: folder.id,
+          name: folder.name,
+          type: "folder",
+          isFolder: true,
+          visitedAt: new Date(),
+          hasText: false, // Folders don't have text content, so set to false
+        };
 
-      // Remove if already exists and add to beginning
-      const filtered = prev.filter((item) => item.id !== folder.id);
-      return [newItem, ...filtered].slice(0, 8); // Keep only 8 most recent
-    });
+        // Remove if already exists and add to beginning
+        const filtered = prev.filter((item) => item.id !== folder.id);
+        return [newItem, ...filtered].slice(0, 8); // Keep only 8 most recent
+      });
 
-    // Create sample files for the folder
-    const sampleFiles: FileItem[] = [
-      {
-        id: `${folder.id}-1`,
-        name: "Q4 Financial Summary.pdf",
-        type: "PDF",
-        size: 1024000,
-      },
-      {
-        id: `${folder.id}-2`,
-        name: "Revenue Analysis.xlsx",
-        type: "XLSX",
-        size: 512000,
-      },
-      {
-        id: `${folder.id}-3`,
-        name: "Marketing Strategy.pptx",
-        type: "PPTX",
-        size: 2048000,
-      },
-      {
-        id: `${folder.id}-4`,
-        name: "Customer Data.csv",
-        type: "CSV",
-        size: 256000,
-      },
-      {
-        id: `${folder.id}-5`,
-        name: "Project Timeline.docx",
-        type: "DOCX",
-        size: 768000,
-      },
-    ];
+      // Create sample files for the folder
+      const sampleFiles: FileItem[] = [
+        {
+          id: `${folder.id}-1`,
+          name: "Q4 Financial Summary.pdf",
+          type: "PDF",
+          size: 1024000,
+        },
+        {
+          id: `${folder.id}-2`,
+          name: "Revenue Analysis.xlsx",
+          type: "XLSX",
+          size: 512000,
+        },
+        {
+          id: `${folder.id}-3`,
+          name: "Marketing Strategy.pptx",
+          type: "PPTX",
+          size: 2048000,
+        },
+        {
+          id: `${folder.id}-4`,
+          name: "Customer Data.csv",
+          type: "CSV",
+          size: 256000,
+        },
+        {
+          id: `${folder.id}-5`,
+          name: "Project Timeline.docx",
+          type: "DOCX",
+          size: 768000,
+        },
+      ];
 
-    // Set the folder view state
-    setCurrentFolder({
-      ...folder,
-      files: sampleFiles,
-    });
-    setIsViewingFolder(true);
-  }, []);
+      // Set the folder view state
+      setCurrentFolder({
+        ...folder,
+        files: sampleFiles,
+      });
+      setIsViewingFolder(true);
+    },
+    []
+  );
 
   // Listen for custom event to open PDF viewer from sidebar
   useEffect(() => {
@@ -817,7 +821,9 @@ function LibraryContent({ files, setFiles, folders, handleDownload }: LibraryCon
                                 className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary cursor-pointer"
                               />
                             </TableHead>
-                            <TableHead className="px-2 sm:px-4">Name</TableHead>
+                            <TableHead className="px-2 sm:px-4">
+                              Name{" "}
+                            </TableHead>
                             <TableHead className="w-[70px] sm:w-[100px] text-xs whitespace-nowrap px-2 sm:px-4">
                               Size
                             </TableHead>
@@ -1014,7 +1020,9 @@ function LibraryContent({ files, setFiles, folders, handleDownload }: LibraryCon
                             imageSrc = "/BigFolder.svg";
                           } else if (item.type?.toLowerCase() === "pdf") {
                             // Use txtPDF.svg for PDFs that contain text, otherwise use the regular PDF icon
-                            imageSrc = item.hasText ? "/txtPDF.svg" : "/RecentFiles/rPDF.svg";
+                            imageSrc = item.hasText
+                              ? "/txtPDF.svg"
+                              : "/RecentFiles/rPDF.svg";
                           } else if (item.type?.toLowerCase() === "txt") {
                             imageSrc = "/RecentFiles/rTXT.svg";
                           } else if (
@@ -1032,7 +1040,10 @@ function LibraryContent({ files, setFiles, folders, handleDownload }: LibraryCon
                             imageSrc = "/RecentFiles/rPNG.svg";
                           } else if (item.type?.toLowerCase() === "gif") {
                             imageSrc = "/RecentFiles/rSVG.svg";
-                          } else if (item.type?.toLowerCase() === "xls" || item.type?.toLowerCase() === "xlsx") {
+                          } else if (
+                            item.type?.toLowerCase() === "xls" ||
+                            item.type?.toLowerCase() === "xlsx"
+                          ) {
                             imageSrc = "/RecentFiles/rXLS.svg";
                           } else if (item.type?.toLowerCase() === "zip") {
                             imageSrc = "/RecentFiles/rZIP.svg";
@@ -1045,11 +1056,12 @@ function LibraryContent({ files, setFiles, folders, handleDownload }: LibraryCon
 
                           // Calculate time ago
                           const now = new Date();
-                          const diffInMs = now.getTime() - item.visitedAt.getTime();
+                          const diffInMs =
+                            now.getTime() - item.visitedAt.getTime();
                           const diffInSeconds = Math.floor(diffInMs / 1000);
                           const diffInMinutes = Math.floor(diffInSeconds / 60);
                           const diffInHours = Math.floor(diffInMinutes / 60);
-                          
+
                           let timeAgo = "Just now";
                           if (diffInSeconds < 60) {
                             if (diffInSeconds === 1) timeAgo = "1 sec ago";
@@ -1063,7 +1075,9 @@ function LibraryContent({ files, setFiles, folders, handleDownload }: LibraryCon
                           } else if (diffInHours < 48) {
                             timeAgo = "1 day ago";
                           } else {
-                            timeAgo = `${Math.floor(diffInHours / 24)} days ago`;
+                            timeAgo = `${Math.floor(
+                              diffInHours / 24
+                            )} days ago`;
                           }
 
                           const actionText = item.isFolder
@@ -1092,11 +1106,21 @@ function LibraryContent({ files, setFiles, folders, handleDownload }: LibraryCon
                                 }
                               }}
                             >
-                              <div className={`flex items-center justify-center w-[156px] h-[90px] shrink-0 ${imageSrc.startsWith('/RecentFiles/') ? 'rounded-lg bg-[#E5E7EB] dark:bg-[#27272A] p-[10px]' : ''}`}>
+                              <div
+                                className={`flex items-center justify-center w-[156px] h-[90px] shrink-0 ${
+                                  imageSrc.startsWith("/RecentFiles/")
+                                    ? "rounded-lg bg-[#E5E7EB] dark:bg-[#27272A] p-[10px]"
+                                    : ""
+                                }`}
+                              >
                                 <img
                                   src={finalImageSrc}
                                   alt={item.isFolder ? "Folder" : "File"}
-                                  className={`${imageSrc.startsWith('/RecentFiles/') ? 'w-[78px] h-[78px]' : 'max-w-full max-h-full'} object-contain`}
+                                  className={`${
+                                    imageSrc.startsWith("/RecentFiles/")
+                                      ? "w-[78px] h-[78px]"
+                                      : "max-w-full max-h-full"
+                                  } object-contain`}
                                 />
                               </div>
                               <div className="w-[156px] h-[36px] flex flex-col items-center justify-center px-1">
@@ -1114,8 +1138,8 @@ function LibraryContent({ files, setFiles, folders, handleDownload }: LibraryCon
                           );
                         })}
                       </div>
-                  </section>
-                )}
+                    </section>
+                  )}
                 </ClientOnly>
 
                 <section
@@ -1576,7 +1600,9 @@ function LibraryContent({ files, setFiles, folders, handleDownload }: LibraryCon
                                           </DropdownMenu.Item>
                                           <DropdownMenu.Item
                                             className="flex items-center gap-2 text-sm p-2 rounded hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer outline-none"
-                                            onSelect={() => handleDownload(file)}
+                                            onSelect={() =>
+                                              handleDownload(file)
+                                            }
                                           >
                                             <Download className="h-4 w-4" />
                                             <span>Download</span>
@@ -1726,7 +1752,7 @@ function LibraryContent({ files, setFiles, folders, handleDownload }: LibraryCon
                                           <img
                                             src={getFileIcon()}
                                             alt={file.type}
-                                            className="h-[16px] w-[16px] sm:h-[20px] sm:w-[20px] shrink-0 object-contain"
+                                            className="h-12 w-12 sm:h-12 sm:w-12 shrink-0 object-contain"
                                           />
                                           <span className="truncate font-medium text-gray-900 dark:text-white text-xs sm:text-sm">
                                             {file.name}
@@ -1796,7 +1822,9 @@ function LibraryContent({ files, setFiles, folders, handleDownload }: LibraryCon
                                                 </DropdownMenu.Item>
                                                 <DropdownMenu.Item
                                                   className="flex items-center gap-2 text-sm p-2 rounded hover:bg-gray-50 dark:hover:bg-[#27272A] cursor-pointer outline-none"
-                                                  onSelect={() => handleDownload(file)}
+                                                  onSelect={() =>
+                                                    handleDownload(file)
+                                                  }
                                                 >
                                                   <Download className="h-4 w-4" />
                                                   <span>Download</span>
@@ -2166,26 +2194,29 @@ export default function LibraryPage() {
   };
 
   const handleDownload = (file: FileItem) => {
-  try {
-    // Create a temporary anchor element to trigger download
-    const link = document.createElement('a');
-    link.href = file.url || '';
-    link.download = file.name;
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    // Show success toast
-    toast.success(`${file.name} downloaded successfully`);
-  } catch (error) {
-    console.error('Download failed:', error);
-    toast.error(`Failed to download ${file.name}`);
-  }
-};
+    try {
+      // Create a temporary anchor element to trigger download
+      const link = document.createElement("a");
+      link.href = file.url || "";
+      link.download = file.name;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Show success toast
+      toast.success(`${file.name} downloaded successfully`);
+    } catch (error) {
+      console.error("Download failed:", error);
+      toast.error(`Failed to download ${file.name}`);
+    }
+  };
 
   return (
-    <DashboardLayout title="Library" headerActions={<UploadDialog onUpload={handleFileUpload} />}>
+    <DashboardLayout
+      title="Library"
+      headerActions={<UploadDialog onUpload={handleFileUpload} />}
+    >
       <LibraryContent
         files={files}
         setFiles={setFiles}
@@ -2196,10 +2227,6 @@ export default function LibraryPage() {
     </DashboardLayout>
   );
 }
-
-
-
-
 
 // "use client";
 
