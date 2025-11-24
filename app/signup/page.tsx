@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import GoogleIcon from "../../public/GoogleIcon.svg";
 import SignupLogo from "../../public/SignupLogo.svg";
-import Container from "../../public/Container.svg";
+import Container from "../../public/Container.png";
 import { toast } from "sonner";
 
 export default function SignupPage() {
@@ -119,7 +119,7 @@ export default function SignupPage() {
     return (
       <div className="flex h-screen overflow-hidden">
         {/* Left Side - Verification Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-2 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
+        <div className="w-full lg:w-[70%] flex items-center justify-center p-4 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
           <div className="w-full max-w-md flex items-center justify-center">
             {/* Form Card */}
             <div className="w-full max-w-[412px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-6 flex flex-col gap-8">
@@ -200,13 +200,18 @@ export default function SignupPage() {
         </div>
 
         {/* Right Side - Background Graphics (Hidden on small/medium, visible on large) */}
-        <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
-          <Image
-            src={Container}
-            alt="Verification Graphic"
-            fill
-            className="object-cover object-center"
-          />
+        <div className="hidden lg:flex lg:w-[50%] relative overflow-hidden p-2">
+          <div className="relative w-full h-full flex items-center justify-center">
+            <div className="relative w-full h-full max-w-[100vw] h-screen rounded-md overflow-hidden">
+              <Image
+                src={Container}
+                alt="Verification Graphic"
+                fill
+                style={{ objectFit: 'cover', objectPosition: 'center' }}
+                priority
+              />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -216,7 +221,7 @@ export default function SignupPage() {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
+      <div className="w-full lg:w-[70%] flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
         <div className="w-full max-w-md flex items-center justify-center">
           {/* Form Card */}
           <div className="w-full max-w-[412px] bg-[rgba(0,0,0,0.001)] rounded-[24px] flex flex-col gap-8">
@@ -318,13 +323,18 @@ export default function SignupPage() {
       </div>
 
       {/* Right Side - Image (Hidden on small/medium, visible on large) */}
-      <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
-        <Image
-          src={Container}
-          alt="Signup Graphic"
-          fill
-          className="object-cover object-center"
-        />
+      <div className="hidden lg:flex lg:w-[50%] relative overflow-hidden p-2">
+        <div className="relative w-full h-full flex items-center justify-center">
+          <div className="relative w-full h-full max-w-[100vw] h-screen rounded-md overflow-hidden">
+            <Image
+              src={Container}
+              alt="Signup Graphic"
+              fill
+              style={{ objectFit: 'cover', objectPosition: 'center' }}
+              priority
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

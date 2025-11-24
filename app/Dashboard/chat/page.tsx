@@ -39,7 +39,7 @@ export default function ChatPage() {
             title="New Chat  "
           >
             <MessageCircle className="h-4 w-4 dark:text-white" />
-            <span className="text-sm font-medium dark:text-white md:block hidden">New Chat</span>
+            <span className="text-sm font-medium dark:text-white md:block hidden cursor-pointer">New Chat </span>
           </button>
         </div>
       }

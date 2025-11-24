@@ -40,10 +40,12 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
     e.stopPropagation();
     const chatToDelete = chats.find((c) => c.id === chatId);
     console.log("Deleting chat:", chatId);
-    
+
     try {
       deleteChat(chatId);
-      toast.success(`Chat "${chatToDelete?.title || 'Untitled'}" deleted successfully`);
+      toast.success(
+        `Chat "${chatToDelete?.title || "Untitled"}" deleted successfully`
+      );
     } catch {
       toast.error("Failed to delete chat");
     }
@@ -158,7 +160,7 @@ export function ChatHistory({ onChatSelect, activeChatId }: ChatHistoryProps) {
               </div>
             ) : (
               <>
-                <span className="text-xs font-medium text-gray-900 dark:text-[#F4F4F5] truncate flex-1">
+                <span className="text-sm font-normal text-[#3f3f46] dark:text-[#F4F4F5] overflow-ellipsis overflow-hidden whitespace-nowrap leading-5">
                   {chat.title}
                 </span>
                 <DropdownMenu>

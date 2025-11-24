@@ -324,11 +324,7 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
       {
         title: "Library",
         icon: (
-          <MdOutlineFolderCopy
-            width={16}
-            height={16}
-            className="shrink-0"
-          />
+          <MdOutlineFolderCopy width={16} height={16} className="shrink-0" />
         ),
         href: "/Dashboard/Library",
       },
@@ -358,7 +354,7 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
             }}
           >
             <span className="flex items-center gap-2 w-full group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:gap-0">
-              <IoIosSearch className="h-6 w-5 shrink-0 text-black dark:text-white" />
+              <IoIosSearch className="h-4 w-4 shrink-0 text-black dark:text-white" />
               <span className="overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:hidden">
                 Search
               </span>
@@ -401,7 +397,7 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
         <div className="flex flex-col gap-0 items-start px-2 border-t w-full mt-2 group-data-[collapsible=icon]:hidden">
           <div className="flex h-8 items-center px-2 py-2 mt-2 w-full">
             <span className="text-xs font-medium text-[#3f3f46] dark:text-[#A1A1AA] opacity-70 overflow-ellipsis overflow-hidden whitespace-nowrap">
-              Starred
+              Starred 
             </span>
           </div>
           <div className="flex flex-col gap-1 items-start w-full">
