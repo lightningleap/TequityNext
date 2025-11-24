@@ -110,109 +110,104 @@ export default function LoginPage() {
     return (
       <div className="flex h-screen overflow-hidden">
         {/* Left Side - Verification Form */}
-        <div className="w-full lg:w-[70%] flex items-center justify-center p-4 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
-          <div className="w-full max-w-sm sm:max-w-md flex items-center justify-center">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
+          <div className="w-full max-w-md flex items-center justify-center">
             {/* Form Card */}
-            <div className="w-full max-w-[412px] min-h-[430px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-4 sm:p-6 flex flex-col gap-6 sm:gap-8">
+            <div className="w-full max-w-[412px] rounded-[24px] p-6 flex flex-col gap-8">
               {/* Logo and Heading */}
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-[10px]">
                 {/* Company Logo */}
-                <div>
+                <div className="mb-[22px]">
                   <Image src={SignupLogo} alt="Signup Logo" />
                 </div>
 
-                <h1 className="text-2xl sm:text-3xl font-normal text-[#09090B] w-full">
+                <h1 className="text-[32px] leading-[40px] font-normal text-[#09090B]">
                   Welcome Back
                 </h1>
 
-                <p className="text-sm text-gray-500 w-full">
+                <p className="text-[14px] leading-[20px] text-[#71717a] tracking-[0.15px]">
                   We sent a temporary login code to {email}
                 </p>
               </div>
 
               {/* Form Fields */}
-              <div className="flex flex-col gap-5 w-full">
-                {/* Error Message */}
-                {error && (
-                  <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-sm text-red-600">{error}</p>
-                  </div>
-                )}
-
-                {/* Verification Code Input with Error Handling */}
-                <div className="space-y-1.5 w-full">
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={verificationCode}
-                      onChange={(e) => setVerificationCode(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          handleVerificationSubmit(e as React.FormEvent);
-                        }
-                      }}
-                      placeholder="Enter verification code"
-                      className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                        error
-                          ? "border-red-300 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-blue-500"
-                      }`}
-                    />
-                    {/* Error Message - Positioned absolutely to prevent layout shift */}
-                    <div
-                      className={`absolute left-0 right-0 transition-all duration-200 ${
-                        error
-                          ? "opacity-100 translate-y-0"
-                          : "opacity-0 -translate-y-2 pointer-events-none"
-                      }`}
-                    >
-                      {error && (
-                        <p className="text-sm text-red-600 py-2">{error}</p>
-                      )}
-                    </div>
-                  </div>
+              <form
+                onSubmit={handleVerificationSubmit}
+                className="flex flex-col gap-5"
+              >
+                {/* Verification Code Input */}
+                <div className="flex flex-col gap-1.5">
+                  <input
+                    type="text"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleVerificationSubmit(e as React.FormEvent);
+                      }
+                    }}
+                    placeholder="Enter verification code"
+                    className={`w-full h-10 px-3 py-2 border ${
+                      error ? "border-red-500" : "border-[#e4e4e7]"
+                    } rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-[#71717a] placeholder:text-[#71717a] transition-colors`}
+                    disabled={isLoading}
+                  />
+                  {/* Error Message */}
+                  {error && (
+                    <p className="text-xs text-red-600">{error}</p>
+                  )}
                 </div>
 
                 {/* Continue Button */}
-                <div className="mt-3">
-                  <Button
-                    onClick={handleVerificationSubmit}
-                    disabled={!verificationCode.trim() || isLoading}
-                    className="w-full h-11 cursor-pointer bg-[#09090B] hover:bg-gray-800 text-white rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isLoading ? "Verifying..." : "Continue"}
-                  </Button>
-                </div>
+                <Button
+                  type="submit"
+                  disabled={!verificationCode.trim() || isLoading}
+                  className="w-full h-11 cursor-pointer bg-[#09090B] hover:bg-[#09090B]/90 text-white rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? "Verifying..." : "Continue"}
+                </Button>
+              </form>
 
-                {/* Link to Signup */}
-                <div className="text-center">
-                  <Link href="/signup">
-                    <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors">
-                      Don&apos;t have an account?{" "}
-                      <span className="text-gray-900 cursor-pointer font-medium">
-                        Create Account
-                      </span>
+              {/* Link to Signup */}
+              <div className="flex items-center justify-center h-11">
+                <Link href="/signup">
+                  <span className="text-sm text-[#71717a] hover:text-[#09090B] transition-colors cursor-pointer">
+                    Don&apos;t have an account?{" "}
+                    <span className="text-[#09090B] font-medium">
+                      Create Account
                     </span>
-                  </Link>
-                </div>
+                  </span>
+                </Link>
               </div>
             </div>
           </div>
         </div>
 
         {/* Right Side - Background Graphics (Hidden on small/medium, visible on large) */}
-        <div className="hidden lg:flex lg:w-[50%] relative overflow-hidden p-2">
-          <div className="relative w-full h-full flex items-center justify-center">
-            <div className="relative w-full h-full max-w-[100%] max-h-[100vh] rounded-md overflow-hidden">
+        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden p-3">
+          <div className="relative w-full h-full flex flex-col items-start justify-start rounded-2xl overflow-hidden">
+            {/* Background gradient and image */}
+            <div className="absolute inset-0">
               <Image
                 src={Container}
                 alt="Verification Graphic"
                 fill
-                style={{ objectFit: "cover", objectPosition: "left" }}
+                style={{ objectFit: "cover", objectPosition: "center" }}
                 priority
               />
             </div>
+
+            {/* Header text overlay */}
+            {/* <div className="relative z-10 pt-16 px-6 flex gap-1.5 items-center">
+              <h2 className="text-[28px] leading-[40px] font-medium text-[#09090B]">
+                Deal-Ready, Effort-Free
+              </h2>
+              <span className="text-2xl">✨</span>
+              <h2 className="text-[28px] leading-[40px] font-medium text-[#09090B]">
+                AI-Powered.
+              </h2>
+            </div> */}
           </div>
         </div>
       </div>
@@ -222,121 +217,123 @@ export default function LoginPage() {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Side - Email Form */}
-      <div className="w-full lg:w-[70%] flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-16 bg-white overflow-y-auto scrollbar-hide">
-        <div className="w-full max-w-sm sm:max-w-md flex items-center justify-center">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
+        <div className="w-full max-w-md flex items-center justify-center">
           {/* Form Card */}
-          <div className="w-full max-w-[412px] min-h-[484px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-4 sm:p-6 flex flex-col gap-6 sm:gap-8">
+          <div className="w-full max-w-[412px] rounded-[24px] p-6 flex flex-col gap-8">
             {/* Logo and Heading */}
-            <div className="flex flex-col gap-2.5">
+            <div className="flex flex-col gap-[10px]">
               {/* Company Logo */}
-              <div>
+              <div className="mb-[22px]">
                 <Image src={SignupLogo} alt="Signup Logo" />
               </div>
 
-              <h1 className="text-2xl sm:text-3xl font-normal text-[#09090B] w-full">
+              <h1 className="text-[32px] leading-[40px] font-normal text-[#09090B]">
                 Welcome Back
               </h1>
-            </div>
 
-            {/* Google Sign In Button - Wrapped in a fixed height container */}
-            <div className="h-12">
-              <button
-                onClick={handleGoogleSignIn}
-                className="w-full h-12 border border-gray-300 rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 cursor-pointer"
-              >
-                <div className="w-5 h-5 relative rounded-sm overflow-hidden">
-                  <Image src={GoogleIcon} alt="Google Logo" />
-                </div>
-                <span className="text-base font-medium text-gray-700">
-                  Continue with Google
-                </span>
-              </button>
-            </div>
-
-            {/* Divider */}
-            <div className="relative flex items-center justify-center">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative bg-white px-4">
-                <span className="text-base text-gray-500 font-medium">or</span>
-              </div>
+              <p className="text-[14px] leading-[20px] text-[#71717a] tracking-[0.15px]">
+                Secure your workspace, streamline due diligence, and join a
+                trusted network of dealmakers.
+              </p>
             </div>
 
             {/* Form Fields */}
-            <div className="w-full space-y-5">
-              {/* Email Input with Error Message */}
-              <div className="space-y-1.5">
-                <div className="relative">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    onKeyDown={(e: React.KeyboardEvent) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        handleEmailSubmit(e as React.FormEvent);
-                      }
-                    }}
-                    placeholder="Enter your email address"
-                    className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                      error
-                        ? "border-red-300 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-blue-500"
-                    }`}
-                  />
-                  {/* Error Message - Positioned absolutely to prevent layout shift */}
-                  <div
-                    className={`absolute left-0 right-0 transition-all duration-200 ${
-                      error
-                        ? "opacity-100 translate-y-0"
-                        : "opacity-0 -translate-y-2 pointer-events-none"
-                    }`}
-                  >
-                    {error && (
-                      <p className="text-sm text-red-600 py-2">{error}</p>
-                    )}
-                  </div>
+            <div className="flex flex-col gap-5">
+              {/* Google Sign In Button */}
+              <button
+                onClick={handleGoogleSignIn}
+                className="w-full h-11 border border-[#e4e4e7] rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                <div className="w-4 h-4 relative">
+                  <Image src={GoogleIcon} alt="Google Logo" />
                 </div>
+                <span className="text-sm font-medium text-[#09090B]">
+                  Continue with Google
+                </span>
+              </button>
+
+              {/* Divider */}
+              <div className="flex gap-4 items-center">
+                <div className="flex-1 h-0 border-t border-[#e4e4e7]" />
+                <p className="text-xs text-[#71717a]">or</p>
+                <div className="flex-1 h-0 border-t border-[#e4e4e7]" />
+              </div>
+
+              {/* Email Input */}
+              <div className="flex flex-col gap-1.5">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e: React.KeyboardEvent) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleEmailSubmit(e as React.FormEvent);
+                    }
+                  }}
+                  placeholder="Enter email address"
+                  className={`w-full h-10 px-3 py-2 border ${
+                    error ? "border-red-500" : "border-[#e4e4e7]"
+                  } rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-[#71717a] placeholder:text-[#71717a] transition-colors`}
+                  required
+                  disabled={isLoading}
+                />
+                {/* Error Message */}
+                {error && (
+                  <p className="text-xs text-red-600">{error}</p>
+                )}
               </div>
 
               {/* Continue Button */}
               <Button
                 onClick={handleEmailSubmit}
                 disabled={!email.trim() || isLoading}
-                className="w-full h-11 cursor-pointer bg-[#09090B] hover:bg-gray-800 text-white rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed mt-3"
+                className="w-full h-11 cursor-pointer bg-[#09090B] hover:bg-[#09090B]/90 text-white rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? "Sending code..." : "Continue"}
               </Button>
+            </div>
 
-              {/* Link to Signup */}
-              <div className="text-center">
-                <Link href="/signup">
-                  <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                    Don&apos;t have an account?{" "}
-                    <span className="text-gray-900 font-medium">
-                      Create Account
-                    </span>
+            {/* Link to Signup */}
+            <div className="flex items-center justify-center h-11">
+              <Link href="/signup">
+                <span className="text-sm text-[#71717a] hover:text-[#09090B] transition-colors cursor-pointer">
+                  Don&apos;t have an account?{" "}
+                  <span className="text-[#09090B] font-medium">
+                    Create Account
                   </span>
-                </Link>
-              </div>
+                </span>
+              </Link>
             </div>
           </div>
         </div>
       </div>
 
       {/* Right Side - Image (Hidden on small/medium, visible on large) */}
-      <div className="hidden lg:flex lg:w-[50%] relative overflow-hidden p-2">
-        <div className="relative w-full h-full flex items-center justify-center">
-          <div className="relative w-full h-full max-w-[100%] max-h-[100vh] rounded-md overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden p-3">
+        <div className="relative w-full h-full flex flex-col items-start justify-start rounded-2xl overflow-hidden">
+          {/* Background gradient and image */}
+          <div className="absolute inset-0">
             <Image
               src={Container}
               alt="Login Graphic"
               fill
-              style={{ objectFit: "cover", objectPosition: "left" }}
+              style={{ objectFit: "cover", objectPosition: "center" }}
               priority
             />
           </div>
+
+          {/* Header text overlay */}
+          {/* <div className="relative z-10 pt-16 px-6 flex gap-1.5 items-center">
+            <h2 className="text-[28px] leading-[40px] font-medium text-[#09090B]">
+              Deal-Ready, Effort-Free
+            </h2>
+            <span className="text-2xl">✨</span>
+            <h2 className="text-[28px] leading-[40px] font-medium text-[#09090B]">
+              AI-Powered.
+            </h2>
+          </div> */}
         </div>
       </div>
     </div>

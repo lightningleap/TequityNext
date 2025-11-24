@@ -119,22 +119,22 @@ export default function SignupPage() {
     return (
       <div className="flex h-screen overflow-hidden">
         {/* Left Side - Verification Form */}
-        <div className="w-full lg:w-[70%] flex items-center justify-center p-4 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
           <div className="w-full max-w-md flex items-center justify-center">
             {/* Form Card */}
-            <div className="w-full max-w-[412px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-6 flex flex-col gap-8">
+            <div className="w-full max-w-[412px] rounded-[24px] p-6 flex flex-col gap-8">
               {/* Logo and Heading */}
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-[10px]">
                 {/* Company Logo */}
-                <div>
+                <div className="mb-[22px]">
                   <Image src={SignupLogo} alt="Signup Logo" />
                 </div>
 
-                <h1 className="text-3xl font-normal text-[#09090B]">
+                <h1 className="text-[32px] leading-[40px] font-normal text-[#09090B]">
                   Get Started Now
                 </h1>
 
-                <p className="text-sm text-gray-500">
+                <p className="text-[14px] leading-[20px] text-[#71717a] tracking-[0.15px]">
                   We sent a temporary login code to {email} <br />
                   Not you?
                 </p>
@@ -143,17 +143,10 @@ export default function SignupPage() {
               {/* Form Fields */}
               <form
                 onSubmit={handleVerificationSubmit}
-                className="flex flex-col gap-5 w-[364px]"
+                className="flex flex-col gap-5"
               >
-                {/* Error Message */}
-                {error && (
-                  <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-sm text-red-600">{error}</p>
-                  </div>
-                )}
-
                 {/* Verification Code Input */}
-                <div className="space-y-1.5 w-[364px]">
+                <div className="flex flex-col gap-1.5">
                   <input
                     type="text"
                     value={verificationCode}
@@ -165,44 +158,45 @@ export default function SignupPage() {
                       }
                     }}
                     placeholder="Enter verification code"
-                    className={`w-full h-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                      error
-                        ? "border-red-300 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-blue-500"
-                    }`}
+                    className={`w-full h-10 px-3 py-2 border ${
+                      error ? "border-red-500" : "border-[#e4e4e7]"
+                    } rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-[#71717a] placeholder:text-[#71717a] transition-colors`}
                     disabled={isLoading}
                   />
+                  {/* Error Message */}
+                  {error && (
+                    <p className="text-xs text-red-600">{error}</p>
+                  )}
                 </div>
 
                 {/* Continue Button */}
-                <div className="mt-3">
-                  <Button
-                    type="submit"
-                    disabled={!verificationCode.trim() || isLoading}
-                    className="w-full h-11 cursor-pointer bg-[#09090B] hover:bg-gray-800 text-white rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isLoading ? "Verifying..." : "Continue"}
-                  </Button>
-                </div>
-
-                {/* Link to Login */}
-                <div className="text-center">
-                  <Link href="/login">
-                    <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                      Already have an account?{" "}
-                      <span className="text-gray-900 font-medium">Log in</span>
-                    </span>
-                  </Link>
-                </div>
+                <Button
+                  type="submit"
+                  disabled={!verificationCode.trim() || isLoading}
+                  className="w-full h-11 cursor-pointer bg-[#09090B] hover:bg-[#09090B]/90 text-white rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? "Verifying..." : "Continue"}
+                </Button>
               </form>
+
+              {/* Link to Login */}
+              <div className="flex items-center justify-center h-11">
+                <Link href="/login">
+                  <span className="text-sm text-[#71717a] hover:text-[#09090B] transition-colors cursor-pointer">
+                    Already have an account?{" "}
+                    <span className="text-[#09090B] font-medium">Log in</span>
+                  </span>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Right Side - Background Graphics (Hidden on small/medium, visible on large) */}
-        <div className="hidden lg:flex lg:w-[50%] relative overflow-hidden p-2">
-          <div className="relative w-full h-full flex items-center justify-center">
-            <div className="relative w-full h-full max-w-[100vw] h-screen rounded-md overflow-hidden">
+        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden p-3">
+          <div className="relative w-full h-full flex flex-col items-start justify-start rounded-2xl overflow-hidden">
+            {/* Background gradient and image */}
+            <div className="absolute inset-0">
               <Image
                 src={Container}
                 alt="Verification Graphic"
@@ -211,6 +205,17 @@ export default function SignupPage() {
                 priority
               />
             </div>
+
+            {/* Header text overlay */}
+            {/* <div className="relative z-10 pt-16 px-6 flex gap-1.5 items-center">
+              <h2 className="text-[28px] leading-[40px] font-medium text-[#09090B]">
+                Deal-Ready, Effort-Free
+              </h2>
+              <span className="text-2xl">✨</span>
+              <h2 className="text-[28px] leading-[40px] font-medium text-[#09090B]">
+                AI-Powered.
+              </h2>
+            </div> */}
           </div>
         </div>
       </div>
@@ -221,56 +226,51 @@ export default function SignupPage() {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Side - Form */}
-      <div className="w-full lg:w-[70%] flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
         <div className="w-full max-w-md flex items-center justify-center">
           {/* Form Card */}
-          <div className="w-full max-w-[412px] bg-[rgba(0,0,0,0.001)] rounded-[24px] flex flex-col gap-8">
+          <div className="w-full max-w-[412px] rounded-[24px] p-6 flex flex-col gap-8">
             {/* Logo and Heading */}
-            <div className="flex flex-col gap-2.5">
+            <div className="flex flex-col gap-[10px]">
               {/* Company Logo */}
-              <div>
+              <div className="mb-[22px]">
                 <Image src={SignupLogo} alt="Signup Logo" />
               </div>
 
-              <h1 className="text-3xl font-normal text-[#09090B]">
+              <h1 className="text-[32px] leading-[40px] font-normal text-[#09090B]">
                 Get Started Now
               </h1>
 
-              <p className="text-sm text-gray-500 leading-relaxed">
+              <p className="text-[14px] leading-[20px] text-[#71717a] tracking-[0.15px]">
                 Secure your workspace, streamline due diligence, and join a
                 trusted network of dealmakers.
               </p>
             </div>
 
-            {/* Google Sign In Button */}
-            <div className="mt-3">
+            {/* Form Fields */}
+            <div className="flex flex-col gap-5">
+              {/* Google Sign In Button */}
               <button
                 onClick={handleGoogleSignIn}
-                className="w-full h-11 border border-gray-300 rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 cursor-pointer"
+                className="w-full h-11 border border-[#e4e4e7] rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer"
               >
-                <div className="w-5 h-5 relative rounded-sm overflow-hidden">
+                <div className="w-4 h-4 relative">
                   <Image src={GoogleIcon} alt="Google Logo" />
                 </div>
-                <span className="text-base font-medium text-gray-700">
+                <span className="text-sm font-medium text-[#09090B]">
                   Continue with Google
                 </span>
               </button>
-            </div>
 
-            {/* Divider */}
-            <div className="relative flex items-center justify-center">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+              {/* Divider */}
+              <div className="flex gap-4 items-center">
+                <div className="flex-1 h-0 border-t border-[#e4e4e7]" />
+                <p className="text-xs text-[#71717a]">or</p>
+                <div className="flex-1 h-0 border-t border-[#e4e4e7]" />
               </div>
-              <div className="relative bg-white px-4">
-                <span className="text-base text-gray-500 font-medium">or</span>
-              </div>
-            </div>
 
-            {/* Form Fields */}
-            <div className="w-full space-y-5">
               {/* Email Input */}
-              <div className="space-y-1.5">
+              <div className="flex flex-col gap-1.5">
                 <input
                   type="email"
                   value={email}
@@ -281,51 +281,49 @@ export default function SignupPage() {
                       handleSubmit(e as React.FormEvent);
                     }
                   }}
-                  placeholder="Enter your email address"
+                  placeholder="Enter email address"
                   className={`w-full h-10 px-3 py-2 border ${
-                    emailError ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors`}
+                    emailError ? "border-red-500" : "border-[#e4e4e7]"
+                  } rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-[#71717a] placeholder:text-[#71717a] transition-colors`}
                   required
                   disabled={isLoading}
                 />
+                {/* Error Message */}
+                {(error || emailError) && (
+                  <p className="text-xs text-red-600">
+                    {error || emailError}
+                  </p>
+                )}
               </div>
-
-              {/* Error Message */}
-              {(error || emailError) && (
-                <div className="p-3 text-sm text-red-600 bg-red-50 rounded-lg">
-                  {error || emailError}
-                </div>
-              )}
 
               {/* Continue Button */}
-              <div className="mt-3">
-                <Button
-                  onClick={handleSubmit}
-                  disabled={!email.trim() || isLoading}
-                  className="w-full h-11 cursor-pointer bg-[#09090B] hover:bg-gray-800 text-white rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? "Sending code..." : "Continue"}
-                </Button>
-              </div>
+              <Button
+                onClick={handleSubmit}
+                disabled={!email.trim() || isLoading}
+                className="w-full h-11 cursor-pointer bg-[#09090B] hover:bg-[#09090B]/90 text-white rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? "Sending code..." : "Continue"}
+              </Button>
+            </div>
 
-              {/* Navigation Options */}
-              <div className="text-center">
-                <Link href="/login">
-                  <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
-                    Already have an account?{" "}
-                    <span className="text-gray-900 font-medium">Log in</span>
-                  </span>
-                </Link>
-              </div>
+            {/* Navigation Options */}
+            <div className="flex items-center justify-center h-11">
+              <Link href="/login">
+                <span className="text-sm text-[#71717a] hover:text-[#09090B] transition-colors cursor-pointer">
+                  Already have an account?{" "}
+                  <span className="text-[#09090B] font-medium">Log in</span>
+                </span>
+              </Link>
             </div>
           </div>
         </div>
       </div>
 
       {/* Right Side - Image (Hidden on small/medium, visible on large) */}
-      <div className="hidden lg:flex lg:w-[50%] relative overflow-hidden p-2">
-        <div className="relative w-full h-full flex items-center justify-center">
-          <div className="relative w-full h-full max-w-[100vw] h-screen rounded-md overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden p-3">
+        <div className="relative w-full h-full flex flex-col items-start justify-start rounded-2xl overflow-hidden">
+          {/* Background gradient and image */}
+          <div className="absolute inset-0">
             <Image
               src={Container}
               alt="Signup Graphic"
@@ -334,6 +332,17 @@ export default function SignupPage() {
               priority
             />
           </div>
+
+          {/* Header text overlay */}
+          {/* <div className="relative z-10 pt-16 px-6 flex gap-1.5 items-center">
+            <h2 className="text-[28px] leading-[40px] font-medium text-[#09090B]">
+              Deal-Ready, Effort-Free
+            </h2>
+            <span className="text-2xl">✨</span>
+            <h2 className="text-[28px] leading-[40px] font-medium text-[#09090B]">
+              AI-Powered.
+            </h2>
+          </div> */}
         </div>
       </div>
     </div>
