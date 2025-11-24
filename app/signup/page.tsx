@@ -119,7 +119,7 @@ export default function SignupPage() {
     return (
       <div className="flex h-screen overflow-hidden">
         {/* Left Side - Verification Form */}
-        <div className="w-full lg:w-[70%] flex items-center justify-center p-4 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
+        <div className="w-full lg:w-[50%] flex items-center justify-center p-4 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
           <div className="w-full max-w-md flex items-center justify-center">
             {/* Form Card */}
             <div className="w-full max-w-[412px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-6 flex flex-col gap-8">
@@ -202,7 +202,7 @@ export default function SignupPage() {
         {/* Right Side - Background Graphics (Hidden on small/medium, visible on large) */}
         <div className="hidden lg:flex lg:w-[50%] relative overflow-hidden p-2">
           <div className="relative w-full h-full flex items-center justify-center">
-            <div className="relative w-full h-full max-w-[100vw] h-screen rounded-md overflow-hidden">
+            <div className="relative w-full h-full rounded-md overflow-hidden">
               <Image
                 src={Container}
                 alt="Verification Graphic"
@@ -221,7 +221,7 @@ export default function SignupPage() {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Side - Form */}
-      <div className="w-full lg:w-[70%] flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
+      <div className="w-full lg:w-[50%] flex items-center justify-center p-6 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
         <div className="w-full max-w-md flex items-center justify-center">
           {/* Form Card */}
           <div className="w-full max-w-[412px] bg-[rgba(0,0,0,0.001)] rounded-[24px] flex flex-col gap-8">

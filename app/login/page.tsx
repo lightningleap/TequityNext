@@ -110,7 +110,7 @@ export default function LoginPage() {
     return (
       <div className="flex h-screen overflow-hidden">
         {/* Left Side - Verification Form */}
-        <div className="w-full lg:w-[70%] flex items-center justify-center p-4 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
+        <div className="w-full lg:w-[50%] flex items-center justify-center p-4 sm:p-16 bg-white overflow-y-auto scrollbar-hide">
           <div className="w-full max-w-sm sm:max-w-md flex items-center justify-center">
             {/* Form Card */}
             <div className="w-full max-w-[412px] min-h-[430px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-4 sm:p-6 flex flex-col gap-6 sm:gap-8">
@@ -222,7 +222,7 @@ export default function LoginPage() {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Side - Email Form */}
-      <div className="w-full lg:w-[70%] flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-16 bg-white overflow-y-auto scrollbar-hide">
+      <div className="w-full lg:w-[50%] flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-16 bg-white overflow-y-auto scrollbar-hide">
         <div className="w-full max-w-sm sm:max-w-md flex items-center justify-center">
           {/* Form Card */}
           <div className="w-full max-w-[412px] min-h-[484px] bg-[rgba(0,0,0,0.001)] rounded-[24px] p-4 sm:p-6 flex flex-col gap-6 sm:gap-8">
