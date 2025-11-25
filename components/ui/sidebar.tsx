@@ -31,8 +31,8 @@ import {
 } from "@/components/ui/tooltip";
 // import { CiSearch } from "react-icons/ci";
 import { MdOutlineFolderCopy } from "react-icons/md";
-import { SearchDialog } from "@/app/Dashboard/components/SearchDialog";
-import { useFilesOptional } from "@/app/Dashboard/context/FilesContext";
+import { SearchDialog } from "@/app/[customer_slug]/Dashboard/components/SearchDialog";
+import { useFilesOptional } from "@/app/[customer_slug]/Dashboard/context/FilesContext";
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = "244px";

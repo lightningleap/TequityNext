@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import GoogleIcon from "../../public/GoogleIcon.svg";
-import SignupLogo from "../../public/SignupLogo.svg";
-import Container from "../../public/Container.png";
 import { toast } from "sonner";
+import { sendSignupOTP, verifySignupOTP } from "@/lib/client-auth";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -18,6 +16,8 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const router = useRouter();
+  const params = useParams();
+  const customerSlug = params.customer_slug as string;
 
   const validateEmail = (email: string): boolean => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -43,29 +43,20 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Replace with actual API call to send verification code
-      // const response = await fetch('/api/auth/signup', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ email }),
-      // });
-      // if (!response.ok) throw new Error('Failed to send verification code');
+      const response = await sendSignupOTP(email);
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (!response.success) {
+        throw new Error(response.error || "Failed to send verification code");
+      }
 
       setStep("verification");
-      toast.success("Verification code sent");
+      toast.success("Verification code sent! Check your console for the OTP.");
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to send verification code. Please try again."
-      );
-      toast.error(
-        err instanceof Error
-          ? err.message
-          : "Failed to send verification code. Please try again."
-      );
+      const errorMessage = err instanceof Error
+        ? err.message
+        : "Failed to send verification code. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -82,29 +73,20 @@ export default function SignupPage() {
         throw new Error("Please enter a valid verification code");
       }
 
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/auth/verify-signup', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ email, code: verificationCode }),
-      // });
-      // if (!response.ok) throw new Error('Invalid verification code');
+      const response = await verifySignupOTP(email, verificationCode);
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (!response.success) {
+        throw new Error(response.error || "Invalid verification code");
+      }
 
-      toast.success("Signup verified");
-      router.push("/workspace-setup");
+      toast.success("Account created successfully!");
+      router.push(`/${customerSlug}/workspace-setup`);
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Verification failed. Please try again."
-      );
-      toast.error(
-        err instanceof Error
-          ? err.message
-          : "Verification failed. Please try again."
-      );
+      const errorMessage = err instanceof Error
+        ? err.message
+        : "Verification failed. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -127,7 +109,7 @@ export default function SignupPage() {
               <div className="flex flex-col gap-2.5">
                 {/* Company Logo */}
                 <div>
-                  <Image src={SignupLogo} alt="Signup Logo" />
+                  <Image src="/SignupLogo.svg" alt="Signup Logo" width={120} height={40} />
                 </div>
 
                 <h1 className="text-3xl font-normal text-[#09090B]">
@@ -187,7 +169,7 @@ export default function SignupPage() {
 
                 {/* Link to Login */}
                 <div className="text-center">
-                  <Link href="/login">
+                  <Link href={`/${customerSlug}/login`}>
                     <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
                       Already have an account?{" "}
                       <span className="text-gray-900 font-medium">Log in</span>
@@ -204,7 +186,7 @@ export default function SignupPage() {
           <div className="relative w-full h-full flex items-center justify-center">
             <div className="relative w-full h-full max-w-[100vw] h-screen rounded-md overflow-hidden">
               <Image
-                src={Container}
+                src="/Container.png"
                 alt="Verification Graphic"
                 fill
                 style={{ objectFit: 'cover', objectPosition: 'center' }}
@@ -229,7 +211,7 @@ export default function SignupPage() {
             <div className="flex flex-col gap-2.5">
               {/* Company Logo */}
               <div>
-                <Image src={SignupLogo} alt="Signup Logo" />
+                <Image src="/SignupLogo.svg" alt="Signup Logo" width={120} height={40} />
               </div>
 
               <h1 className="text-3xl font-normal text-[#09090B]">
@@ -249,7 +231,7 @@ export default function SignupPage() {
                 className="w-full h-11 border border-gray-300 rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 cursor-pointer"
               >
                 <div className="w-5 h-5 relative rounded-sm overflow-hidden">
-                  <Image src={GoogleIcon} alt="Google Logo" />
+                  <Image src="/GoogleIcon.svg" alt="Google Logo" width={20} height={20} />
                 </div>
                 <span className="text-base font-medium text-gray-700">
                   Continue with Google
@@ -310,7 +292,7 @@ export default function SignupPage() {
 
               {/* Navigation Options */}
               <div className="text-center">
-                <Link href="/login">
+                <Link href={`/${customerSlug}/login`}>
                   <span className="text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
                     Already have an account?{" "}
                     <span className="text-gray-900 font-medium">Log in</span>
@@ -327,7 +309,7 @@ export default function SignupPage() {
         <div className="relative w-full h-full flex items-center justify-center">
           <div className="relative w-full h-full max-w-[100vw] h-screen rounded-md overflow-hidden">
             <Image
-              src={Container}
+              src="/Container.png"
               alt="Signup Graphic"
               fill
               style={{ objectFit: 'cover', objectPosition: 'center' }}

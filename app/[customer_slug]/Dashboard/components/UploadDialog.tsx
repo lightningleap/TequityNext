@@ -8,60 +8,37 @@ import {
   DialogDescription,
   DialogTitle,
   DialogTrigger,
-} from "../../../components/ui/dialog";
-import { Button } from "../../../components/ui/button";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { FiUploadCloud } from "react-icons/fi";
 import { FileItem } from "./filegrid";
-import PdfIcon from "../../../public/Files/PDF-icon.svg";
-import XlsIcon from "../../../public/Files/XLS-icon.svg";
-import PptIcon from "../../../public/Files/PPT-icon.svg";
-import PngIcon from "../../../public/Files/PNG-icon.svg";
-import JpgIcon from "../../../public/Files/JPG-icon.svg";
-import DocsIcon from "../../../public/Files/Docs-icon.svg";
-import Mp3Icon from "../../../public/Files/MP3-icon.svg";
-import TxtIcon from "../../../public/Files/TXT-icon.svg";
-import SvgIcon from "../../../public/Files/SVG-icon.svg";
-import ZipIcon from "../../../public/Files/ZIP-icon.svg";
-import PlusIcon from "../../../public/uploadModal/Icon.svg";
 import { X, CheckCircle, RefreshCw } from "lucide-react";
 import Image from "next/image";
 import { UploadGraphic } from "./UploadGraphic";
 import { toast } from "sonner";
 
-function getFileIcon(fileName: string) {
-  const extension = fileName.split(".").pop()?.toLowerCase();
+// File type icons - using public folder paths
+const fileIcons: Record<string, string> = {
+  pdf: "/Files/PDF-icon.svg",
+  xls: "/Files/XLS-icon.svg",
+  xlsx: "/Files/XLS-icon.svg",
+  ppt: "/Files/PPT-icon.svg",
+  pptx: "/Files/PPT-icon.svg",
+  png: "/Files/PNG-icon.svg",
+  jpg: "/Files/JPG-icon.svg",
+  jpeg: "/Files/JPG-icon.svg",
+  doc: "/Files/Docs-icon.svg",
+  docx: "/Files/Docs-icon.svg",
+  mp3: "/Files/MP3-icon.svg",
+  txt: "/Files/TXT-icon.svg",
+  svg: "/Files/SVG-icon.svg",
+  zip: "/Files/ZIP-icon.svg",
+};
 
-  switch (extension) {
-    case "pdf":
-      return <Image src={PdfIcon} alt="PDF" className="w-12 h-12" />;
-    case "docx":
-    case "doc":
-      return <Image src={DocsIcon} alt="Document" className="w-12 h-12" />;
-    case "xlsx":
-    case "xls":
-    case "csv":
-      return <Image src={XlsIcon} alt="Spreadsheet" className="w-12 h-12" />;
-    case "pptx":
-    case "ppt":
-      return <Image src={PptIcon} alt="Presentation" className="w-12 h-12" />;
-    case "png":
-      return <Image src={PngIcon} alt="PNG Image" className="w-12 h-12" />;
-    case "jpg":
-    case "jpeg":
-      return <Image src={JpgIcon} alt="JPEG Image" className="w-12 h-12" />;
-    case "svg":
-      return <Image src={SvgIcon} alt="SVG" className="w-12 h-12" />;
-    case "mp4":
-    case "mov":
-    case "mp3":
-      return <Image src={Mp3Icon} alt="Media" className="w-12 h-12" />;
-    case "txt":
-      return <Image src={TxtIcon} alt="Text" className="w-12 h-12" />;
-    case "zip":
-      return <Image src={ZipIcon} alt="Archive" className="w-12 h-12" />;
-    default:
-      return <Image src={DocsIcon} alt="File" className="w-12 h-12" />;
-  }
+function getFileIcon(fileName: string) {
+  const extension = fileName.split(".").pop()?.toLowerCase() || "";
+  const iconPath = fileIcons[extension] || "/Files/Docs-icon.svg";
+  return <Image src={iconPath} alt={extension.toUpperCase()} width={48} height={48} className="w-12 h-12" />;
 }
 
 type FileType =
@@ -477,8 +454,10 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                     className="flex flex-col justify-center items-center p-[12px] gap-[8px] bg-[#FAFAFA] rounded-xl hover:bg-gray-200 transition-colors h-[140px] cursor-pointer border border-[#E2E8F0] dark:bg-[#18181B] dark:border-[#3F3F46] dark:hover:bg-[#3F3F46]/60 hover:border-[#CBD5F6] dark:hover:border-[#52525B]"
                   >
                     <Image
-                      src={PlusIcon}
+                      src="/uploadModal/Icon.svg"
                       alt="Add files"
+                      width={40}
+                      height={40}
                       className="w-10 h-10"
                     />
                     <p className="font-['Inter'] font-normal text-[14px] leading-[20px] text-[#020617] dark:text-white">
