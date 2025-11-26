@@ -319,6 +319,10 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
     };
   }, []);
 
+  // Get the current path to extract the tenant slug
+  const pathParts = usePathname().split('/');
+  const tenantSlug = pathParts[1]; // Get the tenant slug from the URL
+
   const navItems = React.useMemo(
     () => [
       {
@@ -326,16 +330,23 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
         icon: (
           <MdOutlineFolderCopy width={16} height={16} className="shrink-0" />
         ),
-        href: "/Dashboard/Library",
+        href: `/${tenantSlug}/Dashboard/Library`,
       },
       {
         title: "Chats",
         icon: <MessageCircle className="h-4 w-4 shrink-0" />,
-        href: "/Dashboard/chat",
+        href: `/${tenantSlug}/Dashboard/chat`,
       },
     ],
-    []
+    [tenantSlug]
   );
+
+  // Update the active path check to work with the new URL structure
+  const isActive = (href: string) => {
+    const pathWithoutTenant = pathname.split('/').slice(2).join('/');
+    const hrefWithoutTenant = href.split('/').slice(2).join('/');
+    return pathWithoutTenant === hrefWithoutTenant;
+  };
 
   return (
     <>
@@ -367,9 +378,9 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
           <SidebarMenuItem key={item.href}>
             <SidebarMenuButton
               asChild
-              isActive={pathname === item.href}
+              isActive={isActive(item.href)}
               className={`w-full justify-start h-8 px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-150 ease-in-out ${
-                pathname === item.href && !searchDialogOpen
+                isActive(item.href) && !searchDialogOpen
                   ? "bg-[#F4F4F5] dark:bg-[#27272A] dark:text-white"
                   : "hover:bg-gray-100 dark:hover:bg-[#27272A]"
               }`}
@@ -393,7 +404,7 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
       </SidebarMenu>
 
       {/* Starred Section - Only visible on Library page */}
-      {pathname === "/Dashboard/Library" && starredFiles.length > 0 && (
+      {pathname.endsWith("/Dashboard/Library") && starredFiles.length > 0 && (
         <div className="flex flex-col gap-0 items-start px-2 border-t w-full mt-2 group-data-[collapsible=icon]:hidden">
           <div className="flex h-8 items-center px-2 py-2 mt-2 w-full">
             <span className="text-xs font-medium text-[#3f3f46] dark:text-[#A1A1AA] opacity-70 overflow-ellipsis overflow-hidden whitespace-nowrap">

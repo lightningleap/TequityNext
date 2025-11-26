@@ -127,20 +127,26 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
     }
   };
 
-  const retryUpload = (fileIndex: number) => {
+  const retryUpload = async (fileIndex: number) => {
     const fileToRetry = files[fileIndex];
     if (!fileToRetry) return;
 
-    setUploadProgress((prev) => ({
+    // Reset the progress and status
+    setUploadProgress(prev => ({
       ...prev,
-      [fileIndex]: 0,
+      [fileIndex]: 0
     }));
-    setUploadStatus((prev) => ({
+    
+    setUploadStatus(prev => ({
       ...prev,
-      [fileIndex]: "pending",
+      [fileIndex]: "uploading"
     }));
 
-    startUpload([fileToRetry], fileIndex);
+    // Create a new array with just this file to retry
+    const filesToRetry = [fileToRetry];
+    
+    // Start the upload process for this file
+    await startUpload(filesToRetry, fileIndex);
   };
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -180,6 +186,33 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
     });
   };
 
+  // Helper function to update progress with smooth animation
+  const updateProgress = (index: number, progress: number, duration: number = 300) => {
+    return new Promise<void>((resolve) => {
+      const startTime = performance.now();
+      const startProgress = uploadProgress[index] || 0;
+      
+      const animate = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progressRatio = Math.min(elapsed / duration, 1);
+        const currentProgress = startProgress + (progress - startProgress) * progressRatio;
+        
+        setUploadProgress(prev => ({
+          ...prev,
+          [index]: Math.round(currentProgress * 10) / 10 // Round to 1 decimal for smoother animation
+        }));
+        
+        if (progressRatio < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          resolve();
+        }
+      };
+      
+      requestAnimationFrame(animate);
+    });
+  };
+
   const startUpload = async (filesToUpload: File[], startIndex: number) => {
     console.log("[UploadDialog] startUpload called with", filesToUpload.length, "files, startIndex:", startIndex);
     console.log("[UploadDialog] dataroomId:", dataroomId);
@@ -190,12 +223,18 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
       return;
     }
 
+    // Initialize status and progress for all files
     const initialStatus: Record<number, UploadStatus> = {};
+    const initialProgress: Record<number, number> = {};
+    
     filesToUpload.forEach((_, index) => {
       const actualIndex = startIndex + index;
       initialStatus[actualIndex] = "uploading";
+      initialProgress[actualIndex] = 0;
     });
+    
     setUploadStatus((prev) => ({ ...prev, ...initialStatus }));
+    setUploadProgress((prev) => ({ ...prev, ...initialProgress }));
     setIsUploading(true);
 
     const token = getToken();
@@ -214,28 +253,58 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
         formData.append("dataroomId", dataroomId);
         formData.append("processForRAG", "true");
 
-        // Simulate progress while uploading
-        setUploadProgress((prev) => ({ ...prev, [actualIndex]: 10 }));
+        // Initial progress
+        await updateProgress(actualIndex, 10, 200);
 
         const uploadUrl = `/api/${tenantSlug}/files/upload`;
         console.log("[UploadDialog] Uploading to:", uploadUrl);
 
-        const response = await fetch(uploadUrl, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
+        // Create XMLHttpRequest for progress tracking
+        const xhr = new XMLHttpRequest();
+        
+        // Set up progress tracking
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percentComplete = 10 + (event.loaded / event.total) * 80; // 10-90% for upload
+            setUploadProgress(prev => ({
+              ...prev,
+              [actualIndex]: Math.min(90, Math.round(percentComplete))
+            }));
+          }
+        };
+
+        const response = await new Promise<Response>((resolve, reject) => {
+          xhr.open("POST", uploadUrl, true);
+          xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+          
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve(new Response(xhr.response, {
+                status: xhr.status,
+                statusText: xhr.statusText
+              }));
+            } else {
+              reject(new Error(xhr.statusText));
+            }
+          };
+          
+          xhr.onerror = () => {
+            reject(new Error('Network error'));
+          };
+          
+          xhr.send(formData);
         });
 
         console.log("[UploadDialog] Response status:", response.status);
-        setUploadProgress((prev) => ({ ...prev, [actualIndex]: 50 }));
+        
+        // Simulate processing progress
+        await updateProgress(actualIndex, 95, 300);
 
         const result = await response.json();
         console.log("[UploadDialog] Response body:", result);
 
         if (response.ok && result.success) {
-          setUploadProgress((prev) => ({ ...prev, [actualIndex]: 100 }));
+          await updateProgress(actualIndex, 100, 200);
           setUploadStatus((prev) => ({ ...prev, [actualIndex]: "success" }));
           console.log("[UploadDialog] Upload success! File ID:", result.data?.file?.id);
 
@@ -473,10 +542,16 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                     >
                       {/* Progress bar background for uploading state */}
                       {status === "uploading" && (
-                        <div
-                          className="absolute left-0 top-0 bottom-0 bg-[#F4F4F5] transition-all duration-300 dark:bg-[#3F3F46]/40"
-                          style={{ width: `${progress}%` }}
-                        />
+                        <div className="absolute left-0 top-0 bottom-0 right-0 overflow-hidden rounded-xl">
+                          <div
+                            className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900/40 dark:to-blue-800/40 transition-all duration-300 ease-out"
+                            style={{
+                              width: `${progress}%`,
+                              transition: 'width 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/20 dark:from-transparent dark:to-black/10" />
+                        </div>
                       )}
 
                       <div className="flex flex-col justify-center items-start gap-[12px] w-full relative z-10">
@@ -511,7 +586,10 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                             <button
                               type="button"
                               className="flex items-center justify-center w-[40px] h-[36px] rounded-md hover:bg-gray-100 dark:hover:bg-[#27272A]"
-                              onClick={() => removeFile(index)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                retryUpload(index);
+                              }}
                             >
                               <RefreshCw className="h-4 w-4 text-[#020617] dark:text-white" />
                             </button>
@@ -523,26 +601,23 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
                           <p className="font-['Inter'] font-medium text-[12px] leading-[20px] text-[#020617] dark:text-white line-clamp-2 w-full overflow-ellipsis overflow-hidden">
                             {file.name}
                           </p>
-                          <p
-                            className={`font-['Inter'] font-normal text-[10px] leading-[14px] w-full ${
-                              status === "error"
-                                ? "text-[#E60000] dark:text-[#FF6B6B]"
-                                : "text-[#64748B] dark:text-[#A1A1AA]"
-                            }`}
+                          <button
+                            type="button"
+                            onClick={() => status === "error" && retryUpload(index)}
+                            className={`w-full text-left ${status === "error" ? "cursor-pointer" : "cursor-default"}`}
                           >
-                            {status === "error"
-                              ? "Upload failed try again"
-                              : `${(file.size / (1024 * 1024)).toFixed(1)}MB`}
-                          </p>
-                          {status === "error" && (
-                            <button
-                              type="button"
-                              onClick={() => retryUpload(index)}
-                              className="text-[11px] font-semibold text-[#E60000] dark:text-[#FF6B6B] underline-offset-2 hover:underline"
+                            <p
+                              className={`font-['Inter'] font-normal text-[10px] leading-[14px] w-full ${
+                                status === "error"
+                                  ? "text-[#E60000] dark:text-[#FF6B6B] hover:underline"
+                                  : "text-[#64748B] dark:text-[#A1A1AA]"
+                              }`}
                             >
-                              Upload failed try again
-                            </button>
-                          )}
+                              {status === "error"
+                                ? "Click to try again"
+                                : `${(file.size / (1024 * 1024)).toFixed(1)}MB`}
+                            </p>
+                          </button>
                         </div>
                       </div>
                     </div>
