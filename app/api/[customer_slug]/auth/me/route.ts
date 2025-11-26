@@ -45,6 +45,16 @@ export async function GET(
             status: 'active',
           },
         },
+        // Also get datarooms owned by the user
+        ownedDatarooms: {
+          select: {
+            id: true,
+            name: true,
+          },
+          where: {
+            isActive: true,
+          },
+        },
       },
     })
 
@@ -55,6 +65,29 @@ export async function GET(
     if (!user.isActive) {
       return ApiErrors.forbidden()
     }
+
+    // Combine owned datarooms and memberships
+    const ownedDatarooms = user.ownedDatarooms.map((d) => ({
+      id: d.id,
+      name: d.name,
+      role: 'owner' as const,
+    }))
+
+    const memberDatarooms = user.memberships.map((m) => ({
+      id: m.dataroom.id,
+      name: m.dataroom.name,
+      role: m.role,
+    }))
+
+    // Merge and deduplicate (owned takes precedence)
+    const dataroomMap = new Map<string, { id: string; name: string; role: string }>()
+    for (const d of memberDatarooms) {
+      dataroomMap.set(d.id, d)
+    }
+    for (const d of ownedDatarooms) {
+      dataroomMap.set(d.id, d) // Owner role takes precedence
+    }
+    const datarooms = Array.from(dataroomMap.values())
 
     return successResponse({
       id: user.id,
@@ -75,11 +108,7 @@ export async function GET(
             expiresAt: user.subscription.expiresAt,
           }
         : null,
-      datarooms: user.memberships.map((m) => ({
-        id: m.dataroom.id,
-        name: m.dataroom.name,
-        role: m.role,
-      })),
+      datarooms,
     })
   } catch (error) {
     console.error('Get me error:', error)

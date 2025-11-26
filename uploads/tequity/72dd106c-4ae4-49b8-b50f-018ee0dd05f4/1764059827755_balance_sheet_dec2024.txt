@@ -1,0 +1,16 @@
+Balance Sheet - December 2024
+
+Assets:
+- Cash: $250,000
+- Accounts Receivable: $180,000
+- Inventory: $95,000
+- Equipment: $320,000
+Total Assets: $845,000
+
+Liabilities:
+- Accounts Payable: $65,000
+- Short-term Debt: $100,000
+- Long-term Debt: $200,000
+Total Liabilities: $365,000
+
+Equity: $480,000

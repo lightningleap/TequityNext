@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -12,10 +12,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { FiUploadCloud } from "react-icons/fi";
 import { FileItem } from "./filegrid";
-import { X, CheckCircle, RefreshCw } from "lucide-react";
+import { X, CheckCircle, RefreshCw, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { UploadGraphic } from "./UploadGraphic";
 import { toast } from "sonner";
+import { getToken, getTenantSlug, authFetch } from "@/lib/client-auth";
 
 // File type icons - using public folder paths
 const fileIcons: Record<string, string> = {
@@ -77,6 +78,45 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
   const [uploadMode, setUploadMode] = useState<"files" | "folder">("files");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
+  const [dataroomId, setDataroomId] = useState<string | null>(null);
+  const [uploadedFileIds, setUploadedFileIds] = useState<Record<number, string>>({});
+
+  // Load dataroom ID on mount
+  useEffect(() => {
+    const loadDataroomId = async () => {
+      console.log('[UploadDialog] Loading dataroom ID...');
+      // First try localStorage
+      const storedDataroomId = localStorage.getItem('tequity_dataroom_id');
+      if (storedDataroomId) {
+        console.log('[UploadDialog] Found dataroomId in localStorage:', storedDataroomId);
+        setDataroomId(storedDataroomId);
+        return;
+      }
+
+      // Otherwise, get from user's datarooms
+      try {
+        console.log('[UploadDialog] Fetching dataroom from /auth/me...');
+        const response = await authFetch<{
+          datarooms: Array<{ id: string; name: string; role: string }>;
+        }>('/auth/me');
+
+        console.log('[UploadDialog] /auth/me response:', response);
+
+        if (response.success && response.data?.datarooms?.[0]) {
+          const firstDataroom = response.data.datarooms[0];
+          console.log('[UploadDialog] Setting dataroomId:', firstDataroom.id);
+          setDataroomId(firstDataroom.id);
+          localStorage.setItem('tequity_dataroom_id', firstDataroom.id);
+        } else {
+          console.warn('[UploadDialog] No datarooms found in response');
+        }
+      } catch (error) {
+        console.error('[UploadDialog] Error loading dataroom ID:', error);
+      }
+    };
+
+    loadDataroomId();
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -141,40 +181,91 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
   };
 
   const startUpload = async (filesToUpload: File[], startIndex: number) => {
+    console.log("[UploadDialog] startUpload called with", filesToUpload.length, "files, startIndex:", startIndex);
+    console.log("[UploadDialog] dataroomId:", dataroomId);
+
+    if (!dataroomId) {
+      console.error("[UploadDialog] No dataroomId found!");
+      toast.error("Dataroom not found. Please refresh the page.");
+      return;
+    }
+
     const initialStatus: Record<number, UploadStatus> = {};
     filesToUpload.forEach((_, index) => {
       const actualIndex = startIndex + index;
       initialStatus[actualIndex] = "uploading";
     });
     setUploadStatus((prev) => ({ ...prev, ...initialStatus }));
+    setIsUploading(true);
+
+    const token = getToken();
+    const tenantSlug = getTenantSlug();
+    console.log("[UploadDialog] token exists:", !!token, "tenantSlug:", tenantSlug);
 
     for (let i = 0; i < filesToUpload.length; i++) {
       const actualIndex = startIndex + i;
       const file = filesToUpload[i];
+      console.log(`[UploadDialog] Uploading file ${i + 1}/${filesToUpload.length}:`, file.name, "size:", file.size);
 
       try {
-        for (let progress = 0; progress <= 100; progress += 10) {
-          setUploadProgress((prev) => ({
-            ...prev,
-            [actualIndex]: progress,
-          }));
-          await new Promise((resolve) => setTimeout(resolve, 50));
-        }
+        // Create FormData for file upload
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("dataroomId", dataroomId);
+        formData.append("processForRAG", "true");
 
-        setUploadStatus((prev) => ({
-          ...prev,
-          [actualIndex]: "success",
-        }));
+        // Simulate progress while uploading
+        setUploadProgress((prev) => ({ ...prev, [actualIndex]: 10 }));
+
+        const uploadUrl = `/api/${tenantSlug}/files/upload`;
+        console.log("[UploadDialog] Uploading to:", uploadUrl);
+
+        const response = await fetch(uploadUrl, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        console.log("[UploadDialog] Response status:", response.status);
+        setUploadProgress((prev) => ({ ...prev, [actualIndex]: 50 }));
+
+        const result = await response.json();
+        console.log("[UploadDialog] Response body:", result);
+
+        if (response.ok && result.success) {
+          setUploadProgress((prev) => ({ ...prev, [actualIndex]: 100 }));
+          setUploadStatus((prev) => ({ ...prev, [actualIndex]: "success" }));
+          console.log("[UploadDialog] Upload success! File ID:", result.data?.file?.id);
+
+          // Store the uploaded file ID
+          if (result.data?.file?.id) {
+            setUploadedFileIds((prev) => ({
+              ...prev,
+              [actualIndex]: result.data.file.id,
+            }));
+          }
+        } else {
+          console.error("[UploadDialog] Upload error:", result.error, result);
+          setUploadStatus((prev) => ({ ...prev, [actualIndex]: "error" }));
+        }
       } catch (error) {
-        setUploadStatus((prev) => ({
-          ...prev,
-          [actualIndex]: "error",
-        }));
+        console.error("[UploadDialog] Upload failed with exception:", error);
+        setUploadStatus((prev) => ({ ...prev, [actualIndex]: "error" }));
       }
     }
+
+    setIsUploading(false);
+    console.log("[UploadDialog] All uploads completed");
   };
 
   const handleUpload = async () => {
+    console.log("[UploadDialog] handleUpload (Done button) called");
+    console.log("[UploadDialog] Current uploadStatus:", uploadStatus);
+    console.log("[UploadDialog] Current uploadedFileIds:", uploadedFileIds);
+    console.log("[UploadDialog] Files count:", files.length);
+
     const failedFiles = files.filter(
       (_, index) => uploadStatus[index] === "error"
     );
@@ -182,13 +273,17 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
       (_, index) => uploadStatus[index] === "pending"
     );
 
+    console.log("[UploadDialog] Failed files:", failedFiles.length, "Pending files:", pendingFiles.length);
+
     if (failedFiles.length > 0 || pendingFiles.length > 0) {
+      console.log("[UploadDialog] Cannot proceed - there are failed or pending files");
       return;
     }
 
     const successfulFiles = files.filter(
       (_, index) => uploadStatus[index] === "success"
     );
+    console.log("[UploadDialog] Successful files:", successfulFiles.length);
 
     let fileItems: FileItem[] = [];
     let folderItems: FolderItem[] = [];
@@ -219,7 +314,10 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
         })
       );
     } else {
+      // Use real file IDs from backend uploads
       fileItems = successfulFiles.map((file, idx) => {
+        const originalIndex = files.indexOf(file);
+        const fileId = uploadedFileIds[originalIndex] || `file-${Date.now()}-${idx}`;
         const extension = file.name.split(".").pop()?.toUpperCase() || "TXT";
         const fileType = [
           "PDF",
@@ -234,31 +332,36 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
           ? (extension as FileType)
           : "TXT";
 
-        const fileUrl = URL.createObjectURL(file);
-
         return {
-          id: `file-${Date.now()}-${idx}`,
+          id: fileId,
           name: file.name,
           type: fileType,
           size: file.size,
           uploadedAt: new Date(),
-          url: fileUrl,
         };
       });
     }
 
+    console.log("[UploadDialog] Upload mode:", uploadMode);
+    console.log("[UploadDialog] File items to pass to onUpload:", fileItems);
+    console.log("[UploadDialog] Folder items to pass to onUpload:", folderItems);
+
     if (onUpload) {
+      console.log("[UploadDialog] Calling onUpload callback...");
       onUpload(fileItems, folderItems);
+      console.log("[UploadDialog] onUpload callback completed");
+    } else {
+      console.warn("[UploadDialog] No onUpload callback provided!");
     }
-    console.log("Upload mode:", uploadMode);
-    console.log("File items:", fileItems);
-    console.log("Folder items:", folderItems);
+
     toast.success("Files uploaded successfully");
 
     // Reset and close only if all uploads were successful
+    console.log("[UploadDialog] Resetting state and closing dialog...");
     setFiles([]);
     setUploadProgress({});
     setUploadStatus({});
+    setUploadedFileIds({});
     setIsUploading(false);
     setIsOpen(false);
   };

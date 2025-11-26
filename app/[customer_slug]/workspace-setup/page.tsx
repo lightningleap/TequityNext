@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -11,9 +11,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, Check } from "lucide-react";
-import CompanyLogo from "@/public/SignupLogo.svg";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
+import { authFetch } from "@/lib/client-auth";
+import { toast } from "sonner";
 
 export default function WorkspaceSetupPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -25,7 +26,10 @@ export default function WorkspaceSetupPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [dataroomId, setDataroomId] = useState<string | null>(null);
   const router = useRouter();
+  const params = useParams();
+  const customerSlug = params.customer_slug as string;
 
   // Step 1 handlers
   const handleInputChange = useCallback(
@@ -57,13 +61,8 @@ export default function WorkspaceSetupPage() {
           throw new Error("Dataroom name contains invalid characters");
         }
 
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        // Store dataroom name in localStorage
+        // Move to step 2 (we'll create dataroom after use case selection)
         localStorage.setItem("dataroomName", workspaceName.trim());
-
-        // Move to step 2
         setCurrentStep(2);
       } catch (err) {
         setError(
@@ -78,47 +77,102 @@ export default function WorkspaceSetupPage() {
     [workspaceName]
   );
 
-  // Step 2 handlers
+  // Step 2 handlers - Create dataroom with use case
   const handleStep2Submit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // Create dataroom via API
+      const response = await authFetch<{ dataroom: { id: string; name: string } }>('/datarooms', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: workspaceName.trim(),
+          useCase: selectedOption || null,
+        }),
+      });
+
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to create dataroom');
+      }
+
+      // Store dataroom ID for invitations
+      setDataroomId(response.data?.dataroom.id || null);
+      toast.success('Dataroom created successfully!');
 
       // Move to step 3
       setCurrentStep(3);
+    } catch (err) {
+      const errorMessage = err instanceof Error
+        ? err.message
+        : "Failed to create dataroom. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [workspaceName, selectedOption]);
 
-  // Step 3 handlers
+  // Step 3 handlers - Send invitations
   const handleStep3Submit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
       setIsLoading(true);
+      setError("");
 
       try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        if (!dataroomId) {
+          throw new Error('Dataroom not created. Please go back and try again.');
+        }
 
-        // Navigate to Pricing page
-        router.prefetch("/pricing");
-        router.push("/pricing");
+        // Collect valid emails
+        const emails = [email1, email2, email3]
+          .map(e => e.trim().toLowerCase())
+          .filter(e => e && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+
+        if (emails.length === 0) {
+          // No emails entered, just navigate to dashboard
+          router.push(`/${customerSlug}/Dashboard/Library`);
+          return;
+        }
+
+        // Send invitations for each email
+        let successCount = 0;
+        for (const email of emails) {
+          const response = await authFetch(`/datarooms/${dataroomId}/invite`, {
+            method: 'POST',
+            body: JSON.stringify({ email, role: 'member' }),
+          });
+
+          if (response.success) {
+            successCount++;
+          }
+        }
+
+        if (successCount > 0) {
+          toast.success(`${successCount} invitation(s) sent!`);
+        }
+
+        // Navigate to Dashboard
+        router.push(`/${customerSlug}/Dashboard/Library`);
+      } catch (err) {
+        const errorMessage = err instanceof Error
+          ? err.message
+          : "Failed to send invitations. Please try again.";
+        setError(errorMessage);
+        toast.error(errorMessage);
       } finally {
         setIsLoading(false);
       }
     },
-    [router]
+    [router, customerSlug, dataroomId, email1, email2, email3]
   );
 
   const handleSkip = useCallback(() => {
-    // Navigate to Pricing page when skipping
-    router.prefetch("/pricing");
-    router.push("/pricing");
-  }, [router]);
+    // Navigate to Dashboard when skipping
+    router.push(`/${customerSlug}/Dashboard/Library`);
+  }, [router, customerSlug]);
 
   const options = [
     { value: "investor", label: "Investor" },
@@ -133,7 +187,7 @@ export default function WorkspaceSetupPage() {
       <div className="flex flex-col w-full sm:w-[412px]">
         {/* Company Logo - Fixed Position */}
         <div className="mb-8">
-          <Image src={CompanyLogo} alt="Company Logo" width={60} height={40} />
+          <Image src="/SignupLogo.svg" alt="Company Logo" width={60} height={40} />
         </div>
 
         {/* Steps Container with Fixed Min Height */}

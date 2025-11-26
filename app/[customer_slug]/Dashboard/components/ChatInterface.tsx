@@ -15,12 +15,15 @@ import {
   ThumbsUp,
   ThumbsDown,
   Search,
+  Loader2,
 } from "lucide-react";
 import { GoodResponse } from "./Feedback/goodResponse";
 import { BadResponse } from "./Feedback/badResponse";
 import { useChatContext } from "../context/ChatContext";
+import { useFiles } from "../context/FilesContext";
 import Image from "next/image";
 import Logomark from "@/public/Logomark.svg";
+import { getUser } from "@/lib/client-auth";
 
 export interface FileItem {
   id: string;
@@ -45,8 +48,9 @@ const formatFileSize = (bytes: number): string => {
 };
 
 export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
-  const { activeChat, activeChatId, createNewChat, addMessageToChat, chats } =
+  const { activeChat, activeChatId, createNewChat, sendMessage, isSending, chats } =
     useChatContext();
+  const { files: userFilesFromContext } = useFiles();
   const [inputValue, setInputValue] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -59,6 +63,7 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
   const uploadMenuRef = useRef<HTMLDivElement>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
   const feedbackPanelRef = useRef<HTMLDivElement | null>(null);
+  const [userName, setUserName] = useState<string>("there");
 
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [contextSearchValue, setContextSearchValue] = useState("");
@@ -66,6 +71,14 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
     type: "good" | "bad";
     messageIndex: number;
   } | null>(null);
+
+  // Load user name on mount
+  useEffect(() => {
+    const user = getUser();
+    if (user?.fullName) {
+      setUserName(user.fullName.split(' ')[0]);
+    }
+  }, []);
 
   useEffect(() => {
     if (activeFeedback && feedbackPanelRef.current) {
@@ -117,35 +130,15 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
   >([]);
   const hasInitialized = useRef(false);
 
-  // TODO: Replace with actual file data from your backend/context
-  // You can fetch this from an API or file management context
-  const [userFiles] = useState<FileItem[]>([
-    {
-      id: "1",
-      name: "Project Proposal.pdf",
-      type: "application/pdf",
-      size: 2457600,
-    },
-    {
-      id: "2",
-      name: "Financial Report Q1.xlsx",
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      size: 1048576,
-    },
-    {
-      id: "3",
-      name: "Meeting Notes.docx",
-      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      size: 524288,
-    },
-    { id: "4", name: "Design Mockups.png", type: "image/png", size: 3145728 },
-    {
-      id: "5",
-      name: "Contract Agreement.pdf",
-      type: "application/pdf",
-      size: 1572864,
-    },
-  ]);
+  // Use files from context (fetched from backend)
+  const userFiles: FileItem[] = useMemo(() => {
+    return userFilesFromContext.map((f) => ({
+      id: f.id || '',
+      name: f.name,
+      type: f.type,
+      size: f.size || 0,
+    }));
+  }, [userFilesFromContext]);
 
   // Create a new chat only if there are no chats at all (initial app load)
   useEffect(() => {
@@ -184,9 +177,9 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
     };
   }, []);
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!activeChatId) return;
+    if (!activeChatId || isSending) return;
 
     if (
       inputValue.trim() ||
@@ -204,25 +197,13 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
           : contextText;
       }
 
-      // Add user message with files
-      const userMessage = {
-        text: messageText || "Uploaded files",
-        isUser: true,
-        timestamp: new Date(),
-        files: attachedFiles.length > 0 ? [...attachedFiles] : undefined,
-      };
-      addMessageToChat(activeChatId, userMessage);
+      // Get file IDs from selected context items that are files
+      const fileIds = selectedContextItems
+        .filter((item) => item.type === "file")
+        .map((item) => item.id);
 
-      // Simulate AI response
-      setTimeout(() => {
-        const aiResponse = generateAIResponse();
-        const aiMessage = {
-          text: aiResponse,
-          isUser: false,
-          timestamp: new Date(),
-        };
-        addMessageToChat(activeChatId, aiMessage);
-      }, 1000);
+      // Send message using context (calls backend API)
+      await sendMessage(activeChatId, messageText || "Uploaded files", fileIds.length > 0 ? fileIds : undefined);
 
       setInputValue("");
       setAttachedFiles([]);
@@ -281,17 +262,6 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
 
   const removeAttachedFile = (index: number) => {
     setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const generateAIResponse = (): string => {
-    const responses = [
-      "I understand your question. Let me help you with that.",
-      "That's an interesting point. Here's what I think...",
-      "I can help you find information about that in your documents.",
-      "Let me analyze that for you. Based on what I see...",
-      "Good question! Here's my analysis...",
-    ];
-    return responses[Math.floor(Math.random() * responses.length)];
   };
 
   const handleCopy = (text: string, index: number) => {
@@ -460,7 +430,7 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
                   verticalAlign: "middle",
                 }}
               >
-                Hello Marcus
+                Hello {userName}
               </h3>
               <p
                 className="text-gray-500 text-sm leading-5 text-center dark:text-[#F4F4F5]"
@@ -533,11 +503,47 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
                         : "text-black dark:text-white"
                     }`}
                   >
-                    <p className="text-sm">{message.text}</p>
+                    {message.isStreaming && !message.text ? (
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin text-[#D91D69]" />
+                        <span className="text-sm text-gray-500">Thinking...</span>
+                      </div>
+                    ) : (
+                      <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                    )}
                   </div>
 
+                  {/* Sources - Only for AI messages with sources */}
+                  {!message.isUser && message.sources && message.sources.length > 0 && !message.isStreaming && (
+                    <div className="mt-2 w-full max-w-full">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Sources:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {message.sources.slice(0, 3).map((source, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center gap-1 px-2 py-1 bg-[#F4F4F5] dark:bg-[#27272A] rounded text-xs"
+                            title={`${source.filename} (${Math.round(source.similarity * 100)}% match)`}
+                          >
+                            <FileText className="h-3 w-3 text-gray-500" />
+                            <span className="truncate max-w-[150px] text-gray-700 dark:text-gray-300">
+                              {source.filename}
+                            </span>
+                            <span className="text-gray-400">
+                              {Math.round(source.similarity * 100)}%
+                            </span>
+                          </div>
+                        ))}
+                        {message.sources.length > 3 && (
+                          <span className="text-xs text-gray-400 px-2 py-1">
+                            +{message.sources.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Action Buttons - Only for AI messages */}
-                  {!message.isUser && (
+                  {!message.isUser && !message.isStreaming && (
                     <div className="flex items-center gap-1">
                       <div className="relative flex h-6 w-6 items-center justify-center">
                         <button
@@ -725,14 +731,19 @@ export function ChatInterface({ selectedFile }: ChatInterfaceProps) {
                 <button
                   type="submit"
                   disabled={
-                    !inputValue.trim() &&
+                    isSending ||
+                    (!inputValue.trim() &&
                     attachedFiles.length === 0 &&
-                    selectedContextItems.length === 0
+                    selectedContextItems.length === 0)
                   }
                   className="flex items-center justify-center w-8 h-8 rounded-full bg-[#D91D69] text-white hover:bg-[#D91D69] dark:bg-[#D91D69] dark:text-black dark:border-[#3F3F46] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                   aria-label="Send message"
                 >
-                  <ArrowUp className="h-4 w-4" />
+                  {isSending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <ArrowUp className="h-4 w-4" />
+                  )}
                 </button>
               </div>
               <div className="flex gap-2 relative">

@@ -2097,107 +2097,69 @@ function LibraryContent({
 }
 
 export default function LibraryPage() {
-  const { setFiles: setGlobalFiles, setFolders: setGlobalFolders } = useFiles();
+  const {
+    files: contextFiles,
+    folders: contextFolders,
+    loadFiles,
+    isLoading
+  } = useFiles();
 
-  const [folders, setFolders] = useState([
-    { id: "1", name: "Financial Reports", fileCount: 24 },
-    { id: "2", name: "Marketing Materials", fileCount: 156 },
-    { id: "3", name: "Product Documents", fileCount: 45 },
-    { id: "4", name: "Meeting Notes", fileCount: 89 },
-    { id: "5", name: "Design Assets", fileCount: 234 },
-    { id: "6", name: "Legal Documents", fileCount: 12 },
-  ]);
+  console.log('[LibraryPage] Rendering with contextFiles:', contextFiles.length, 'isLoading:', isLoading);
 
-  const [files, setFiles] = useState<FileItem[]>([
-    {
-      id: "1",
-      name: "Financial Report Q4 2024",
-      type: "PDF",
-      size: 2457600,
-      uploadedAt: new Date("2024-12-15"),
-      url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-    },
-    {
-      id: "2",
-      name: "Marketing Strategy",
-      type: "PDF",
-      size: 1024000,
-      uploadedAt: new Date("2024-12-10"),
-      url: "https://www.africau.edu/images/default/sample.pdf",
-    },
-    {
-      id: "3",
-      name: "Product Roadmap",
-      type: "PDF",
-      size: 512000,
-      uploadedAt: new Date("2024-12-08"),
-      url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-    },
-    {
-      id: "4",
-      name: "Company Logo",
-      type: "PNG",
-      size: 204800,
-      uploadedAt: new Date("2024-12-05"),
-      url: "https://via.placeholder.com/400x300/0066cc/ffffff?text=Company+Logo",
-    },
-    {
-      id: "5",
-      name: "Meeting Notes",
-      type: "PNG",
-      size: 15360,
-      uploadedAt: new Date("2024-12-01"),
-      url: "https://via.placeholder.com/600x400/FF6B6B/ffffff?text=Meeting+Notes",
-    },
-    {
-      id: "6",
-      name: "Presentation Deck",
-      type: "PDF",
-      size: 3072000,
-      uploadedAt: new Date("2024-11-28"),
-      url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-    },
-    {
-      id: "7",
-      name: "Budget Analysis",
-      type: "PNG",
-      size: 456000,
-      uploadedAt: new Date("2024-11-25"),
-      url: "https://via.placeholder.com/800x600/FFA500/ffffff?text=Budget+Analysis",
-    },
-    {
-      id: "8",
-      name: "Team Photo",
-      type: "PNG",
-      size: 1536000,
-      uploadedAt: new Date("2024-11-20"),
-      url: "https://via.placeholder.com/800x600/4CAF50/ffffff?text=Team+Photo",
-    },
-  ]);
+  // Convert context files to the format expected by LibraryContent
+  const files: FileItem[] = contextFiles.map((f) => ({
+    id: f.id || '',
+    name: f.name,
+    type: getFileTypeFromMimetype(f.type) as FileItem['type'],
+    size: f.size || 0,
+    uploadedAt: f.createdAt || new Date(),
+  }));
 
-  // Update global context whenever files or folders change
+  const folders = contextFolders.map((f) => ({
+    id: f.id,
+    name: f.name,
+    fileCount: f.fileCount || 0,
+  }));
+
+  // Local state for managing files in the UI
+  const [localFiles, setLocalFiles] = useState<FileItem[]>(files);
+  const [localFolders, setLocalFolders] = useState(folders);
+
+  // Sync local state with context when context updates
   useEffect(() => {
-    setGlobalFiles(files);
-    setGlobalFolders(folders);
-  }, [files, folders, setGlobalFiles, setGlobalFolders]);
+    console.log('[LibraryPage] contextFiles changed, updating localFiles:', files.length);
+    setLocalFiles(files);
+  }, [contextFiles]);
+
+  useEffect(() => {
+    setLocalFolders(folders);
+  }, [contextFolders]);
 
   const handleFileUpload = (
     newFiles: FileItem[],
     newFolders: UploadedFolder[]
   ) => {
-    console.log("Library received - Files:", newFiles);
-    console.log("Library received - Folders:", newFolders);
-    // Add new files to the existing files array
-    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
-    // Add new folders to the existing folders array
-    setFolders((prevFolders) => [...prevFolders, ...newFolders]);
+    console.log("[LibraryPage] handleFileUpload called");
+    console.log("[LibraryPage] Library received - Files:", newFiles);
+    console.log("[LibraryPage] Library received - Folders:", newFolders);
+    // Files are already uploaded to backend by UploadDialog
+    // Refresh the files list from the backend
+    console.log("[LibraryPage] Calling loadFiles to refresh from backend...");
+    loadFiles();
+    // Also add to local state for immediate feedback
+    setLocalFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    setLocalFolders((prevFolders) => [...prevFolders, ...newFolders]);
   };
 
   const handleDownload = (file: FileItem) => {
     try {
+      // For backend files, construct download URL
+      const tenantSlug = window.location.pathname.split('/')[1];
+      const downloadUrl = `/api/${tenantSlug}/files/${file.id}/download`;
+
       // Create a temporary anchor element to trigger download
       const link = document.createElement("a");
-      link.href = file.url || "";
+      link.href = downloadUrl;
       link.download = file.name;
       link.style.display = "none";
       document.body.appendChild(link);
@@ -2205,7 +2167,7 @@ export default function LibraryPage() {
       document.body.removeChild(link);
 
       // Show success toast
-      toast.success(`${file.name} downloaded successfully`);
+      toast.success(`${file.name} downloading...`);
     } catch (error) {
       console.error("Download failed:", error);
       toast.error(`Failed to download ${file.name}`);
@@ -2217,15 +2179,45 @@ export default function LibraryPage() {
       title="Library"
       headerActions={<UploadDialog onUpload={handleFileUpload} />}
     >
-      <LibraryContent
-        files={files}
-        setFiles={setFiles}
-        folders={folders}
-        setFolders={setFolders}
-        handleDownload={handleDownload}
-      />
+      {isLoading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+        </div>
+      ) : (
+        <LibraryContent
+          files={localFiles}
+          setFiles={setLocalFiles}
+          folders={localFolders}
+          setFolders={setLocalFolders}
+          handleDownload={handleDownload}
+        />
+      )}
     </DashboardLayout>
   );
+}
+
+// Helper function to convert mimetype to file type
+function getFileTypeFromMimetype(mimetype: string): string {
+  const mimeToType: Record<string, string> = {
+    'application/pdf': 'PDF',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'XLSX',
+    'application/vnd.ms-excel': 'XLS',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
+    'application/msword': 'DOC',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'PPTX',
+    'application/vnd.ms-powerpoint': 'PPT',
+    'text/plain': 'TXT',
+    'text/csv': 'CSV',
+    'image/png': 'PNG',
+    'image/jpeg': 'JPG',
+    'image/jpg': 'JPG',
+    'image/svg+xml': 'SVG',
+    'video/mp4': 'MP4',
+    'audio/mp3': 'MP3',
+    'audio/mpeg': 'MP3',
+    'application/zip': 'ZIP',
+  };
+  return mimeToType[mimetype] || mimetype.split('/').pop()?.toUpperCase() || 'FILE';
 }
 
 // "use client";

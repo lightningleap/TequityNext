@@ -1,14 +1,18 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Public path patterns (using :param syntax for dynamic segments)
+// Public path patterns (routes that don't require authentication)
 const publicPathPatterns = [
   /^\/api\/[^/]+\/auth\/signup$/,
   /^\/api\/[^/]+\/auth\/verify-signup$/,
   /^\/api\/[^/]+\/auth\/send-code$/,
   /^\/api\/[^/]+\/auth\/verify-code$/,
   /^\/api\/health$/,
+  /^\/api\/admin\//, // Admin routes use their own auth (x-admin-secret)
 ]
+
+// Protected paths that require authentication (all other /api/ paths)
+// These are handled by the middleware check below
 
 // Check if path matches any public path pattern
 function isPublicPath(pathname: string): boolean {
