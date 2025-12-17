@@ -41,7 +41,7 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const isChatPage = pathname === "/Dashboard/chat";
+  const isChatPage = pathname === "/Dashboard/chat" || pathname === "/Dashboard/Home";
   const { theme, setTheme } = useTheme();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [starredFiles, setStarredFiles] = useState<
