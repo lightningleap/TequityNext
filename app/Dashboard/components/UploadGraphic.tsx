@@ -247,7 +247,7 @@ function FileFormatIcons() {
 function Icon() {
   return (
     <div
-      className="content-stretch flex gap-[10px] items-center relative shrink-0"
+      className="content-stretch flex gap-[10px] items-center relative shrink-0 transition-transform duration-200 hover:scale-110 hover:-translate-y-2 hover:-translate-x-1"
       data-name="Icon"
     >
       <div className="flex h-[calc(1px*((52*0.13917310535907745)+(52*0.9902680516242981)))] items-center justify-center relative shrink-0 w-[calc(1px*((52*0.13917310535907745)+(52*0.9902680516242981)))]">
@@ -471,7 +471,7 @@ function FileFormatIcons1() {
 function Icon1() {
   return (
     <div
-      className="content-stretch flex gap-[10px] items-center relative shrink-0"
+      className="content-stretch flex gap-[10px] items-center relative shrink-0 transition-transform duration-200 hover:scale-110 hover:-translate-y-2"
       data-name="Icon"
     >
       <FileFormatIcons1 />
@@ -693,7 +693,7 @@ function FileFormatIcons2() {
 function Icon2() {
   return (
     <div
-      className="content-stretch flex gap-[10px] items-center relative shrink-0"
+      className="content-stretch flex gap-[10px] items-center relative shrink-0 transition-transform duration-200 hover:scale-110 hover:-translate-y-2 hover:translate-x-1"
       data-name="Icon"
     >
       <div className="flex h-[calc(1px*((52*0.13917310535907745)+(52*0.9902680516242981)))] items-center justify-center relative shrink-0 w-[calc(1px*((52*0.13917310535907745)+(52*0.9902680516242981)))]">
@@ -708,12 +708,26 @@ function Icon2() {
 function IconGroup() {
   return (
     <div
-      className="absolute content-stretch flex items-start justify-center left-[calc(50%+0.45px)] opacity-80 top-[-7px] translate-x-[-50%]"
+      className="absolute content-stretch flex items-start justify-center left-[calc(50%+0.45px)] opacity-80 top-[-7px] translate-x-[-50%] group cursor-pointer"
       data-name="Icon Group"
     >
-      <Icon />
-      <Icon1 />
-      <Icon2 />
+      <div className="content-stretch flex gap-[10px] items-center relative shrink-0 transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-2 group-hover:-translate-x-1">
+        <div className="flex h-[calc(1px*((52*0.13917310535907745)+(52*0.9902680516242981)))] items-center justify-center relative shrink-0 w-[calc(1px*((52*0.13917310535907745)+(52*0.9902680516242981)))]">
+          <div className="flex-none -rotate-20">
+            <FileFormatIcons />
+          </div>
+        </div>
+      </div>
+      <div className="content-stretch flex gap-[10px] items-center relative shrink-0 transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-2">
+        <FileFormatIcons1 />
+      </div>
+      <div className="content-stretch flex gap-[10px] items-center relative shrink-0 transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-2 group-hover:translate-x-1">
+        <div className="flex h-[calc(1px*((52*0.13917310535907745)+(52*0.9902680516242981)))] items-center justify-center relative shrink-0 w-[calc(1px*((52*0.13917310535907745)+(52*0.9902680516242981)))]">
+          <div className="flex-none rotate-20">
+            <FileFormatIcons2 />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -747,7 +761,7 @@ function Icons24X24Plus() {
 function Button() {
   return (
     <div
-      className="absolute bg-slate-950 box-border content-stretch flex gap-[8px] items-center justify-center left-1/2 p-[10px] rounded-[99px] shadow-[0px_-4px_6px_-1px_rgba(0,0,0,0.2),0px_-2px_4px_-2px_rgba(0,0,0,0.2)] size-[40px] top-[24.75px] translate-x-[-50%]"
+      className="absolute bg-slate-950 box-border content-stretch flex gap-[8px] items-center justify-center left-1/2 p-[10px] rounded-[99px] shadow-[0px_-4px_6px_-1px_rgba(0,0,0,0.2),0px_-2px_4px_-2px_rgba(0,0,0,0.2)] size-[40px] top-[24.75px] translate-x-[-50%] transition-transform duration-200 hover:scale-110 hover:-translate-y-3 cursor-pointer"
       data-name="Button"
     >
       <Icons24X24Plus />
@@ -758,11 +772,34 @@ function Button() {
 export function UploadGraphic() {
   return (
     <div
-      className="h-[60.5px] relative shrink-0 w-[98.716px]"
+      className="h-[60.5px] relative shrink-0 w-[98.716px] group cursor-pointer"
       data-name="Upload Graphic"
     >
-      <IconGroup />
-      <Button />
+      <div className="absolute content-stretch flex items-start justify-center left-[calc(50%+0.45px)] opacity-80 top-[-7px] translate-x-[-50%]">
+        <div className="content-stretch flex gap-[10px] items-center relative shrink-0 transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-8 group-hover:-translate-x-3">
+          <div className="flex h-[calc(1px*((52*0.13917310535907745)+(52*0.9902680516242981)))] items-center justify-center relative shrink-0 w-[calc(1px*((52*0.13917310535907745)+(52*0.9902680516242981)))]">
+            <div className="flex-none -rotate-20">
+              <FileFormatIcons />
+            </div>
+          </div>
+        </div>
+        <div className="content-stretch flex gap-[10px] items-center relative shrink-0 transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-8">
+          <FileFormatIcons1 />
+        </div>
+        <div className="content-stretch flex gap-[10px] items-center relative shrink-0 transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-8 group-hover:translate-x-3">
+          <div className="flex h-[calc(1px*((52*0.13917310535907745)+(52*0.9902680516242981)))] items-center justify-center relative shrink-0 w-[calc(1px*((52*0.13917310535907745)+(52*0.9902680516242981)))]">
+            <div className="flex-none rotate-20">
+              <FileFormatIcons2 />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="absolute bg-slate-950 box-border content-stretch flex gap-[8px] items-center justify-center left-1/2 p-[10px] rounded-[99px] shadow-[0px_-4px_6px_-1px_rgba(0,0,0,0.2),0px_-2px_4px_-2px_rgba(0,0,0,0.2)] size-[40px] top-[24.75px] translate-x-[-50%] transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-3"
+        data-name="Button"
+      >
+        <Icons24X24Plus />
+      </div>
     </div>
   );
 }
