@@ -7,7 +7,7 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.push("/Dashboard/Library");
+    router.push("/Dashboard/Home");
   }, [router]);
 
   return (

@@ -37,8 +37,8 @@ export function PricingHeader({ plusJakartaSansClass, instrumentSerifClass }: Pr
           <span>for 30-Days</span>
         </p>
       </div>
-      <div className={`flex flex-col ${instrumentSerifClass} justify-center leading-[0] not-italic relative shrink-0 text-[32px] text-slate-950`}>
-        <p className="leading-[40px]">No credit card required.</p>
+      <div className={`flex flex-col ${plusJakartaSansClass} font-normal justify-center leading-[20px] relative shrink-0 text-[14px] text-[#71717A] tracking-[0.15px]`}>
+        <p className="align-middle" style={{ color: 'var(--tokens-muted-foreground, #71717A)' }}>Whether you're raising, scaling, or exiting – we've got you covered.</p>
       </div>
       <Scribble />
     </div>

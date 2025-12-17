@@ -13,6 +13,16 @@ interface SearchDropdownProps {
   isOpen: boolean;
   searchQuery: string;
   onSelect: (item: FileItem) => void;
+  files?: Array<{
+    id?: string;
+    name: string;
+    type: string;
+  }>;
+  folders?: Array<{
+    id: string;
+    name: string;
+    fileCount: number;
+  }>;
 }
 
 const fileIcons = {
@@ -119,59 +129,51 @@ const fileIcons = {
 export const SearchDropdown: React.FC<SearchDropdownProps> = ({
   isOpen,
   searchQuery,
-
   onSelect,
+  files = [],
+  folders = [],
 }) => {
-  // Sample data - replace with your actual data
-  const files: FileItem[] = [
-    { id: "1", name: "Legal Agreements", type: "folder", section: "Categories" },
-    {
-      id: "2",
-      name: "Financial Statements",
-      type: "folder",
-      section: "Categories",
-    },
-    { id: "3", name: "Team & HR Docs", type: "folder", section: "Categories" },
-    { id: "4", name: "Q4_Financial_Report.pdf", type: "pdf", section: "Files" },
-    {
-      id: "5",
-      name: "Client_Proposal_Template.docx",
-      type: "doc",
-      section: "Files",
-    },
-    {
-      id: "6",
-      name: "Sales_Data_Analysis.xlsx",
-      type: "xls",
-      section: "Files",
-    },
-    {
-      id: "7",
-      name: "2023_Marketing_Strategy.pptx",
-      type: "ppt",
-      section: "Files",
-    },
-    {
-      id: "8",
-      name: "Project_Management_Guide.txt",
-      type: "txt",
-      section: "Files",
-    },
+  // Convert files and folders to the format expected by SearchDropdown
+  const allItems: FileItem[] = [
+    ...folders.map(folder => ({
+      id: folder.id,
+      name: folder.name,
+      type: 'folder' as const,
+      section: 'Categories'
+    })),
+    ...files.map(file => {
+      // Map file type to the expected format
+      const fileType = file.type.toLowerCase();
+      let mappedType: "pdf" | "doc" | "xls" | "ppt" | "txt" = "txt";
+      
+      if (fileType.includes('pdf')) mappedType = "pdf";
+      else if (fileType.includes('doc')) mappedType = "doc";
+      else if (fileType.includes('xls') || fileType.includes('csv')) mappedType = "xls";
+      else if (fileType.includes('ppt')) mappedType = "ppt";
+      else if (fileType.includes('txt')) mappedType = "txt";
+      
+      return {
+        id: file.id || file.name,
+        name: file.name,
+        type: mappedType,
+        section: 'Files'
+      };
+    })
   ];
 
-  // Filter files based on search query if it exists
-  const filteredFiles = searchQuery
-    ? files.filter((file) =>
-        file.name.toLowerCase().includes(searchQuery.toLowerCase())
+  // Filter items based on search query if it exists
+  const filteredItems = searchQuery
+    ? allItems.filter((item) =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    : files; // Show all files when search input is focused but no query
+    : allItems; // Show all items when search input is focused but no query
 
-  // Group files by section
-  const filesBySection = filteredFiles.reduce((acc, file) => {
-    if (!acc[file.section]) {
-      acc[file.section] = [];
+  // Group items by section
+  const itemsBySection = filteredItems.reduce((acc, item) => {
+    if (!acc[item.section]) {
+      acc[item.section] = [];
     }
-    acc[file.section].push(file);
+    acc[item.section].push(item);
     return acc;
   }, {} as Record<string, FileItem[]>);
 
@@ -187,7 +189,7 @@ export const SearchDropdown: React.FC<SearchDropdownProps> = ({
       )}
     >
       <div className="overflow-y-auto max-h-[480px]">
-        {Object.entries(filesBySection).map(([section, sectionFiles]) => (
+        {Object.entries(itemsBySection).map(([section, sectionItems]) => (
           <div
             key={section}
             className="border-b border-gray-100 last:border-b-0"
@@ -196,10 +198,10 @@ export const SearchDropdown: React.FC<SearchDropdownProps> = ({
               <div className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider px-3 py-1.5">
                 {section}
               </div>
-              <div className="mt-1">
-                {sectionFiles.map((file) => (
+              <div className="mt-1 max-h-48 overflow-y-auto">
+                {sectionItems.map((item) => (
                   <button
-                    key={file.id}
+                    key={item.id}
                     className={cn(
                       "w-full px-3 py-1 text-left text-sm flex items-center gap-3",
                       "hover:bg-gray-100 dark:hover:bg-[#27272A] hover:rounded-md",
@@ -207,10 +209,10 @@ export const SearchDropdown: React.FC<SearchDropdownProps> = ({
                       "transition-colors duration-150",
                       "text-gray-900 dark:text-gray-100"
                     )}
-                    onClick={() => onSelect(file)}
+                    onClick={() => onSelect(item)}
                   >
-                    {fileIcons[file.type]}
-                    <span className="truncate">{file.name}</span>
+                    {fileIcons[item.type]}
+                    <span className="truncate">{item.name}</span>
                   </button>
                 ))}
               </div>
@@ -218,7 +220,7 @@ export const SearchDropdown: React.FC<SearchDropdownProps> = ({
           </div>
         ))}
 
-        {filteredFiles.length === 0 && (
+        {filteredItems.length === 0 && (
           <div className="p-6 text-center text-black dark:text-gray-400">
             No results found 
           </div>

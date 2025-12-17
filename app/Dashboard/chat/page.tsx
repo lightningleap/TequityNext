@@ -46,13 +46,11 @@ export default function ChatPage() {
       activeChatId={activeChatId || undefined}
       onChatSelect={handleChatSelect}
     >
-      <main className="flex-1 overflow-hidden">
-        <ChatInterface
-          key={activeChatId || 'new'} // This forces a remount when chat changes
-          selectedFile={null}
-          onNewChat={handleNewChat}
-        />
-      </main>
+      <ChatInterface
+        key={activeChatId || 'new'} // This forces a remount when chat changes
+        selectedFile={null}
+        onNewChat={handleNewChat}
+      />
     </DashboardLayout>
   );
 }
