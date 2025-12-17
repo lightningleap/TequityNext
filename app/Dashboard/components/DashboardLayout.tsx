@@ -16,6 +16,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Plus, Settings, LogOut, Moon, Sun, Menu } from "lucide-react";
 import { SettingsDialog } from "../Settings/SettingsDialog";
 import { ChevronsLeft, ChevronDown, UploadCloud } from "lucide-react";
@@ -154,23 +159,30 @@ export function DashboardLayout({
           <div className="flex flex-col gap-2 px-2 py-3 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:py-3">
             <div className="flex items-center gap-2 px-2 py-2 rounded-md h-12 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-300 ease-in-out w-full relative">
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <div className="flex items-center gap-2 flex-1 cursor-pointer hover:bg-gray-50 rounded-md px-2 py-2 -mx-2 -my-2 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:py-0 group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:my-0 dark:hover:bg-[#27272A] dark:hover:text-white data-[state=open]:bg-[#F4F4F5] dark:data-[state=open]:bg-[#27272A]">
-                    <Image
-                      src={Logo}
-                      alt="Company Logo"
-                      width={32}
-                      height={32}
-                      priority
-                      className="shrink-0"
-                    />
-                    <div className="flex items-center gap-2 flex-1 overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">
-                      <p className="font-sans font-medium text-sm leading-none tracking-[-0.084px] whitespace-nowrap overflow-hidden text-left">
-                        {formattedDataroomName}
-                      </p>
-                    </div>
-                  </div>
-                </DropdownMenuTrigger>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <DropdownMenuTrigger asChild>
+                      <div className="flex items-center gap-2 flex-1 cursor-pointer hover:bg-gray-50 rounded-md px-2 py-2 -mx-2 -my-2 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:py-0 group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:my-0 dark:hover:bg-[#27272A] dark:hover:text-white data-[state=open]:bg-[#F4F4F5] dark:data-[state=open]:bg-[#27272A]">
+                        <Image
+                          src={Logo}
+                          alt="Company Logo"
+                          width={32}
+                          height={32}
+                          priority
+                          className="shrink-0"
+                        />
+                        <div className="flex items-center gap-2 flex-1 overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">
+                          <p className="font-sans font-medium text-sm leading-none tracking-[-0.084px] whitespace-nowrap overflow-hidden text-left">
+                            {formattedDataroomName}
+                          </p>
+                        </div>
+                      </div>
+                    </DropdownMenuTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Dataroom option</p>
+                  </TooltipContent>
+                </Tooltip>
                 <DropdownMenuContent
                   className="w-59 -ml-1 space-y-1.5 dark:bg-[#09090B] dark:text-white"
                   align="start"

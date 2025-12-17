@@ -287,12 +287,12 @@ export default function HomePage() {
           </div>
 
           {/* Title */}
-          <h1 className="text-3xl font-semibold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl font-semibold font-[var(--font-jakarta-sans)] text-gray-900 dark:text-white mb-2">
             Work smarter with Tequity
           </h1>
 
           {/* Subtitle */}
-          <p className="text-base text-gray-600 dark:text-gray-400">
+          <p className="text-base font-[var(--font-inter)] text-[#71717A] dark:text-gray-400">
             Your AI assistant for documents and insights.
           </p>
         </div>
