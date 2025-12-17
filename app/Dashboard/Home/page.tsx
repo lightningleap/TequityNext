@@ -278,7 +278,7 @@ export default function HomePage() {
       activeChatId={activeChatId || undefined}
       onChatSelect={handleChatSelect}
     >
-      <div className="flex flex-col items-center justify-start min-h-full p-8 pt-16">
+      <div className="flex flex-col items-center justify-start min-h-full p-8 pt-24">
         {/* Logo and Header Section */}
         <div className="flex flex-col items-center text-center mb-8 max-w-2xl">
           {/* Tequity Logo */}
@@ -408,7 +408,7 @@ export default function HomePage() {
                           <button
                             type="button"
                             onClick={() => handleFileUpload("files")}
-                            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white transition-colors"
+                            className="w-full flex items-center gap-3 px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-[#27272A] dark:text-white transition-colors"
                           >
                             <File className="h-4 w-4 text-blue-600" />
                             <span>Upload Files</span>
@@ -483,18 +483,18 @@ export default function HomePage() {
                           </div>
 
                           {/* Files Section */}
-                          <div className="border-t border-gray-200 dark:border-[#27272A] pt-2">
+                          <div className="border-t border-gray-200 dark:border-[#27272A]">
                             <div className="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400">
                               Files
                             </div>
-                            <div className="max-h-40 overflow-y-auto scrollbar-hide">
+                            <div className="max-h-20 overflow-y-auto scrollbar-hide">
                               {filteredFiles.length > 0 ? (
                                 filteredFiles.slice(0, 5).map((file) => (
                                   <button
                                     key={file.id}
                                     type="button"
                                     onClick={() => handleFileContextSelect(file)}
-                                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors"
+                                    className="w-full flex items-center gap-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors"
                                   >
                                     {getContextFileIcon(file.type)}
                                     <div className="flex-1 text-left min-w-0">
@@ -617,7 +617,7 @@ export default function HomePage() {
           {categories.map((category) => (
             <button
               key={category.id}
-              className="px-4 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="px-4 py-1.5 text-sm font-medium text-gray-700 dark:text-white bg-white dark:bg-[#18181B] border border-gray-200 dark:border-gray-800 rounded-full hover:bg-gray-50 dark:hover:bg-[#27272A] transition-colors"
             >
               {category.label}
             </button>
@@ -633,19 +633,78 @@ export default function HomePage() {
             </h2>
             <div className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 md:grid md:grid-cols-3 lg:grid-cols-4 md:overflow-x-visible">
               {recentlyVisited.slice(0, 4).map((item, index) => {
-                const imageSrc = item.isFolder
-                  ? "/BigFolder.svg"
-                  : getFileIcon(item.type, item.hasText);
+                // Determine image source based on type and folder status
+                let imageSrc = "/RecentFiles/rSVG.svg"; // default
+                if (item.isFolder) {
+                  imageSrc = "/BigFolder.svg";
+                } else if (item.type?.toLowerCase() === "pdf") {
+                  imageSrc = item.hasText
+                    ? "/txtPDF.svg"
+                    : "/RecentFiles/rPDF.svg";
+                } else if (item.type?.toLowerCase() === "txt") {
+                  imageSrc = "/RecentFiles/rTXT.svg";
+                } else if (
+                  item.type?.toLowerCase() === "doc" ||
+                  item.type?.toLowerCase() === "docx"
+                ) {
+                  imageSrc = "/RecentFiles/rDOC.svg";
+                } else if (item.type?.toLowerCase() === "mp3") {
+                  imageSrc = "/RecentFiles/eMP3.svg";
+                } else if (item.type?.toLowerCase() === "mp4") {
+                  imageSrc = "/RecentFiles/eMP3.svg";
+                } else if (item.type?.toLowerCase() === "jpg") {
+                  imageSrc = "/RecentFiles/rJPG.svg";
+                } else if (item.type?.toLowerCase() === "png") {
+                  imageSrc = "/RecentFiles/rPNG.svg";
+                } else if (item.type?.toLowerCase() === "gif") {
+                  imageSrc = "/RecentFiles/rSVG.svg";
+                } else if (
+                  item.type?.toLowerCase() === "xls" ||
+                  item.type?.toLowerCase() === "xlsx"
+                ) {
+                  imageSrc = "/RecentFiles/rXLS.svg";
+                } else if (item.type?.toLowerCase() === "zip") {
+                  imageSrc = "/RecentFiles/rZIP.svg";
+                }
+
+                const finalImageSrc = imageSrc;
+
+                // Calculate time ago
+                const now = new Date();
+                const diffInMs = now.getTime() - item.visitedAt.getTime();
+                const diffInSeconds = Math.floor(diffInMs / 1000);
+                const diffInMinutes = Math.floor(diffInSeconds / 60);
+                const diffInHours = Math.floor(diffInMinutes / 60);
+
+                let timeAgo = "Just now";
+                if (diffInSeconds < 60) {
+                  timeAgo = "Just now";
+                } else if (diffInMinutes < 60) {
+                  if (diffInMinutes === 1) timeAgo = "1 min ago";
+                  else timeAgo = `${diffInMinutes} mins ago`;
+                } else if (diffInHours < 24) {
+                  if (diffInHours === 1) timeAgo = "1 hour ago";
+                  else timeAgo = `${diffInHours} hours ago`;
+                } else if (diffInHours < 48) {
+                  timeAgo = "1 day ago";
+                } else {
+                  timeAgo = `${Math.floor(diffInHours / 24)} days ago`;
+                }
+
+                const actionText = item.isFolder
+                  ? "Opened"
+                  : index === 3
+                  ? "Last updated"
+                  : "Opened";
 
                 return (
                   <div
-                    key={`${item.id}-${index}`}
-                    className="min-w-[160px] sm:min-w-0 flex-shrink-0 cursor-pointer group mb-5"
+                    key={item.id}
+                    className="flex flex-col items-center w-[180px] h-[170px] rounded-lg border border-gray-200 dark:border-gray-800 bg-[#F4F4F5] dark:hover:bg-[#27272A] hover:bg-gray-50 dark:bg-[#18181B] cursor-pointer transition-colors text-center p-[12px] gap-[20px] shrink-0"
                     onClick={() => {
                       if (item.isFolder) {
                         router.push(`/Dashboard/Library?folder=${item.id}`);
                       } else {
-                        // Open file viewer
                         const event = new CustomEvent("openPDFViewer", {
                           detail: {
                             id: item.id,
@@ -658,18 +717,34 @@ export default function HomePage() {
                       }
                     }}
                   >
-                    <div className="aspect-[3/4] rounded-lg overflow-hidden mb-3 border border-gray-200 dark:border-gray-700 group-hover:shadow-lg transition-shadow bg-white dark:bg-gray-800">
-                      <Image
-                        src={imageSrc}
-                        alt={item.name}
-                        width={100}
-                        height={167}
-                        className="w-full h-full object-cover"
+                    <div
+                      className={`flex items-center justify-center w-[156px] h-[90px] shrink-0 ${
+                        imageSrc.startsWith("/RecentFiles/")
+                          ? "rounded-lg bg-[#E5E7EB] dark:bg-[#27272A] p-[10px]"
+                          : ""
+                      }`}
+                    >
+                      <img
+                        src={finalImageSrc}
+                        alt={item.isFolder ? "Folder" : "File"}
+                        className={`${
+                          imageSrc.startsWith("/RecentFiles/")
+                            ? "w-[78px] h-[78px]"
+                            : "max-w-full max-h-full"
+                        } object-contain`}
                       />
                     </div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                      {item.name}
-                    </p>
+                    <div className="w-[156px] h-[36px] flex flex-col items-center justify-center px-1">
+                      <p
+                        className="text-xs sm:text-sm font-medium text-gray-900 truncate dark:text-white w-full text-center"
+                        title={item.name}
+                      >
+                        {item.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {actionText} {timeAgo}
+                      </p>
+                    </div>
                   </div>
                 );
               })}

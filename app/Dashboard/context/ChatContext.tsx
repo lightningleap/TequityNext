@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 export interface ChatMessage {
   text: string;
@@ -44,8 +44,55 @@ export function useChatContextOptional() {
 }
 
 export function ChatProvider({ children }: { children: ReactNode }) {
-  const [chats, setChats] = useState<Chat[]>([]);
-  const [activeChatId, setActiveChatId] = useState<string | null>(null);
+  const [chats, setChats] = useState<Chat[]>(() => {
+    // Load chats from localStorage on mount
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("tequity_chats");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          // Convert date strings back to Date objects
+          return parsed.map((chat: any) => ({
+            ...chat,
+            createdAt: new Date(chat.createdAt),
+            updatedAt: new Date(chat.updatedAt),
+            messages: chat.messages.map((msg: any) => ({
+              ...msg,
+              timestamp: new Date(msg.timestamp),
+            })),
+          }));
+        } catch (error) {
+          console.error("Error loading chats from localStorage:", error);
+        }
+      }
+    }
+    return [];
+  });
+  const [activeChatId, setActiveChatId] = useState<string | null>(() => {
+    // Load active chat ID from localStorage on mount
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("tequity_activeChatId");
+    }
+    return null;
+  });
+
+  // Save chats to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("tequity_chats", JSON.stringify(chats));
+    }
+  }, [chats]);
+
+  // Save active chat ID to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (activeChatId) {
+        localStorage.setItem("tequity_activeChatId", activeChatId);
+      } else {
+        localStorage.removeItem("tequity_activeChatId");
+      }
+    }
+  }, [activeChatId]);
 
   const generateChatTitle = (firstMessage: string): string => {
     // Generate title from first message (first 50 chars)

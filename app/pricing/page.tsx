@@ -42,7 +42,7 @@ export default function PricingPage() {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Navigate to Dashboard
-      router.push("/Dashboard/Library");
+      router.push("/Dashboard/Home");
     } catch (error) {
       console.error("Error selecting plan:", error);
       setLoadingPlan(null);

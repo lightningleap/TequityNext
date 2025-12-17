@@ -457,7 +457,7 @@ function LibraryContent({
   };
 
   const handleFileSelect = useCallback((file: FileItem) => {
-    console.log("File selected:", file);
+    console.log("handleFileSelect called with:", file);
     setSelectedFile(file);
     setIsPDFViewerOpen(true);
 
@@ -986,15 +986,30 @@ function LibraryContent({
                       onFocus={() => setIsSearchFocused(true)}
                       onClick={() => setIsSearchFocused(true)}
                       placeholder="Search files and folders..."
-                    />
-                    <SearchDropdown
-                      isOpen={isSearchFocused}
-                      searchQuery={searchQuery}
-                      onSelect={(file) => {
-                        console.log("Selected file:", file);
-                        // Handle file selection (e.g., open file, navigate, etc.)
-                        setIsSearchFocused(false);
-                      }}
+                      onFileSelect={handleFileSelect}
+                      onFolderSelect={handleFolderSelect}
+                      searchResults={filteredFiles.map(file => ({
+                        id: file.id || file.name,
+                        name: file.name,
+                        type: file.type,
+                        isFolder: false,
+                        size: file.size,
+                        uploadedAt: file.uploadedAt,
+                        url: file.url
+      })).concat(folders.map(folder => ({
+                        id: folder.id,
+                        name: folder.name,
+                        type: 'FOLDER',
+                        isFolder: true,
+                        fileCount: folder.fileCount,
+                        size: undefined,
+                        uploadedAt: undefined,
+                        url: undefined
+      })))}
+                      isSearchFocused={isSearchFocused}
+                      onSearchFocus={setIsSearchFocused}
+                      files={files}
+                      folders={folders}
                     />
                   </div>
                 </header>

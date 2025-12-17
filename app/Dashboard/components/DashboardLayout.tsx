@@ -42,6 +42,7 @@ export function DashboardLayout({
   const pathname = usePathname();
   const router = useRouter();
   const isChatPage = pathname === "/Dashboard/chat" || pathname === "/Dashboard/Home";
+  const isActualChatPage = pathname === "/Dashboard/chat";
   const { theme, setTheme } = useTheme();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [starredFiles, setStarredFiles] = useState<
@@ -282,7 +283,7 @@ export function DashboardLayout({
             </SidebarTrigger>
 
             {/* Middle Content */}
-            {isChatPage && chatContext && chatContext.chats.length > 0 ? (
+            {isActualChatPage && chatContext && chatContext.chats.length > 0 ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors focus:ring-0 focus:ring-offset-0 focus:outline-none border-0 focus:border-0 focus-visible:border-0">
@@ -445,7 +446,7 @@ export function DashboardLayout({
                     )}
                   </DropdownMenuContent>
                 </DropdownMenu>
-              ) : isChatPage && chatContext && chatContext.chats.length > 0 ? (
+              ) : isActualChatPage && chatContext && chatContext.chats.length > 0 ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="flex items-center gap-2 h-9 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-[#27272A] transition-colors focus:ring-0 focus:ring-offset-0 focus:outline-none border-0 focus:border-0 focus-visible:border-0">
@@ -491,7 +492,9 @@ export function DashboardLayout({
             )}
           </header>
 
-          {children}
+          <main className="flex-1 overflow-y-auto overflow-x-hidden">
+            {children}
+          </main>
         </div>
       </div>
 

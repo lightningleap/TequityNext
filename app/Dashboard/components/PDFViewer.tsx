@@ -309,14 +309,32 @@ export function PDFViewer({
                     </div>
                   }
                   error={
-                    <div className="flex items-center justify-center h-64">
-                      <div className="text-center bg-white dark:bg-[#09090B] rounded-lg border border-red-200 p-6">
-                        <p className="text-sm text-red-600 mb-2">
-                          Failed to load PDF
+                    <div className="flex flex-col items-center justify-center h-full min-h-[400px]">
+                      <div className="text-center">
+                        {/* Large Document Icon */}
+                        <div className="mb-6">
+                          <Image
+                            src="/uploadModal/No-Preview.svg"
+                            alt="No Preview"
+                            width={177}
+                            height={170}
+                            className="mx-auto"
+                          />
+                        </div>
+
+                        {/* No Preview Available Text */}
+                        <p className="text-base font-medium text-gray-700 dark:text-gray-300 mb-4">
+                          No Preview Available
                         </p>
-                        <p className="text-xs text-gray-500">
-                          The PDF file could not be loaded
-                        </p>
+
+                        {/* Download File Link */}
+                        <button
+                          onClick={handleDownload}
+                          className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium cursor-pointer inline-flex items-center gap-1"
+                        >
+                          <Download className="h-4 w-4" />
+                          Download File
+                        </button>
                       </div>
                     </div>
                   }
@@ -340,12 +358,32 @@ export function PDFViewer({
                 )}
               </div>
             ) : (
-              <div className="p-6 flex items-center justify-center h-64">
-                <div className="text-center bg-white rounded-lg border border-gray-200 p-6">
-                  <p className="text-sm text-gray-600 mb-2">
-                    No preview available
+              <div className="flex flex-col items-center justify-center h-full min-h-[400px]">
+                <div className="text-center">
+                  {/* Large Document Icon */}
+                  <div className="mb-6">
+                    <Image
+                      src="/uploadModal/No-Preview.svg"
+                      alt="No Preview"
+                      width={177}
+                      height={170}
+                      className="mx-auto"
+                    />
+                  </div>
+
+                  {/* No Preview Available Text */}
+                  <p className="text-base font-medium text-gray-700 dark:text-gray-300 mb-4">
+                    No Preview Available
                   </p>
-                  <p className="text-xs text-gray-400">PDF URL not provided</p>
+
+                  {/* Download File Link */}
+                  <button
+                    onClick={handleDownload}
+                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium cursor-pointer inline-flex items-center gap-1"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download File
+                  </button>
                 </div>
               </div>
             )
@@ -404,14 +442,32 @@ export function PDFViewer({
                 />
               </div>
             ) : (
-              <div className="p-6 flex items-center justify-center h-64">
-                <div className="text-center bg-white rounded-lg border border-gray-200 p-6">
-                  <p className="text-sm text-gray-600 mb-2">
-                    No preview available
+              <div className="flex flex-col items-center justify-center h-full min-h-[400px]">
+                <div className="text-center">
+                  {/* Large Document Icon */}
+                  <div className="mb-6">
+                    <Image
+                      src="/uploadModal/No-Preview.svg"
+                      alt="No Preview"
+                      width={177}
+                      height={170}
+                      className="mx-auto"
+                    />
+                  </div>
+
+                  {/* No Preview Available Text */}
+                  <p className="text-base font-medium text-gray-700 dark:text-gray-300 mb-4">
+                    No Preview Available
                   </p>
-                  <p className="text-xs text-gray-400">
-                    Image URL not provided
-                  </p>
+
+                  {/* Download File Link */}
+                  <button
+                    onClick={handleDownload}
+                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium cursor-pointer inline-flex items-center gap-1"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download File
+                  </button>
                 </div>
               </div>
             )
@@ -428,14 +484,32 @@ export function PDFViewer({
                 </div>
               </div>
             ) : (
-              <div className="p-6 flex items-center justify-center h-64">
-                <div className="text-center bg-white rounded-lg border border-gray-200 p-6">
-                  <p className="text-sm text-gray-600 mb-2">
-                    No preview available
+              <div className="flex flex-col items-center justify-center h-full min-h-[400px]">
+                <div className="text-center">
+                  {/* Large Document Icon */}
+                  <div className="mb-6">
+                    <Image
+                      src="/uploadModal/No-Preview.svg"
+                      alt="No Preview"
+                      width={177}
+                      height={170}
+                      className="mx-auto"
+                    />
+                  </div>
+
+                  {/* No Preview Available Text */}
+                  <p className="text-base font-medium text-gray-700 dark:text-gray-300 mb-4">
+                    No Preview Available
                   </p>
-                  <p className="text-xs text-gray-400">
-                    Text file URL not provided
-                  </p>
+
+                  {/* Download File Link */}
+                  <button
+                    onClick={handleDownload}
+                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium cursor-pointer inline-flex items-center gap-1"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download File
+                  </button>
                 </div>
               </div>
             )
