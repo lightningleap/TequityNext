@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps, cva } from "class-variance-authority";
 import { IoIosSearch } from "react-icons/io";
-import { FileText, PanelLeftIcon, MessageCircle } from "lucide-react";
+import { FileText, PanelLeftIcon, MessageCircle, Home } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -322,6 +322,11 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
   const navItems = React.useMemo(
     () => [
       {
+        title: "Home",
+        icon: <Home className="h-4 w-4 shrink-0" />,
+        href: "/Dashboard/Home",
+      },
+      {
         title: "Library",
         icon: (
           <MdOutlineFolderCopy width={16} height={16} className="shrink-0" />
@@ -340,28 +345,6 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
   return (
     <>
       <SidebarMenu className="gap-1 px-2 mt-2 mb-2 group-data-[collapsible=icon]:px-2">
-        {/* Search Item - Clickable to open dialog */}
-        <SidebarMenuItem>
-          <SidebarMenuButton
-            className={`w-full justify-start h-8 px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-150 ease-in-out cursor-pointer ${
-              searchDialogOpen
-                ? "bg-[#F4F4F5] dark:bg-[#27272A] dark:text-white"
-                : "bg-transparent hover:bg-gray-100 dark:hover:bg-[#27272A]"
-            }`}
-            onClick={handleSearchOpen}
-            tooltip={{
-              children: "Search",
-            }}
-          >
-            <span className="flex items-center gap-2 w-full group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:gap-0">
-              <IoIosSearch className="h-4 w-4 shrink-0 text-black dark:text-white" />
-              <span className="overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:hidden">
-                Search
-              </span>
-            </span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-
         {/* Regular Navigation Items */}
         {navItems.map((item) => (
           <SidebarMenuItem key={item.href}>
@@ -369,7 +352,7 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
               asChild
               isActive={pathname === item.href}
               className={`w-full justify-start h-8 px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2 transition-all duration-150 ease-in-out ${
-                pathname === item.href && !searchDialogOpen
+                pathname === item.href
                   ? "bg-[#F4F4F5] dark:bg-[#27272A] dark:text-white"
                   : "hover:bg-gray-100 dark:hover:bg-[#27272A]"
               }`}

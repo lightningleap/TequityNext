@@ -122,7 +122,7 @@ export default function WorkspaceSetupPage() {
 
   const options = [
     { value: "investor", label: "Investor" },
-    { value: "single-firm", label: "Single Firm " },
+    { value: "owner", label: "Owner" },
   ];
 
   const progressWidth = `${(currentStep / 3) * 100}%`;
@@ -207,7 +207,7 @@ export default function WorkspaceSetupPage() {
             <>
               <div className="space-y-2 mb-6">
                 <h1 className="text-3xl font-normal text-gray-900">
-                  What brings you to Tequity?
+                  What describes you best?
                 </h1>
                 <p className="text-sm text-gray-500 leading-relaxed">
                   Help us tailor your experience with the right tools.

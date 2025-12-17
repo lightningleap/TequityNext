@@ -7,6 +7,10 @@ interface FileItem {
   name: string;
   type: string;
   size?: number;
+  uploadedAt?: Date;
+  url?: string;
+  hasText?: boolean;
+  files?: FileItem[];
 }
 
 interface FolderItem {
