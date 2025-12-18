@@ -98,10 +98,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleBackToSignup = () => {
-    window.location.href = "/signup";
-  };
-
   const handleGoogleSignIn = () => {
     console.log("Google sign-in clicked");
   };

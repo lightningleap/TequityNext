@@ -3,20 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Plus_Jakarta_Sans, Instrument_Serif } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { PricingHeader } from "./components/PricingHeader";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   variable: "--font-plus-jakarta",
-  display: "swap",
-});
-
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: ["400"],
-  variable: "--font-instrument-serif",
   display: "swap",
 });
 
@@ -61,7 +54,6 @@ export default function PricingPage() {
             {/* Main Heading and Subheading */}
             <PricingHeader
               plusJakartaSansClass={plusJakartaSans.className}
-              instrumentSerifClass={instrumentSerif.className}
             />
 
             {/* Billing Toggle */}

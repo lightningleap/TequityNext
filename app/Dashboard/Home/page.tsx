@@ -46,7 +46,7 @@ export default function HomePage() {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [recentlyVisited, setRecentlyVisited] = useState<
     Array<{
-      hasText: any;
+      hasText: boolean;
       id: string;
       name: string;
       type: string;
@@ -63,7 +63,7 @@ export default function HomePage() {
         try {
           const parsed = JSON.parse(stored);
           setRecentlyVisited(
-            parsed.map((item: any) => ({
+            parsed.map((item: { hasText: boolean; id: string; name: string; type: string; isFolder: boolean; visitedAt: string }) => ({
               ...item,
               visitedAt: new Date(item.visitedAt),
             }))
@@ -157,7 +157,7 @@ export default function HomePage() {
   };
 
   // Handle upload
-  const handleUpload = (newFiles: any[], newFolders: any[]) => {
+  const handleUpload = (newFiles: typeof files, newFolders: typeof folders) => {
     setFiles([...files, ...newFiles]);
     setFolders([...folders, ...newFolders]);
   };
@@ -170,7 +170,7 @@ export default function HomePage() {
   };
 
   // Handle file selection for context
-  const handleFileContextSelect = (file: any) => {
+  const handleFileContextSelect = (file: typeof files[number]) => {
     if (
       !selectedContextItems.some(
         (item) => item.id === file.id && item.type === "file"
@@ -250,26 +250,6 @@ export default function HomePage() {
 
   // Get messages from active chat
   const messages = activeChat?.messages || [];
-
-  // Get file icon based on type
-  const getFileIcon = (type: string, hasText?: boolean) => {
-    const lowerType = type?.toLowerCase();
-
-    if (lowerType === "pdf") {
-      return hasText ? "/txtPDF.svg" : "/RecentFiles/rPDF.svg";
-    } else if (lowerType === "txt") {
-      return "/RecentFiles/rTXT.svg";
-    } else if (lowerType === "doc" || lowerType === "docx") {
-      return "/RecentFiles/rDOC.svg";
-    } else if (lowerType === "xls" || lowerType === "xlsx") {
-      return "/RecentFiles/rXLS.svg";
-    } else if (lowerType === "ppt" || lowerType === "pptx") {
-      return "/RecentFiles/rPPT.svg";
-    } else if (lowerType === "jpg" || lowerType === "jpeg" || lowerType === "png") {
-      return "/RecentFiles/rIMG.svg";
-    }
-    return "/RecentFiles/rSVG.svg";
-  };
 
   return (
     <DashboardLayout
@@ -586,7 +566,7 @@ export default function HomePage() {
                 type="file"
                 multiple
                 className="hidden"
-                // @ts-ignore
+                // @ts-expect-error - webkitdirectory is a non-standard attribute
                 webkitdirectory="true"
                 onChange={(e) => {
                   if (e.target.files) {

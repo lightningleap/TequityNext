@@ -59,7 +59,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { SearchDropdown } from "../components/SearchDropdown";
 
 // ClientOnly component to prevent hydration mismatch
 function ClientOnly({ children }: { children: React.ReactNode }) {

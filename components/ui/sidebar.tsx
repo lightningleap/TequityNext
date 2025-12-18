@@ -1,13 +1,10 @@
 "use client";
 
-"use client";
-
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps, cva } from "class-variance-authority";
-import { IoIosSearch } from "react-icons/io";
 import { FileText, PanelLeftIcon, MessageCircle, Home } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -275,10 +272,6 @@ const SidebarMenuItems = React.memo(function SidebarMenuItems() {
     Array<{ id: string; name: string; type: string }>
   >([]);
   const filesContext = useFilesOptional();
-
-  const handleSearchOpen = React.useCallback(() => {
-    setSearchDialogOpen(true);
-  }, []);
 
   // Load starred files from localStorage
   React.useEffect(() => {

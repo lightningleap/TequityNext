@@ -21,10 +21,9 @@ function Scribble() {
 
 interface PricingHeaderProps {
   plusJakartaSansClass: string;
-  instrumentSerifClass: string;
 }
 
-export function PricingHeader({ plusJakartaSansClass, instrumentSerifClass }: PricingHeaderProps) {
+export function PricingHeader({ plusJakartaSansClass }: PricingHeaderProps) {
   return (
     <div className="content-stretch flex flex-col gap-[8px] items-start relative w-full">
       <div className={`flex flex-col ${plusJakartaSansClass} font-normal justify-center leading-[0] relative shrink-0 text-[32px] text-slate-950 w-full max-w-[504px]`}>
@@ -38,7 +37,7 @@ export function PricingHeader({ plusJakartaSansClass, instrumentSerifClass }: Pr
         </p>
       </div>
       <div className={`flex flex-col ${plusJakartaSansClass} font-normal justify-center leading-[20px] relative shrink-0 text-[14px] text-[#71717A] tracking-[0.15px]`}>
-        <p className="align-middle" style={{ color: 'var(--tokens-muted-foreground, #71717A)' }}>Whether you're raising, scaling, or exiting – we've got you covered.</p>
+        <p className="align-middle" style={{ color: 'var(--tokens-muted-foreground, #71717A)' }}>Whether you&apos;re raising, scaling, or exiting – we&apos;ve got you covered.</p>
       </div>
       <Scribble />
     </div>

@@ -52,11 +52,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         try {
           const parsed = JSON.parse(stored);
           // Convert date strings back to Date objects
-          return parsed.map((chat: any) => ({
+          return parsed.map((chat: { id: string; title: string; createdAt: string; updatedAt: string; messages: Array<{ text: string; isUser: boolean; timestamp: string }> }) => ({
             ...chat,
             createdAt: new Date(chat.createdAt),
             updatedAt: new Date(chat.updatedAt),
-            messages: chat.messages.map((msg: any) => ({
+            messages: chat.messages.map((msg: { text: string; isUser: boolean; timestamp: string }) => ({
               ...msg,
               timestamp: new Date(msg.timestamp),
             })),

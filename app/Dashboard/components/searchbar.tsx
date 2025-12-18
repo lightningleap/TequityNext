@@ -38,21 +38,12 @@ export function SearchBar({
   onClick,
   onFileSelect,
   onFolderSelect,
-  searchResults = [],
   isSearchFocused = false,
   onSearchFocus,
   files = [],
   folders = [],
 }: SearchBarProps) {
   const searchRef = useRef<HTMLDivElement>(null);
-
-  // Format file size for display
-  const formatFileSize = (bytes?: number) => {
-    if (!bytes) return '0 B';
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return `${parseFloat((bytes / Math.pow(1024, i)).toFixed(2))} ${sizes[i]}`;
-  };
 
   // Close search results when clicking outside
   useEffect(() => {
@@ -69,7 +60,7 @@ export function SearchBar({
   }, [onSearchFocus]);
 
   // Handle selection from SearchDropdown
-  const handleSelect = (item: any) => {
+  const handleSelect = (item: { name: string; type: string }) => {
     console.log("SearchDropdown item selected:", item);
     if (item.type === 'folder') {
       // Find the corresponding folder and call onFolderSelect
