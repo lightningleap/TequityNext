@@ -1,7 +1,7 @@
 "use client";
 
 import { Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AddUserDialog } from "../dialogbox/AddUserDialog";
 import { RemoveUserDialog } from "../dialogbox/RemoveUserDialog";
 import { Pagination } from "@/components/ui/pagination";
@@ -13,39 +13,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { usersApi, type User as ApiUser } from "@/lib/api";
+import { toast } from "sonner";
 
 // Types
 interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
   initials: string;
   role: string;
 }
 
-// Generate mock users
-const generateMockUsers = (): User[] => {
-  const roles = ["Admin", "General", "Financial", "Viewer"];
-  const mockUsers: User[] = [];
+// Convert API user to local format
+function mapApiUserToLocal(apiUser: ApiUser): User {
+  const nameParts = (apiUser.name || apiUser.email.split("@")[0]).split(" ");
+  const initials = nameParts.length >= 2
+    ? `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase()
+    : nameParts[0].substring(0, 2).toUpperCase();
 
-  for (let i = 1; i <= 15; i++) {
-    const firstName = ["John", "Jane", "Michael", "Sarah", "David"][
-      Math.floor(Math.random() * 5)
-    ];
-    const lastName = ["Doe", "Smith", "Johnson", "Williams", "Brown"][
-      Math.floor(Math.random() * 5)
-    ];
-    mockUsers.push({
-      id: i,
-      name: `${firstName} ${lastName}`,
-      email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
-      initials: `${firstName[0]}${lastName[0]}`,
-      role: roles[Math.floor(Math.random() * roles.length)],
-    });
-  }
-
-  return mockUsers;
-};
+  return {
+    id: apiUser.id,
+    name: apiUser.name || apiUser.email.split("@")[0],
+    email: apiUser.email,
+    initials,
+    role: apiUser.role === "owner" ? "Admin" : apiUser.role === "admin" ? "Admin" : "Member",
+  };
+}
 
 export function People() {
   // State
@@ -53,18 +47,57 @@ export function People() {
   const [addUserOpen, setAddUserOpen] = useState(false);
   const [removeUserOpen, setRemoveUserOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<{
+    id: string;
     name: string;
     email: string;
   } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch users
+  const fetchUsers = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await usersApi.list();
+      if (response.success && response.data) {
+        setUsers(response.data.map(mapApiUserToLocal));
+      }
+    } catch (err) {
+      console.error("Failed to fetch users:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  // Delete user handler
+  const handleDeleteUser = async () => {
+    if (!selectedUser) return;
+
+    try {
+      const response = await usersApi.delete(selectedUser.id);
+      if (response.success) {
+        setUsers((prev) => prev.filter((u) => u.id !== selectedUser.id));
+        toast.success("User removed successfully");
+        setRemoveUserOpen(false);
+        setSelectedUser(null);
+      } else {
+        toast.error(response.error || "Failed to remove user");
+      }
+    } catch (err) {
+      toast.error("Failed to remove user");
+    }
+  };
 
   // Data
-  const users = generateMockUsers();
   const itemsPerPage = 10;
   const indexOfLastUser = currentPage * itemsPerPage;
   const indexOfFirstUser = indexOfLastUser - itemsPerPage;
   const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
-  // const totalPages = Math.ceil(users.length / itemsPerPage);
 
   // Handlers
   const handlePageChange = (page: number) => {
@@ -195,6 +228,7 @@ export function People() {
                       <button
                         onClick={() => {
                           setSelectedUser({
+                            id: user.id,
                             name: user.name,
                             email: user.email,
                           });
@@ -233,12 +267,13 @@ export function People() {
         </div>
 
         {/* Dialog Components */}
-        <AddUserDialog open={addUserOpen} onOpenChange={setAddUserOpen} />
+        <AddUserDialog open={addUserOpen} onOpenChange={setAddUserOpen} onUserAdded={fetchUsers} />
         <RemoveUserDialog
           open={removeUserOpen}
           onOpenChange={setRemoveUserOpen}
           userName={selectedUser?.name}
           userEmail={selectedUser?.email}
+          onConfirm={handleDeleteUser}
         />
       </div>
     </div>

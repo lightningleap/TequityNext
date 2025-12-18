@@ -9,6 +9,7 @@ import GoogleIcon from "../../public/GoogleIcon.svg";
 import SignupLogo from "../../public/SignupLogo.svg";
 import Container from "../../public/Container.png";
 import { toast } from "sonner";
+import { authApi } from "@/lib/api";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -43,18 +44,15 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Replace with actual API call to send verification code
-      // const response = await fetch('/api/auth/signup', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ email }),
-      // });
-      // if (!response.ok) throw new Error('Failed to send verification code');
+      // Call signup API to create user and send verification code
+      const response = await authApi.signup({ email });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      setStep("verification");
-      toast.success("Verification code sent");
+      if (response.success) {
+        setStep("verification");
+        toast.success("Verification code sent to your email");
+      } else {
+        throw new Error(response.error || "Failed to send verification code");
+      }
     } catch (err) {
       setError(
         err instanceof Error
@@ -82,18 +80,19 @@ export default function SignupPage() {
         throw new Error("Please enter a valid verification code");
       }
 
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/auth/verify-signup', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ email, code: verificationCode }),
-      // });
-      // if (!response.ok) throw new Error('Invalid verification code');
+      // Call verify OTP API
+      const response = await authApi.verifyOtp({
+        email,
+        code: verificationCode,
+        purpose: 'email_verification',
+      });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      toast.success("Signup verified");
-      router.push("/workspace-setup");
+      if (response.success) {
+        toast.success("Account verified successfully");
+        router.push("/workspace-setup");
+      } else {
+        throw new Error(response.error || "Invalid verification code");
+      }
     } catch (err) {
       setError(
         err instanceof Error

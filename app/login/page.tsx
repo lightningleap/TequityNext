@@ -9,6 +9,7 @@ import GoogleIcon from "../../public/GoogleIcon.svg";
 import Container from "../../public/Container.png";
 import Image from "next/image";
 import { toast } from "sonner";
+import { authApi } from "@/lib/api";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -30,19 +31,16 @@ export default function LoginPage() {
         throw new Error("Please enter a valid email address");
       }
 
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/auth/send-code', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ email }),
-      // });
-      // if (!response.ok) throw new Error('Failed to send verification code');
+      // Call signin API to send OTP
+      const response = await authApi.signin(email);
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Switch to verification step
-      setStep("verification");
-      toast.success("Verification code sent");
+      if (response.success) {
+        // Switch to verification step
+        setStep("verification");
+        toast.success("Verification code sent to your email");
+      } else {
+        throw new Error(response.error || "Failed to send verification code");
+      }
     } catch (err) {
       setError(
         err instanceof Error
@@ -70,18 +68,19 @@ export default function LoginPage() {
         throw new Error("Please enter a valid verification code");
       }
 
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/auth/verify-code', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ email, code: verificationCode }),
-      // });
-      // if (!response.ok) throw new Error('Invalid verification code');
+      // Call verify OTP API
+      const response = await authApi.verifyOtp({
+        email,
+        code: verificationCode,
+        purpose: 'login_otp',
+      });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      toast.success("Verification successful");
-      router.push("/Dashboard/Library");
+      if (response.success) {
+        toast.success("Verification successful");
+        router.push("/Dashboard/Library");
+      } else {
+        throw new Error(response.error || "Invalid verification code");
+      }
     } catch (err) {
       setError(
         err instanceof Error

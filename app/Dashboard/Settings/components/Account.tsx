@@ -1,19 +1,64 @@
 "use client";
 
 import { FiUser } from "react-icons/fi";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { ChangePasswordDialog } from "../dialogbox/ChangePasswordDialog";
 import { LogoutDialog } from "../dialogbox/LogoutDialog";
 import { DisableAccountDialog } from "../dialogbox/DisableAccountDialog";
-// import Link from "next/link";
+import { usersApi, type User } from "@/lib/api";
+import { toast } from "sonner";
 
 export function Account() {
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [disableAccountOpen, setDisableAccountOpen] = useState(false);
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [name, setName] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch current user on mount
+  useEffect(() => {
+    const fetchUser = async () => {
+      setIsLoading(true);
+      try {
+        const response = await usersApi.getMe();
+        if (response.success && response.data) {
+          setUser(response.data);
+          setName(response.data.name || "");
+          setProfilePicture(response.data.avatarUrl || null);
+        }
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  // Save name changes
+  const handleNameSave = async () => {
+    if (!user || name === user.name) return;
+
+    setIsSaving(true);
+    try {
+      const response = await usersApi.update(user.id, { name });
+      if (response.success && response.data) {
+        setUser(response.data);
+        toast.success("Name updated successfully");
+      } else {
+        toast.error(response.error || "Failed to update name");
+      }
+    } catch (err) {
+      toast.error("Failed to update name");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="space-y-6 dark:bg-[#09090B]">
@@ -44,12 +89,25 @@ export function Account() {
             <p className="text-xs font-medium" style={{ color: "#64748B" }}>
               Preferred Name
             </p>
-            <input
-              type="text"
-              className="w-50% px-3 py-2 border border-gray-300 rounded-md"
-              placeholder="Your name"
-              defaultValue="John Doe"
-            />
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                className="w-50% px-3 py-2 border border-gray-300 rounded-md"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                disabled={isLoading}
+              />
+              {name !== (user?.name || "") && (
+                <button
+                  onClick={handleNameSave}
+                  disabled={isSaving}
+                  className="px-3 py-2 bg-black text-white text-sm rounded-md hover:bg-gray-800 disabled:opacity-50"
+                >
+                  {isSaving ? "Saving..." : "Save"}
+                </button>
+              )}
+            </div>
           </div>
         </div>
         <p className="text-xs text-gray-500">
@@ -109,7 +167,7 @@ export function Account() {
             Email
           </p>
           <p className="text-sm text-gray-600 dark:text-[#A1A1AA]">
-            john.doe@example.com
+            {isLoading ? "Loading..." : user?.email || "No email"}
           </p>
         </div>
         <button

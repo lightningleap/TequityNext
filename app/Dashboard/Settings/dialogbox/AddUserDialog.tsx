@@ -8,13 +8,16 @@ import {
 } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
+import { usersApi } from "@/lib/api";
+import { toast } from "sonner";
 
 interface AddUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onUserAdded?: () => void;
 }
 
-export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
+export function AddUserDialog({ open, onOpenChange, onUserAdded }: AddUserDialogProps) {
   useEffect(() => {
     if (open) {
       const overlays = document.querySelectorAll('[data-radix-dialog-overlay]');
@@ -22,21 +25,46 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
       if (lastOverlay) lastOverlay.style.zIndex = '100';
     }
   }, [open]);
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("General");
+  const [role, setRole] = useState("member");
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const roles = ["Admin", "General", "Financial"];
+  const roles = [
+    { value: "admin", label: "Admin" },
+    { value: "member", label: "Member" },
+  ];
 
-  const handleSubmit = () => {
-    // Handle add user logic here
-    console.log("Adding user:", { name, email, role });
-    onOpenChange(false);
-    setName("");
-    setEmail("");
-    setRole("General");
+  const handleSubmit = async () => {
+    if (!email) {
+      toast.error("Please enter an email address");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await usersApi.invite({
+        email,
+        role: role as "admin" | "member",
+      });
+
+      if (response.success) {
+        toast.success("Invitation sent successfully");
+        onOpenChange(false);
+        setEmail("");
+        setRole("member");
+        onUserAdded?.();
+      } else {
+        toast.error(response.error || "Failed to send invitation");
+      }
+    } catch (err) {
+      toast.error("Failed to send invitation");
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const selectedRoleLabel = roles.find((r) => r.value === role)?.label || "Member";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
@@ -80,21 +108,21 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
               onClick={() => setShowRoleDropdown(!showRoleDropdown)}
               className="text-xs w-full px-3 py-2 border border-gray-300 dark:border-[#27272A] rounded-md  flex items-center justify-between"
             >
-              <span>{role}</span>
+              <span>{selectedRoleLabel}</span>
               <ChevronDown className="h-4 w-4" />
             </button>
             {showRoleDropdown && (
               <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 dark:border-[#27272A] rounded-md shadow-lg dark:bg-[#09090B]">
                 {roles.map((r) => (
                   <button
-                    key={r}
+                    key={r.value}
                     onClick={() => {
-                      setRole(r);
+                      setRole(r.value);
                       setShowRoleDropdown(false);
                     }}
-                    className="text-xs w-full px-3 py-2 text-left hover:bg-gray-100 transition-colors"
+                    className="text-xs w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-[#27272A] transition-colors"
                   >
-                    {r}
+                    {r.label}
                   </button>
                 ))}
               </div>
@@ -102,17 +130,12 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
           </div>
         </div>
         <div className="flex justify-center gap-3 py-4">
-          {/* <button
-            onClick={() => onOpenChange(false)}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 transition-colors"
-          >
-            Cancel
-          </button> */}
           <button
             onClick={handleSubmit}
-            className="px-4 font-semibold w-full border dark:border-[#27272A] dark:hover:bg-[#27272A] py-2 bg-black dark:bg-white text-white dark:text-black rounded-md text-sm hover:bg-gray-800 transition-colors"
+            disabled={isLoading || !email}
+            className="px-4 font-semibold w-full border dark:border-[#27272A] dark:hover:bg-[#27272A] py-2 bg-black dark:bg-white text-white dark:text-black rounded-md text-sm hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Send Invite
+            {isLoading ? "Sending..." : "Send Invite"}
           </button>
         </div>
       </DialogContent>

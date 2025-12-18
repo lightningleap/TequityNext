@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { PricingHeader } from "./components/PricingHeader";
+import { loadStripe } from "@stripe/stripe-js";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -13,31 +14,98 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   display: "swap",
 });
 
+// Initialize Stripe
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ""
+);
+
+// Plan ID mapping to API plan IDs
+const PLAN_ID_MAP: Record<string, string> = {
+  Starter: "STARTER",
+  Professional: "PROFESSIONAL",
+  Enterprise: "ENTERPRISE",
+};
+
 export default function PricingPage() {
   const [billingType, setBillingType] = useState("yearly");
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  // Get tenant context from session/local storage (set during signup)
+  const [tenantId, setTenantId] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Retrieve tenant context from localStorage (set during signup flow)
+    const storedTenantId = localStorage.getItem("tenantId");
+    const storedEmail = localStorage.getItem("userEmail");
+    setTenantId(storedTenantId);
+    setUserEmail(storedEmail);
+  }, []);
 
   const handleSelectPlan = async (planName: string) => {
     setSelectedPlan(planName);
     setLoadingPlan(planName);
+    setError(null);
 
     try {
-      // TODO: Replace with actual API call to save selected plan
-      // const response = await fetch('/api/subscription/select', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ plan: planName, billing: billingType }),
-      // });
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+      const planId = PLAN_ID_MAP[planName];
+      const billing = billingType.toUpperCase();
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Create checkout session via API
+      const response = await fetch(`${apiUrl}/checkout/paid`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          planId,
+          billingCycle: billing,
+          tenantId: tenantId,
+          email: userEmail,
+        }),
+      });
 
-      // Navigate to Dashboard
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || "Failed to create checkout session");
+      }
+
+      // If we have a session URL, redirect to Stripe Checkout
+      if (data.data?.sessionUrl) {
+        window.location.href = data.data.sessionUrl;
+        return;
+      }
+
+      // Alternative: use Stripe.js to redirect
+      if (data.data?.sessionId) {
+        const stripe = await stripePromise;
+        if (stripe) {
+          const { error: stripeError } = await stripe.redirectToCheckout({
+            sessionId: data.data.sessionId,
+          });
+          if (stripeError) {
+            throw new Error(stripeError.message);
+          }
+        }
+        return;
+      }
+
+      // If this was a free plan, redirect to dashboard
+      if (data.data?.redirectUrl) {
+        router.push(data.data.redirectUrl);
+        return;
+      }
+
+      // Fallback: navigate to Dashboard
       router.push("/Dashboard/Home");
-    } catch (error) {
-      console.error("Error selecting plan:", error);
+    } catch (err) {
+      console.error("Error selecting plan:", err);
+      setError(err instanceof Error ? err.message : "Failed to process plan selection");
       setLoadingPlan(null);
       setSelectedPlan(null);
     }
@@ -55,6 +123,13 @@ export default function PricingPage() {
             <PricingHeader
               plusJakartaSansClass={plusJakartaSans.className}
             />
+
+            {/* Error Display */}
+            {error && (
+              <div className="w-full bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                <p className="text-sm font-medium">{error}</p>
+              </div>
+            )}
 
             {/* Billing Toggle */}
             <div className="flex items-center gap-1">

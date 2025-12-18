@@ -6,21 +6,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface RemoveUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   userName?: string;
   userEmail?: string;
+  onConfirm?: () => Promise<void>;
 }
 
 export function RemoveUserDialog({
   open,
   onOpenChange,
   userName = "User",
-  // userEmail = ""
+  onConfirm,
 }: RemoveUserDialogProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     if (open) {
       const overlays = document.querySelectorAll('[data-radix-dialog-overlay]');
@@ -28,10 +31,19 @@ export function RemoveUserDialog({
       if (lastOverlay) lastOverlay.style.zIndex = '100';
     }
   }, [open]);
-  const handleRemove = () => {
-    // Handle remove user logic here
-    console.log("Removing user:", userName);
-    onOpenChange(false);
+
+  const handleRemove = async () => {
+    if (onConfirm) {
+      setIsLoading(true);
+      try {
+        await onConfirm();
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      console.log("Removing user:", userName);
+      onOpenChange(false);
+    }
   };
 
   return (
@@ -52,15 +64,17 @@ export function RemoveUserDialog({
         <div className="flex justify-center gap-3">
           <button
             onClick={() => onOpenChange(false)}
-            className="px-4 w-full py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 dark:hover:bg-[#27272A] dark:hover:text-white transition-colors dark:border-[#27272A] dark:text-white"
+            disabled={isLoading}
+            className="px-4 w-full py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 dark:hover:bg-[#27272A] dark:hover:text-white transition-colors dark:border-[#27272A] dark:text-white disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleRemove}
-            className="px-4 w-full py-2 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 transition-colors"
+            disabled={isLoading}
+            className="px-4 w-full py-2 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 transition-colors disabled:opacity-50"
           >
-            Yes, Remove
+            {isLoading ? "Removing..." : "Yes, Remove"}
           </button>
         </div>
       </DialogContent>
