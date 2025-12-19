@@ -92,7 +92,7 @@ export default function PricingPage() {
           <div className="w-full min-h-[566px] flex gap-5 justify-start xl:justify-center overflow-x-auto overflow-y-visible xl:overflow-x-visible scrollbar-hide snap-x snap-mandatory xl:flex-row items-start pb-4 pt-5 px-4 sm:px-6 lg:px-8">
             {/* Starter Plan Card */}
             <div className="w-[320px] min-w-[300px] flex-shrink-0 border-2 snap-center bg-white border-[#E4E4E7]"
-            style={{ borderRadius: '24px' }}
+            style={{ borderRadius: '24px', minHeight: '624px', maxHeight: 'min(90vh, 700px)' }}
             >
               <div className="w-[320px] flex flex-col items-start" style={{ padding: '24px 16px 16px', gap: '24px' }}>
                 {/* Card Header */}
@@ -124,7 +124,7 @@ export default function PricingPage() {
                       lineHeight: '44px',
                       color: '#09090B'
                     }}>
-                      ${billingType === "yearly" ? "12" : "15"}
+                      ${billingType === "yearly" ? "10" : "12"}
                     </span>
                     <div className="flex flex-col" style={{ gap: '0px' }}>
                       <span style={{
@@ -188,7 +188,7 @@ export default function PricingPage() {
                 <div className="flex flex-col items-start" style={{ padding: '0px 16px 16px 8px', gap: '20px', width: '288px' }}>
                   {/* Feature items */}
                   {[
-                    "3 Paid Users",
+                    "Starting at 3 Paid Users",
                     "200 Total Users",
                     "1 TB Cloud Storage",
                     "AI data room setup from file dump",
@@ -280,7 +280,7 @@ export default function PricingPage() {
                       lineHeight: '44px',
                       color: '#09090B'
                     }}>
-                      ${billingType === "yearly" ? "25" : "30"}
+                      ${billingType === "yearly" ? "20" : "25"}
                     </span>
                     <div className="flex flex-col" style={{ gap: '0px' }}>
                       <span style={{
@@ -340,15 +340,16 @@ export default function PricingPage() {
                 <div className="flex flex-col items-start" style={{ padding: '0px 16px 16px 8px', gap: '20px', width: '288px' }}>
                   {/* Feature items */}
                   {[
-                    "10 Paid Users",
+                    "Starting at 10 Paid Users",
                     "1,000 Total Users",
                     "Unlimited Cloud Storage",
+                    "Everything in Starter, plus:",
                     "Up to 3 active deal rooms",
                     "Full AI-powered Q&A + search",
                     "Custom document requests & fulfillment",
-                    "Advanced activity tracking",
+                    "Advanced activity tracking (views, time spent, doc-level insights)",
+                    "Watermarking & access controls",
                     "Slack/CRM integrations",
-                    "Email support",
                   ].map((feature, index) => (
                     <div key={index} className="flex items-start" style={{ gap: '8px', width: '264px' }}>
                       <div style={{ width: '18px', height: '18px' }}>
@@ -382,7 +383,7 @@ export default function PricingPage() {
 
             {/* Enterprise Plan Card */}
             <div className="w-[320px] min-w-[300px] flex-shrink-0 border-2 snap-center bg-white border-[#E4E4E7]"
-            style={{ borderRadius: '24px' }}
+            style={{ borderRadius: '24px', minHeight: '600px', maxHeight: 'min(90vh, 700px)' }}
             >
               <div className="w-[320px] flex flex-col items-start" style={{ padding: '24px 16px 16px', gap: '24px' }}>
                 {/* Card Header */}
@@ -415,7 +416,7 @@ export default function PricingPage() {
                       lineHeight: '44px',
                       color: '#09090B'
                     }}>
-                      ${billingType === "yearly" ? "59" : "70"}
+                      ${billingType === "yearly" ? "47" : "59"}
                     </span>
                     <div className="flex flex-col" style={{ gap: '0px' }}>
                       <span style={{
@@ -479,13 +480,15 @@ export default function PricingPage() {
                 <div className="flex flex-col items-start" style={{ padding: '0px 16px 16px 8px', gap: '20px', width: '288px' }}>
                   {/* Feature items */}
                   {[
-                    "20 Paid Users",
+                    "Starting at 20 Paid Users",
                     "Unlimited Users",
                     "Unlimited Cloud Storage",
-                    "Everything in Professional",
+                    "Everything in Professional, plus:",
                     "Unlimited deal rooms",
                     "Multi-user teams + role-based permissions",
                     "Audit logs & download tracking",
+                    "NDA gating, expiry access, and revocation",
+                    "AI-based document health checks (e.g. missing docs alert)",
                     "Priority support",
                   ].map((feature, index) => (
                     <div key={index} className="flex items-start" style={{ gap: '8px', width: '264px' }}>

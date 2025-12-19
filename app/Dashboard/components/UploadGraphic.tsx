@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
 
 const svgPaths = {
   p1ce53700:
@@ -695,37 +696,123 @@ function Icons24X24Plus() {
 }
 
 
-export function UploadGraphic() {
+// DOC Icon (Blue) - Left icon with rotation and animation
+function Icon({ isHovered }: { isHovered: boolean }) {
   return (
-    <div
-      className="h-[60.5px] relative shrink-0 w-[98.716px] group cursor-pointer"
-      data-name="Upload Graphic"
+    <motion.div
+      className="content-stretch flex gap-[10px] items-center relative shrink-0"
+      data-name="Icon"
+      animate={{
+        scale: isHovered ? 1.115 : 1,
+        x: isHovered ? -20 : 0,
+        y: isHovered ? -15 : 0,
+      }}
+      transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
     >
-      <div className="absolute content-stretch flex items-start justify-center left-[calc(50%+0.45px)] opacity-80 top-[-7px] translate-x-[-50%]">
-        <div className="content-stretch flex gap-[10px] items-center relative shrink-0 transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-8 group-hover:-translate-x-3">
-          <div className="flex h-[calc(1px*((52*0.13917310535907745)+(52*0.9902680516242981)))] items-center justify-center relative shrink-0 w-[calc(1px*((52*0.13917310535907745)+(52*0.9902680516242981)))]">
-            <div className="flex-none -rotate-20">
-              <FileFormatIcons />
-            </div>
-          </div>
-        </div>
-        <div className="content-stretch flex gap-[10px] items-center relative shrink-0 transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-8">
-          <FileFormatIcons1 />
-        </div>
-        <div className="content-stretch flex gap-[10px] items-center relative shrink-0 transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-8 group-hover:translate-x-3">
-          <div className="flex h-[calc(1px*((52*0.13917310535907745)+(52*0.9902680516242981)))] items-center justify-center relative shrink-0 w-[calc(1px*((52*0.13917310535907745)+(52*0.9902680516242981)))]">
-            <div className="flex-none rotate-20">
-              <FileFormatIcons2 />
-            </div>
-          </div>
+      <div className="flex items-center justify-center relative shrink-0 size-[58.731px]" style={{ "--transform-inner-width": "52", "--transform-inner-height": "52" } as React.CSSProperties}>
+        <div className="flex-none rotate-[352deg]">
+          <FileFormatIcons />
         </div>
       </div>
-      <div
-        className="absolute bg-slate-950 box-border content-stretch flex gap-[8px] items-center justify-center left-1/2 p-[10px] rounded-[99px] shadow-[0px_-4px_6px_-1px_rgba(0,0,0,0.2),0px_-2px_4px_-2px_rgba(0,0,0,0.2)] size-[40px] top-[24.75px] translate-x-[-50%] transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-3"
-        data-name="Button"
+    </motion.div>
+  );
+}
+
+// PDF Icon (Red) - Center icon with vertical animation
+function Icon1({ isHovered }: { isHovered: boolean }) {
+  return (
+    <motion.div
+      className="content-stretch flex gap-[10px] items-center relative shrink-0"
+      data-name="Icon"
+      animate={{
+        scale: isHovered ? 1.115 : 1,
+        y: isHovered ? -20 : 0,
+      }}
+      transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+    >
+      <FileFormatIcons1 />
+    </motion.div>
+  );
+}
+
+// XLS Icon (Green) - Right icon with rotation and animation
+function Icon2({ isHovered }: { isHovered: boolean }) {
+  return (
+    <motion.div
+      className="content-stretch flex gap-[10px] items-center relative shrink-0"
+      data-name="Icon"
+      animate={{
+        scale: isHovered ? 1.115 : 1,
+        x: isHovered ? 20 : 0,
+        y: isHovered ? -15 : 0,
+      }}
+      transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+    >
+      <div className="flex items-center justify-center relative shrink-0 size-[58.731px]" style={{ "--transform-inner-width": "52", "--transform-inner-height": "52" } as React.CSSProperties}>
+        <div className="flex-none rotate-[8deg]">
+          <FileFormatIcons2 />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// Icon Group with coordinated animation
+function IconGroup({ isHovered }: { isHovered: boolean }) {
+  return (
+    <motion.div
+      className="absolute content-stretch flex items-start justify-center left-[calc(50%+0.45px)] opacity-80 translate-x-[-50%]"
+      data-name="Icon Group"
+      animate={{
+        top: isHovered ? -27.5 : -7,
+        gap: isHovered ? 3 : 10,
+      }}
+      transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+    >
+      <Icon isHovered={isHovered} />
+      <Icon1 isHovered={isHovered} />
+      <Icon2 isHovered={isHovered} />
+    </motion.div>
+  );
+}
+
+// Animated Button component
+function Button({ isHovered }: { isHovered: boolean }) {
+  return (
+    <motion.div
+      className="absolute bg-slate-950 dark:bg-slate-950 box-border content-stretch flex gap-[8px] items-center justify-center left-1/2 p-[10px] rounded-[99px] shadow-[0px_-4px_6px_-1px_rgba(0,0,0,0.2),0px_-2px_4px_-2px_rgba(0,0,0,0.2)] translate-x-[-50%] cursor-pointer"
+      data-name="Button"
+      animate={{
+        width: isHovered ? 46 : 40,
+        height: isHovered ? 46 : 40,
+        top: isHovered ? 21.75 : 24.75,
+      }}
+      transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+    >
+      <motion.div
+        animate={{
+          scale: isHovered ? 1.15 : 1,
+        }}
+        transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
       >
         <Icons24X24Plus />
-      </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+export function UploadGraphic() {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      className="h-[60.5px] relative shrink-0 w-[98.716px]"
+      data-name="Upload Graphic"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <IconGroup isHovered={isHovered} />
+      <Button isHovered={isHovered} />
     </div>
   );
 }

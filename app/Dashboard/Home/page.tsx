@@ -267,12 +267,12 @@ export default function HomePage() {
           </div>
 
           {/* Title */}
-          <h1 className="text-3xl font-semibold font-[var(--font-jakarta-sans)] text-gray-900 dark:text-white mb-2">
+          <h1 className="font-[var(--font-jakarta-sans)] font-medium text-[20px] leading-[28px] md:text-[24px] md:leading-[32px] lg:text-[28px] lg:leading-[40px] text-gray-900 dark:text-white mb-2 tracking-[0px] align-middle">
             Work smarter with Tequity
           </h1>
 
           {/* Subtitle */}
-          <p className="text-base font-[var(--font-inter)] text-[#71717A] dark:text-gray-400">
+          <p className="font-[var(--font-inter)] font-normal text-[14px] leading-[20px] text-[#71717A] dark:text-gray-400 text-center tracking-[0%]">
             Your AI assistant for documents and insights.
           </p>
         </div>
@@ -607,9 +607,9 @@ export default function HomePage() {
         {/* Recently Visited Section */}
         {recentlyVisited.length > 0 && (
           <div className="w-full max-w-[792px]">
-            <h2 className="mb-4 sm:mb-6 flex gap-2 text-sm font-medium text-muted-foreground">
+            <h2 className="mb-4 sm:mb-6 flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <LuClock className="size-4 text-muted-foreground" />
-              Recently visited
+              <span>Recently visited</span>
             </h2>
             <div className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 md:grid md:grid-cols-3 lg:grid-cols-4 md:overflow-x-visible">
               {recentlyVisited.slice(0, 4).map((item, index) => {
