@@ -704,14 +704,12 @@ export default function HomePage() {
                           : ""
                       }`}
                     >
-                      <img
+                      <Image
                         src={finalImageSrc}
                         alt={item.isFolder ? "Folder" : "File"}
-                        className={`${
-                          imageSrc.startsWith("/RecentFiles/")
-                            ? "w-[78px] h-[78px]"
-                            : "max-w-full max-h-full"
-                        } object-contain`}
+                        width={imageSrc.startsWith("/RecentFiles/") ? 78 : 156}
+                        height={imageSrc.startsWith("/RecentFiles/") ? 78 : 90}
+                        className="object-contain"
                       />
                     </div>
                     <div className="w-[156px] h-[36px] flex flex-col items-center justify-center px-1">
