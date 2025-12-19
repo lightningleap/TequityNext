@@ -1021,10 +1021,10 @@ function LibraryContent({
                     >
                       <h2
                         id="recently-visited"
-                        className="mb-4 sm:mb-6 flex gap-2 text-sm font-medium text-muted-foreground"
+                        className="mb-4 sm:mb-6 flex items-center gap-2 text-sm font-medium text-muted-foreground"
                       >
                         <LuClock className="size-4 text-muted-foreground" />
-                        Recently visited
+                        <span>Recently visited</span>
                       </h2>
                       <div className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 md:grid md:grid-cols-3 lg:grid-cols-4 md:overflow-x-visible">
                         {recentlyVisited.slice(0, 4).map((item, index) => {

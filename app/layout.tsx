@@ -20,8 +20,8 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "Tequity AI",
-  description: "Tequity AI - Secure Data Rooms",
+  title: "Tequity",
+  description: "Tequity- Secure Data Rooms",
   icons: {
     icon: '/SignupLogo.svg',
     shortcut: '/SignupLogo.svg',
