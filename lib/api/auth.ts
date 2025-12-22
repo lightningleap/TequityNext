@@ -31,6 +31,9 @@ export interface AuthResponse {
     id: string;
     email: string;
     name?: string;
+    fullName?: string | null;
+    role?: string;
+    tenantSlug?: string;
   };
   tenantId?: string;
   email?: string;
@@ -75,6 +78,10 @@ export const authApi = {
         // Store user data
         if (response.data.user) {
           localStorage.setItem('user', JSON.stringify(response.data.user));
+          // Store tenantSlug separately for easy access
+          if (response.data.user.tenantSlug) {
+            localStorage.setItem('tenantSlug', response.data.user.tenantSlug);
+          }
         }
         // Store tenantId and email for pricing/checkout flow
         if (response.data.tenantId) {

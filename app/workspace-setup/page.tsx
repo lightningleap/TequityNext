@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,8 @@ import { ChevronDown, Check } from "lucide-react";
 import CompanyLogo from "@/public/SignupLogo.svg";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
+import { onboardingApi } from "@/lib/api/onboarding";
+import { authApi } from "@/lib/api/auth";
 
 export default function WorkspaceSetupPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -26,6 +28,11 @@ export default function WorkspaceSetupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+
+  // Initialize auth from storage on mount
+  useEffect(() => {
+    authApi.initFromStorage();
+  }, []);
 
   // Step 1 handlers
   const handleInputChange = useCallback(
@@ -57,11 +64,20 @@ export default function WorkspaceSetupPage() {
           throw new Error("Dataroom name contains invalid characters");
         }
 
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // Call API to set dataroom name
+        const response = await onboardingApi.setDataroom({
+          dataroomName: workspaceName.trim(),
+        });
 
-        // Store dataroom name in localStorage
+        if (!response.success) {
+          throw new Error(response.error || "Failed to save dataroom name");
+        }
+
+        // Store dataroom name and slug in localStorage
         localStorage.setItem("dataroomName", workspaceName.trim());
+        if (response.data?.slug) {
+          localStorage.setItem("tenantSlug", response.data.slug);
+        }
 
         // Move to step 2
         setCurrentStep(2);
@@ -81,41 +97,72 @@ export default function WorkspaceSetupPage() {
   // Step 2 handlers
   const handleStep2Submit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // Call API to set use case
+      const response = await onboardingApi.setUseCase({
+        useCase: selectedOption,
+      });
+
+      if (!response.success) {
+        throw new Error(response.error || "Failed to save use case");
+      }
 
       // Move to step 3
       setCurrentStep(3);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to save selection. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [selectedOption]);
 
   // Step 3 handlers
   const handleStep3Submit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
+      setError("");
       setIsLoading(true);
 
       try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // Collect team member emails
+        const teamMembers = [email1, email2, email3].filter(
+          (email) => email && email.trim()
+        );
+
+        if (teamMembers.length > 0) {
+          // Call API to invite team
+          const response = await onboardingApi.inviteTeam({ teamMembers });
+
+          if (!response.success) {
+            throw new Error(response.error || "Failed to send invitations");
+          }
+        }
 
         // Navigate to Pricing page
         router.prefetch("/pricing");
         router.push("/pricing");
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to send invitations. Please try again."
+        );
       } finally {
         setIsLoading(false);
       }
     },
-    [router]
+    [router, email1, email2, email3]
   );
 
-  const handleSkip = useCallback(() => {
-    // Navigate to Pricing page when skipping
+  const handleSkip = useCallback(async () => {
+    // Navigate to Pricing page when skipping (no team invites)
     router.prefetch("/pricing");
     router.push("/pricing");
   }, [router]);

@@ -101,8 +101,13 @@ export default function PricingPage() {
         return;
       }
 
-      // Fallback: navigate to Dashboard
-      router.push("/Dashboard/Home");
+      // Fallback: navigate to Dashboard with tenant slug
+      const tenantSlug = localStorage.getItem("tenantSlug");
+      if (tenantSlug) {
+        router.push(`/${tenantSlug}/dashboard/home`);
+      } else {
+        router.push("/Dashboard/Home");
+      }
     } catch (err) {
       console.error("Error selecting plan:", err);
       setError(err instanceof Error ? err.message : "Failed to process plan selection");

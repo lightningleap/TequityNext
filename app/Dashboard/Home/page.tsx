@@ -5,7 +5,7 @@ import { DashboardLayout } from "../components/DashboardLayout";
 import { ArrowUp, Plus, AtSign, File, Folder, Image as ImageIcon, Search, X } from "lucide-react";
 import Image from "next/image";
 import Logomark from "@/public/Logomark.svg";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { UploadDialog } from "../components/UploadDialog";
 import { useFiles } from "../context/FilesContext";
 import { LuClock } from "react-icons/lu";
@@ -25,7 +25,16 @@ export default function HomePage() {
   const { files, folders, setFiles, setFolders } = useFiles();
   const { createNewChat, addMessageToChat, activeChatId, selectChat, activeChat } = useChatContext();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Redirect to checkout success page if session_id is present (post-Stripe checkout)
+  useEffect(() => {
+    const sessionId = searchParams.get("session_id");
+    if (sessionId) {
+      router.replace(`/checkout/success?session_id=${sessionId}`);
+    }
+  }, [searchParams, router]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [showUploadMenu, setShowUploadMenu] = useState(false);
   const [showContextMenu, setShowContextMenu] = useState(false);

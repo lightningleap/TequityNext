@@ -77,7 +77,20 @@ export default function LoginPage() {
 
       if (response.success) {
         toast.success("Verification successful");
-        router.push("/Dashboard/Library");
+
+        // Use redirectUrl from backend - it now includes slug-based routes
+        if (response.data?.redirectUrl) {
+          router.push(response.data.redirectUrl);
+        } else {
+          // Fallback: try to use tenantSlug from user object
+          const tenantSlug = response.data?.user?.tenantSlug;
+          if (tenantSlug) {
+            router.push(`/${tenantSlug}/dashboard/library`);
+          } else {
+            // Last resort fallback to old route
+            router.push("/Dashboard/Library");
+          }
+        }
       } else {
         throw new Error(response.error || "Invalid verification code");
       }

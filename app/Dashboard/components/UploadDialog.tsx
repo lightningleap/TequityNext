@@ -27,6 +27,7 @@ import { X, CheckCircle, RefreshCw } from "lucide-react";
 import Image from "next/image";
 import { UploadGraphic } from "./UploadGraphic";
 import { toast } from "sonner";
+import { useFiles } from "../context/FilesContext";
 
 function getFileIcon(fileName: string) {
   const extension = fileName.split(".").pop()?.toLowerCase();
@@ -101,6 +102,9 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
 
+  // Get upload function and current dataroom from context
+  const { uploadFile, currentDataroom, refreshFiles } = useFiles();
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newFiles = Array.from(e.target.files);
@@ -164,6 +168,11 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
   };
 
   const startUpload = async (filesToUpload: File[], startIndex: number) => {
+    if (!currentDataroom) {
+      toast.error("Please select a dataroom first");
+      return;
+    }
+
     const initialStatus: Record<number, UploadStatus> = {};
     filesToUpload.forEach((_, index) => {
       const actualIndex = startIndex + index;
@@ -176,19 +185,32 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
       const file = filesToUpload[i];
 
       try {
-        for (let progress = 0; progress <= 100; progress += 10) {
+        // Show initial progress
+        setUploadProgress((prev) => ({
+          ...prev,
+          [actualIndex]: 10,
+        }));
+
+        // Actually upload the file to the backend
+        const success = await uploadFile(file, currentDataroom.id);
+
+        if (success) {
           setUploadProgress((prev) => ({
             ...prev,
-            [actualIndex]: progress,
+            [actualIndex]: 100,
           }));
-          await new Promise((resolve) => setTimeout(resolve, 50));
+          setUploadStatus((prev) => ({
+            ...prev,
+            [actualIndex]: "success",
+          }));
+        } else {
+          setUploadStatus((prev) => ({
+            ...prev,
+            [actualIndex]: "error",
+          }));
         }
-
-        setUploadStatus((prev) => ({
-          ...prev,
-          [actualIndex]: "success",
-        }));
       } catch (error) {
+        console.error("Upload error:", error);
         setUploadStatus((prev) => ({
           ...prev,
           [actualIndex]: "error",
@@ -213,72 +235,14 @@ export function UploadDialog({ onUpload }: UploadDialogProps) {
       (_, index) => uploadStatus[index] === "success"
     );
 
-    let fileItems: FileItem[] = [];
-    let folderItems: FolderItem[] = [];
-
-    if (uploadMode === "folder") {
-      const folderMap = new Map<string, File[]>();
-
-      successfulFiles.forEach((file: File) => {
-        const path =
-          (file as File & { webkitRelativePath?: string }).webkitRelativePath ||
-          file.name;
-        const pathParts = path.split("/");
-
-        if (pathParts.length > 1) {
-          const folderName = pathParts[0];
-          if (!folderMap.has(folderName)) {
-            folderMap.set(folderName, []);
-          }
-          folderMap.get(folderName)!.push(file);
-        }
-      });
-
-      folderItems = Array.from(folderMap.entries()).map(
-        ([folderName, folderFiles], index) => ({
-          id: `folder-${Date.now()}-${index}`,
-          name: folderName,
-          fileCount: folderFiles.length,
-        })
-      );
-    } else {
-      fileItems = successfulFiles.map((file, idx) => {
-        const extension = file.name.split(".").pop()?.toUpperCase() || "TXT";
-        const fileType = [
-          "PDF",
-          "DOCX",
-          "XLSX",
-          "PPTX",
-          "PNG",
-          "MP4",
-          "CSV",
-          "TXT",
-        ].includes(extension)
-          ? (extension as FileType)
-          : "TXT";
-
-        const fileUrl = URL.createObjectURL(file);
-
-        return {
-          id: `file-${Date.now()}-${idx}`,
-          name: file.name,
-          type: fileType,
-          size: file.size,
-          uploadedAt: new Date(),
-          url: fileUrl,
-        };
-      });
+    // Files are already uploaded to the backend via startUpload
+    // Just refresh the files list and close the dialog
+    if (successfulFiles.length > 0) {
+      await refreshFiles();
+      toast.success(`${successfulFiles.length} file(s) uploaded successfully`);
     }
 
-    if (onUpload) {
-      onUpload(fileItems, folderItems);
-    }
-    console.log("Upload mode:", uploadMode);
-    console.log("File items:", fileItems);
-    console.log("Folder items:", folderItems);
-    toast.success("Files uploaded successfully");
-
-    // Reset and close only if all uploads were successful
+    // Reset and close
     setFiles([]);
     setUploadProgress({});
     setUploadStatus({});
